@@ -40,6 +40,13 @@ jobs:
           pip install pyyaml
           python scripts/supermercados.py --config scripts/supermercados.yaml --salida precios_super.json --pausa 2.5
 
+      # Guarda el precio online del día para los gráficos de la pestaña Alzas.
+      - name: Historial de precios online
+        if: github.event_name != 'push'
+        continue-on-error: true
+        run: |
+          if [ -f precios_super.json ]; then python scripts/historial_precios.py --hoy precios_super.json --hist precios_hist.json; fi
+
       # Mercados y supermercados de Lima y Callao desde OpenStreetMap: los lunes (el extracto de BBBike es semanal),
       # al correrlo a mano, o si falta el archivo. Una sola descarga de ~30 MB.
       - name: Mercados y supermercados cercanos (OpenStreetMap)
@@ -58,7 +65,7 @@ jobs:
         run: |
           git config user.name "acuanto-bot"
           git config user.email "acuanto-bot@users.noreply.github.com"
-          for f in precios_super.json lugares.json; do [ -f "$f" ] && git add "$f"; done
+          for f in precios_super.json precios_hist.json lugares.json; do [ -f "$f" ] && git add "$f"; done
           git diff --cached --quiet || git commit -m "Precios del día y lugares"
           git push
 
