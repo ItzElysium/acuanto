@@ -11,7 +11,7 @@ Uso:
 
 Salida (lugares.json):
     {"fecha", "fuente", "mercados": [[id, nombre, distrito, lat, lon, area_m2]],
-     "supers": [[id, cadena, nombre, distrito, lat, lon]], "distritos": {nombre: [lat, lon]}}
+     "supers": [[id, cadena, nombre, distrito, lat, lon]], "distritos": {nombre: [lat, lon]}, "zonas": {nombre: [lat, lon, distrito]}}
 """
 
 import argparse
@@ -101,7 +101,7 @@ class Lector(osmium.SimpleHandler):
     def __init__(self):
         super().__init__()
         self.wkb = osmium.geom.WKBFactory()
-        self.mercados, self.supers, self.distritos = [], [], []
+        self.mercados, self.supers, self.distritos, self.zonas = [], [], [], []
 
     def _clasificar(self, tags):
         nombre = tags.get("name", "")
@@ -138,6 +138,9 @@ class Lector(osmium.SimpleHandler):
     def node(self, n):
         if not n.tags:
             return
+        lugar = n.tags.get("place")
+        if lugar in ("town", "suburb", "village", "quarter") and n.tags.get("name"):   # zonas: Chosica, Huaycán, Manchay…
+            self.zonas.append({"nombre": limpiar_nombre(n.tags["name"]), "tipo": lugar, "lat": n.location.lat, "lon": n.location.lon})
         c = self._clasificar(n.tags)
         if c:
             self._guardar(c[0], c[1], dict(n.tags), n.location.lat, n.location.lon, f"n{n.id}")
@@ -232,16 +235,30 @@ def main(argv=None):
             p = g.representative_point()
             centros[n] = [round(p.y, 4), round(p.x, 4)]
 
+    # Zonas conocidas que no son un distrito (Chosica, Huaycán, Manchay…), con al menos un mercado a 2.5 km.
+    nombres_distrito = {norm(n) for n in usados} | {norm(n) for n, _ in lec.distritos}
+    zonas, vistas = {}, set()
+    orden = {"town": 0, "suburb": 1, "village": 2, "quarter": 3}
+    for z in sorted(lec.zonas, key=lambda z: orden[z["tipo"]]):
+        k = norm(z["nombre"])
+        if any(k == d or d.startswith(k + " ") or k.startswith(d + " ") for d in nombres_distrito) or k in vistas or not any(distancia_m((z["lat"], z["lon"]), (m["lat"], m["lon"])) < 2500 for m in mercados):
+            continue
+        dz = distrito(z["lat"], z["lon"])
+        if dz:
+            vistas.add(k)
+            zonas[z["nombre"]] = [round(z["lat"], 4), round(z["lon"], 4), dz]
+
     datos = {
         "fecha": fecha,
         "fuente": "© colaboradores de OpenStreetMap (ODbL), extracto de BBBike",
         "mercados": sorted([[f["id"], f["nombre"], f["distrito"], round(f["lat"], 5), round(f["lon"], 5), area_m2(f)] for f in mercados], key=lambda x: (x[2], x[1])),
         "supers": sorted([[f["id"], f["cadena"], f["sede"], f["distrito"], round(f["lat"], 5), round(f["lon"], 5)] for f in supers], key=lambda x: (x[1], x[3])),
         "distritos": dict(sorted(centros.items())),
+        "zonas": dict(sorted(zonas.items())),
     }
     pathlib.Path(a.salida).write_text(json.dumps(datos, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     por_cadena = {c: sum(1 for s in datos["supers"] if s[1] == c) for c in CADENAS}
-    print(f"{len(datos['mercados'])} mercados, {len(datos['supers'])} supermercados {por_cadena}, {len(centros)} distritos -> {a.salida}")
+    print(f"{len(datos['mercados'])} mercados, {len(datos['supers'])} supermercados {por_cadena}, {len(centros)} distritos, {len(zonas)} zonas -> {a.salida}")
 
 
 if __name__ == "__main__":
