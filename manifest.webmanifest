@@ -1,0 +1,26 @@
+{
+  "name": "Acuánto (prueba)",
+  "short_name": "Acuánto",
+  "lang": "es-PE",
+  "description": "Precios del día en mercados y supermercados de Lima, canasta de la semana y costos para restaurantes de menú.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f6f1",
+  "theme_color": "#0b6b3a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

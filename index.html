@@ -1,0 +1,1861 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="¿Cuánto te cuesta la semana? Arma tu menú día por día y compara mercados y supermercados de Lima. Versión de prueba.">
+<meta name="theme-color" content="#0b6b3a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Acuánto: ¿cuánto te cuesta la semana?">
+<meta property="og:description" content="Arma tu menú día por día y mira cuánto cuesta en tu mercado y en el súper. Versión de prueba: dame tu opinión.">
+<meta property="og:url" content="https://itzelysium.github.io/acuanto/">
+<meta property="og:image" content="https://itzelysium.github.io/acuanto/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Acuánto">
+<title>Acuánto</title>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bungee&display=swap">
+<style>
+  /* Layout: app de una columna (máx. 480px) con cabecera fija arriba y barra de 3 botones grandes abajo.
+     Lo memorable: los precios en etiquetas de cartón como las pizarras del mercado. Todo lo demás, sobrio y grande. */
+  :root {
+    --bg: #f3f6f1;
+    --surface: #ffffff;
+    --ink: #17201a;
+    --muted: #4b5a50;
+    --line: #d3dcd1;
+    --green: #0b6b3a;
+    --green-ink: #ffffff;
+    --green-soft: #e1f2e7;
+    --red: #b42318;
+    --red-soft: #fde7e3;
+    --same: #46555f;
+    --same-soft: #e7ecef;
+    --kraft: #dcb77d;
+    --kraft-ink: #26180a;
+    --yellow: #ffd60a;
+    --yellow-ink: #1d1a00;
+    --alert-bg: #fff3bf;
+    --alert-ink: #3d3100;
+    --amber: #8a5300;
+    --font-brand: "Bungee", "Arial Black", Impact, sans-serif;
+    --font-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1410; --surface: #19211b; --ink: #eef3ee; --muted: #b5c2b8; --line: #2d382f;
+      --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --red: #ff8b76; --red-soft: #3b1712;
+      --same: #b3c3cd; --same-soft: #26313a; --kraft: #c9a46b; --kraft-ink: #1f1308;
+      --alert-bg: #3a3205; --alert-ink: #fff0a8; --amber: #f0b45a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1410; --surface: #19211b; --ink: #eef3ee; --muted: #b5c2b8; --line: #2d382f;
+    --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --red: #ff8b76; --red-soft: #3b1712;
+    --same: #b3c3cd; --same-soft: #26313a; --kraft: #c9a46b; --kraft-ink: #1f1308;
+    --alert-bg: #3a3205; --alert-ink: #fff0a8; --amber: #f0b45a; color-scheme: dark;
+  }
+  html { font-size: 19px; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.45;
+         -webkit-text-size-adjust: 100%; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--green); }
+  * { box-sizing: border-box; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+  header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--green); color: var(--green-ink);
+               padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+               padding-block: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: grid; gap: 0; min-width: 0; }
+  .brand b { font-family: var(--font-brand); font-weight: 400; font-size: 1.45rem; line-height: 1.05; letter-spacing: 0.01em; }
+  .brand span { font-size: 0.78rem; opacity: 0.92; }
+  .aa { min-width: 56px; min-height: 52px; border-radius: 12px; border: 2px solid currentColor; background: transparent;
+        color: var(--green-ink); font-weight: 700; font-size: 1rem; padding: 0 10px; }
+
+  main { flex: 1; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+         padding-block: 16px 128px; display: grid; gap: 18px; align-content: start; }
+  h1, h2 { margin: 0; line-height: 1.2; text-wrap: balance; }
+  h1 { font-size: 1.55rem; }
+  h2 { font-size: 1.2rem; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.85rem; }
+
+  /* Botones grandes */
+  .btn { min-height: 60px; border-radius: var(--radius); border: 2px solid var(--green); background: var(--green); color: var(--green-ink);
+         font-weight: 700; font-size: 1.05rem; padding: 12px 18px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+  .btn.sec { background: var(--surface); color: var(--green); }
+  .btn.quiet { background: transparent; border-color: var(--line); color: var(--ink); }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .back { justify-self: start; min-height: 52px; padding: 0 14px 0 6px; border: none; background: transparent; color: var(--green);
+          font-weight: 700; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 4px; }
+
+  /* Tarjetas de opción */
+  .choice { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; text-align: left; width: 100%;
+            min-height: 92px; padding: 14px 16px; border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface); }
+  .choice[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); }
+  .choice .ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); color: var(--green); font-size: 1.6rem; }
+  .choice b { display: block; font-size: 1.1rem; }
+  .choice span { color: var(--muted); font-size: 0.9rem; }
+
+  /* Chips de mercados */
+  .chips { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .chip { flex: 0 0 auto; min-height: 52px; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface);
+          font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chip.add { border-style: dashed; color: var(--green); }
+
+  .alert { background: var(--alert-bg); color: var(--alert-ink); border-radius: var(--radius); padding: 14px 16px; display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+  .alert .bang { width: 36px; height: 36px; border-radius: 50%; background: var(--yellow); color: var(--yellow-ink); display: grid; place-items: center; font-weight: 700; font-size: 1.2rem; }
+  .note { border: 2px dashed var(--line); border-radius: var(--radius); padding: 12px 14px; color: var(--muted); font-size: 0.88rem; }
+
+  /* Fila de producto con etiqueta de cartón */
+  .list { display: grid; gap: 12px; }
+  .prod { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "emo name tag" "meta meta meta"; gap: 6px 12px; align-items: center; width: 100%; text-align: left;
+          background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .prod .emo { grid-area: emo; } .prod .name { grid-area: name; } .prod .tag { grid-area: tag; }
+  .prod .meta { grid-area: meta; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .prod .emo { font-size: 2rem; line-height: 1; text-align: center; }
+  .prod .name { font-weight: 700; font-size: 1.15rem; }
+  .prod .src { font-size: 0.82rem; color: var(--muted); }
+  .tag { background: var(--kraft); color: var(--kraft-ink); border-radius: 6px; padding: 6px 10px 4px; text-align: right; transform: rotate(-1.5deg);
+         box-shadow: 0 2px 0 rgba(0,0,0,0.12); min-width: 104px; }
+  .tag .p { font-weight: 700; font-size: 1.45rem; line-height: 1.05; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tag .u { font-size: 0.78rem; }
+  .tag.big .p { font-size: 2.2rem; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; padding: 2px 8px; white-space: nowrap; }
+  .pill.up { background: var(--red-soft); color: var(--red); }
+  .pill.down { background: var(--green-soft); color: var(--green); }
+  .pill.same { background: var(--same-soft); color: var(--same); }
+  .cheap { display: inline-block; background: var(--yellow); color: var(--yellow-ink); font-weight: 700; font-size: 0.85rem; border-radius: 6px; padding: 2px 8px; }
+
+  .card { background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; }
+  .mrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .mrow:last-child { border-bottom: none; }
+
+  /* Formularios */
+  label.lbl { font-weight: 700; display: block; margin-bottom: 6px; }
+  select.big, input.big { width: 100%; min-height: 60px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); padding: 10px 14px; font-size: 1.1rem; }
+  .money { display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 8px; align-items: center; }
+  .money button { min-height: 60px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); font-size: 1.5rem; font-weight: 700; }
+  .money input { text-align: center; font-weight: 700; font-size: 1.5rem; }
+  .grid-prod { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tile { min-height: 96px; border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; gap: 4px; padding: 10px; font-weight: 700; text-align: center; }
+  .tile .emo { font-size: 2rem; line-height: 1; }
+  .tile[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); }
+  .item { display: grid; gap: 8px; background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .item .hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 700; }
+  .x { min-width: 52px; min-height: 52px; border-radius: 12px; border: 2px solid var(--line); background: transparent; font-weight: 700; }
+  .photo { width: 100%; max-height: 260px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--line); }
+  .status { font-weight: 700; }
+
+  /* Puntos */
+  .points { text-align: center; display: grid; gap: 4px; padding: 20px 16px; }
+  .points .n { font-family: var(--font-brand); font-size: 3rem; line-height: 1; color: var(--green); }
+  .reward { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+  .reward .btn { width: auto; min-width: 128px; min-height: 52px; font-size: 0.95rem; }
+  .hist { display: grid; gap: 6px; font-size: 0.9rem; }
+  .hist div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--line); padding: 6px 0; }
+
+  .done { text-align: center; display: grid; gap: 12px; justify-items: center; padding-top: 24px; }
+  .done .ok { width: 96px; height: 96px; border-radius: 50%; background: var(--green); color: var(--green-ink); display: grid; place-items: center; font-size: 3rem; font-weight: 700; }
+  .done .pts { font-family: var(--font-brand); font-size: 2rem; color: var(--green); }
+
+  /* Barra inferior */
+  nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 2px solid var(--line);
+            padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  nav.bar .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr); gap: 6px; padding: 8px 10px; }
+  nav.bar button { min-height: 64px; min-width: 0; border: none; background: transparent; border-radius: 14px; display: grid; justify-items: center; align-content: center; gap: 2px;
+                   font-weight: 700; font-size: 0.8rem; line-height: 1.1; text-align: center; padding: 4px 2px; color: var(--muted); }
+  nav.bar button svg { width: 28px; height: 28px; }
+  nav.bar button[aria-current="page"] { color: var(--green); background: var(--green-soft); }
+  nav.bar button.main { background: var(--green); color: var(--green-ink); }
+  nav.bar button.main[aria-current="page"] { outline: 3px solid var(--yellow); }
+  .spin { width: 40px; height: 40px; border-radius: 50%; border: 5px solid var(--line); border-top-color: var(--green); animation: rot 0.9s linear infinite; justify-self: center; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  h1:focus { outline: none; }
+  /* Las rejillas no crecen con el contenido: las tiras de chips se desplazan dentro de su caja. */
+  main, .card, .list, .grp { grid-template-columns: minmax(0, 1fr); }
+  .chips.wrap { flex-wrap: wrap; overflow: visible; }
+  .grp-t { font-size: 1rem; color: var(--muted); margin-top: 6px; }
+
+  /* Mi semana */
+  .bigstep { display: grid; grid-template-columns: 80px minmax(0, 1fr) 80px; gap: 12px; align-items: center; }
+  .bigstep button { min-height: 80px; border-radius: 18px; border: 2px solid var(--green); background: var(--surface); color: var(--green); font-size: 2.2rem; font-weight: 700; }
+  .bigstep output { text-align: center; font-family: var(--font-brand); font-size: 3.2rem; line-height: 1; color: var(--green); font-variant-numeric: tabular-nums; }
+  .plato { display: grid; grid-template-columns: 44px minmax(0, 1fr); grid-template-areas: "emo name" "emo fila"; gap: 6px 12px; align-items: center;
+           background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .plato[data-on="true"] { border-color: var(--green); background: var(--green-soft); }
+  .plato .emo { grid-area: emo; font-size: 2rem; line-height: 1; text-align: center; align-self: start; padding-top: 2px; }
+  .plato .name { grid-area: name; font-size: 1.12rem; }
+  .plato .fila { grid-area: fila; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+  .plato .meta { flex: 1 1 110px; font-size: 0.88rem; color: var(--muted); display: grid; gap: 4px; justify-items: start; }
+  .step { display: inline-grid; grid-template-columns: 52px minmax(2.2ch, auto) 52px; gap: 6px; align-items: center; margin-left: auto; }
+  .step button { min-height: 52px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); font-size: 1.5rem; font-weight: 700; color: var(--ink); }
+  .step button[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .step output { text-align: center; font-weight: 700; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+  .stick { position: sticky; bottom: calc(var(--nav-h, 96px) + 10px); z-index: 10; }
+  .stick .btn { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22); }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--green); border-radius: var(--radius); overflow: hidden; }
+  .seg button { min-height: 56px; border: none; background: var(--surface); color: var(--green); font-weight: 700; padding: 6px 8px; }
+  .seg button[aria-pressed="true"] { background: var(--green); color: var(--green-ink); }
+  .grp { display: grid; }
+  h3 { margin: 12px 0 0; font-size: 0.95rem; color: var(--muted); }
+  .lrow { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; grid-template-areas: "emo nm pr" ". act act"; gap: 6px 10px; align-items: center;
+          padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .grp .lrow:last-child { border-bottom: none; }
+  .lrow .emo { grid-area: emo; font-size: 1.6rem; line-height: 1; text-align: center; align-self: start; }
+  .lrow .nm { grid-area: nm; min-width: 0; }
+  .lrow .pr { grid-area: pr; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; align-self: start; }
+  .lrow .act { grid-area: act; display: flex; flex-wrap: wrap; gap: 8px; }
+  .lrow .act .chip { min-height: 48px; font-size: 0.85rem; }
+  .lrow.off .nm b, .lrow.off .pr { text-decoration: line-through; opacity: 0.6; }
+  .link { background: none; border: none; color: var(--green); font-weight: 700; text-decoration: underline; padding: 0 4px; min-height: 44px; }
+  .sug { grid-template-columns: minmax(0, 1fr); }
+
+  /* Cabecera: botones Opinar y Aa */
+  .hbtns { display: flex; gap: 8px; flex: 0 0 auto; }
+  .opina { min-width: 56px; min-height: 52px; border-radius: 12px; border: 2px solid currentColor; background: transparent; color: var(--green-ink);
+           font-weight: 700; font-size: 0.7rem; line-height: 1.05; padding: 2px 6px; display: grid; justify-items: center; align-content: center; }
+  .opina span { font-size: 1.05rem; }
+  .prem { display: inline-block; justify-self: start; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.04em; border-radius: 6px; padding: 4px 8px; }
+  a.btn { text-decoration: none; }
+  textarea.big { width: 100%; min-height: 120px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); padding: 10px 14px; font: inherit; color: inherit; }
+
+  /* Plan Restaurante */
+  .opts { display: grid; gap: 8px; }
+  .opt { display: grid; grid-template-columns: 40px minmax(0, 1fr) 34px; grid-template-areas: "emo name chk" "emo meta chk"; gap: 2px 10px; align-items: center; width: 100%;
+         text-align: left; min-height: 68px; padding: 10px 12px; border-radius: var(--radius); border: 2px solid var(--line); background: var(--surface); }
+  .opt[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); }
+  .opt .emo { grid-area: emo; font-size: 1.7rem; line-height: 1; text-align: center; }
+  .opt .name { grid-area: name; font-weight: 700; }
+  .opt .meta { grid-area: meta; font-size: 0.85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+  .opt .chk { grid-area: chk; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-weight: 700; }
+  .opt[aria-pressed="true"] .chk { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5em), 1fr)); gap: 10px; }
+  .kpi { background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 2px; align-content: start; }
+  .kpi b { font-size: 1.3rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .kpi.ok { border-color: var(--green); } .kpi.warn { border-color: var(--amber); } .kpi.bad { border-color: var(--red); }
+  .semaf { font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
+  .semaf.ok { color: var(--green); } .semaf.warn { color: var(--amber); } .semaf.bad { color: var(--red); }
+  .drow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .drow:last-of-type { border-bottom: none; }
+  .prow { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; grid-template-areas: "emo nm sub" ". inp inp"; gap: 6px 10px; align-items: center;
+          padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .prow .emo { grid-area: emo; font-size: 1.5rem; line-height: 1; text-align: center; align-self: start; }
+  .prow .nm { grid-area: nm; min-width: 0; }
+  .prow .sub { grid-area: sub; font-weight: 700; white-space: nowrap; align-self: start; font-variant-numeric: tabular-nums; }
+  .prow .inp { grid-area: inp; display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); }
+  .prow .inp input::placeholder { color: var(--muted); font-weight: 400; opacity: 0.8; }
+  .prow .inp input { width: 6.5em; min-height: 48px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); padding: 6px 10px;
+                     font-weight: 700; font-size: 1rem; color: var(--ink); }
+  /* Semana día por día */
+  .dias { display: grid; gap: 10px; }
+  .dia { display: grid; gap: 8px; background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+  .dia.on { border-color: var(--green); }
+  .dia .dn { font-size: 1.1rem; text-transform: capitalize; }
+  .dchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .dchip { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 4px 4px 4px 12px; border-radius: 999px; background: var(--green-soft);
+           border: 2px solid var(--green); font-weight: 700; font-size: 0.95rem; max-width: 100%; }
+  .dchip button { min-width: 40px; min-height: 40px; border-radius: 50%; border: none; background: var(--surface); color: var(--ink); font-weight: 700; }
+  .dadd { min-height: 48px; padding: 6px 16px; border-radius: 999px; border: 2px dashed var(--green); background: transparent; color: var(--green); font-weight: 700; font-size: 0.95rem; }
+  .lleva { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .lleva .emo { font-size: 1.5rem; line-height: 1; text-align: center; }
+  .lleva .pr { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .toast { position: fixed; left: 16px; right: 16px; bottom: calc(var(--nav-h, 96px) + 12px); max-width: 448px; margin: 0 auto; z-index: 40;
+           background: var(--ink); color: var(--bg); padding: 14px 16px; border-radius: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><b>ACUÁNTO</b><span>El precio de hoy en tu mercado</span></div>
+    <div class="hbtns">
+      <button class="opina" id="btn-opinar" type="button" aria-label="Dar mi opinión sobre la app"><span aria-hidden="true">💬</span>Opinar</button>
+      <button class="aa" id="btn-letra" type="button" aria-label="Cambiar tamaño de letra">Aa</button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <p id="sr" class="sr" aria-live="polite"></p>
+  <nav class="bar" id="bar" hidden aria-label="Menú principal">
+    <div class="in">
+      <button type="button" data-go="inicio" id="nav-inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l2-6h14l2 6"/><path d="M3 11h18v2a3 3 0 01-6 0 3 3 0 01-6 0 3 3 0 01-6 0z"/><path d="M5 15v5h14v-5"/></svg>
+        Precios
+      </button>
+      <button type="button" data-go="semana" id="nav-semana">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h16l-1.6 9.2a1 1 0 01-1 .8H6.6a1 1 0 01-1-.8z"/><path d="M8.5 10l3.5-6 3.5 6"/><path d="M9.5 14v3M14.5 14v3"/></svg>
+        <span id="nav-semana-txt">Mi semana</span>
+      </button>
+      <button type="button" data-go="aportar" id="nav-aportar" class="main">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span id="nav-aportar-txt">Aportar</span>
+      </button>
+      <button type="button" data-go="puntos" id="nav-puntos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+        Mis puntos
+      </button>
+    </div>
+  </nav>
+</div>
+
+<script>
+/* =========================================================================
+   Datos de ejemplo. En la app real: mercados desde GeoLeads y precios
+   estimados desde el mayorista de MIDAGRI. Aquí son ilustrativos.
+   ========================================================================= */
+const PRODUCTOS = [
+  { id: "limon", nombre: "Limón", emo: "🍋", unidad: "kilo", base: 4.5, riesgo: true, rubro: "verduras", pieza: [0.03, "limón", "limones"] },
+  { id: "tomate", nombre: "Tomate", emo: "🍅", unidad: "kilo", base: 4.0, riesgo: true, rubro: "verduras" },
+  { id: "cebolla", nombre: "Cebolla roja", emo: "🧅", unidad: "kilo", base: 2.8, riesgo: true, rubro: "verduras" },
+  { id: "papa-amarilla", nombre: "Papa amarilla", emo: "🥔", unidad: "kilo", base: 5.0, riesgo: true, rubro: "verduras" },
+  { id: "papa-blanca", nombre: "Papa blanca", emo: "🥔", unidad: "kilo", base: 2.2, riesgo: false, rubro: "verduras" },
+  { id: "aji", nombre: "Ají amarillo", emo: "🌶️", unidad: "kilo", base: 9.0, riesgo: true, rubro: "verduras" },
+  { id: "zapallo", nombre: "Zapallo", emo: "🎃", unidad: "kilo", base: 2.8, riesgo: false, rubro: "verduras" },
+  { id: "choclo", nombre: "Choclo", emo: "🌽", unidad: "unidad", base: 1.5, riesgo: false, rubro: "verduras", cuenta: ["choclo", "choclos"] },
+  { id: "camote", nombre: "Camote", emo: "🍠", unidad: "kilo", base: 2.5, riesgo: false, rubro: "verduras" },
+  { id: "zanahoria", nombre: "Zanahoria", emo: "🥕", unidad: "kilo", base: 2.0, riesgo: false, rubro: "verduras" },
+  { id: "arveja", nombre: "Arveja verde", emo: "🟢", unidad: "kilo", base: 7.0, riesgo: false, rubro: "verduras" },
+  { id: "ajo", nombre: "Ajos", emo: "🧄", unidad: "kilo", base: 12.0, riesgo: false, rubro: "verduras" },
+  { id: "platano", nombre: "Plátano de seda", emo: "🍌", unidad: "kilo", base: 3.5, riesgo: false, rubro: "frutas", pieza: [0.15, "plátano", "plátanos"] },
+  { id: "manzana", nombre: "Manzana", emo: "🍎", unidad: "kilo", base: 5.0, riesgo: false, rubro: "frutas", pieza: [0.17, "manzana", "manzanas"] },
+  { id: "mandarina", nombre: "Mandarina", emo: "🟠", unidad: "kilo", base: 4.0, riesgo: false, rubro: "frutas", pieza: [0.1, "mandarina", "mandarinas"] },
+  { id: "naranja", nombre: "Naranja de jugo", emo: "🍊", unidad: "kilo", base: 3.0, riesgo: false, rubro: "frutas", pieza: [0.2, "naranja", "naranjas"] },
+  { id: "papaya", nombre: "Papaya", emo: "🍈", unidad: "kilo", base: 3.5, riesgo: false, rubro: "frutas" },
+  { id: "pina", nombre: "Piña", emo: "🍍", unidad: "kilo", base: 3.0, riesgo: false, rubro: "frutas", pieza: [1.5, "piña", "piñas"] },
+  { id: "maracuya", nombre: "Maracuyá", emo: "🟡", unidad: "kilo", base: 5.0, riesgo: false, rubro: "frutas", pieza: [0.1, "maracuyá", "maracuyás"] },
+  { id: "pollo", nombre: "Pollo", emo: "🍗", unidad: "kilo", base: 9.5, riesgo: false, rubro: "carnes" },
+  { id: "gallina", nombre: "Gallina", emo: "🐔", unidad: "kilo", base: 12.0, riesgo: false, rubro: "carnes" },
+  { id: "carne", nombre: "Carne de res", emo: "🥩", unidad: "kilo", base: 30.0, riesgo: false, rubro: "carnes" },
+  { id: "huevo", nombre: "Huevo", emo: "🥚", unidad: "kilo", base: 8.5, riesgo: false, rubro: "carnes", pieza: [0.06, "huevo", "huevos"] },
+  { id: "jurel", nombre: "Jurel", emo: "🐟", unidad: "kilo", base: 8.0, riesgo: true, rubro: "pescado" },
+  { id: "arroz", nombre: "Arroz", emo: "🍚", unidad: "kilo", base: 4.2, riesgo: false, rubro: "abarrotes" },
+  { id: "lenteja", nombre: "Lenteja", emo: "🟤", unidad: "kilo", base: 7.5, riesgo: false, rubro: "abarrotes" },
+  { id: "fideos", nombre: "Fideos", emo: "🍝", unidad: "kilo", base: 6.0, riesgo: false, rubro: "abarrotes" },
+  { id: "quinua", nombre: "Quinua", emo: "🌾", unidad: "kilo", base: 12.0, riesgo: false, rubro: "abarrotes" },
+  { id: "maiz-morado", nombre: "Maíz morado", emo: "🟣", unidad: "kilo", base: 5.0, riesgo: false, rubro: "abarrotes" },
+  { id: "azucar", nombre: "Azúcar rubia", emo: "🍬", unidad: "kilo", base: 4.2, riesgo: false, rubro: "abarrotes" },
+  { id: "aceite", nombre: "Aceite vegetal", emo: "🧴", unidad: "litro", base: 10.0, riesgo: false, rubro: "abarrotes" },
+  { id: "leche", nombre: "Leche evaporada", emo: "🥛", unidad: "lata", base: 4.2, riesgo: false, rubro: "abarrotes", cuenta: ["lata", "latas"] },
+  { id: "queso", nombre: "Queso fresco", emo: "🧀", unidad: "kilo", base: 20.0, riesgo: false, rubro: "abarrotes" },
+];
+const RUBROS = [
+  { id: "verduras", nombre: "Verduras y tubérculos", corto: "Verduras", emo: "🥬" }, { id: "frutas", nombre: "Frutas", corto: "Frutas", emo: "🍎" },
+  { id: "carnes", nombre: "Carnes, pollo y huevos", corto: "Carnes", emo: "🍗" }, { id: "pescado", nombre: "Pescado", corto: "Pescado", emo: "🐟" },
+  { id: "abarrotes", nombre: "Abarrotes y lácteos", corto: "Abarrotes", emo: "🛒" },
+];
+const MERCADOS = [
+  { id: "ciudad-de-dios", nombre: "Mercado Ciudad de Dios", distrito: "San Juan de Miraflores", f: 0.92 },
+  { id: "villa-sur", nombre: "Mercado Villa Sur", distrito: "Villa El Salvador", f: 0.90 },
+  { id: "surquillo-1", nombre: "Mercado N.° 1 de Surquillo", distrito: "Surquillo", f: 1.15 },
+  { id: "surquillo-2", nombre: "Mercado N.° 2 de Surquillo", distrito: "Surquillo", f: 1.10 },
+  { id: "san-jose", nombre: "Mercado San José", distrito: "Jesús María", f: 1.00 },
+  { id: "magdalena", nombre: "Mercado de Magdalena", distrito: "Magdalena del Mar", f: 1.06 },
+  { id: "lobaton", nombre: "Mercado Lobatón", distrito: "Lince", f: 1.04 },
+  { id: "caja-de-agua", nombre: "Mercado Caja de Agua", distrito: "San Juan de Lurigancho", f: 0.93 },
+];
+const TIPOS = [
+  { id: "segundo", nombre: "Segundos", por: "por plato" }, { id: "sopa", nombre: "Caldos y sopas", por: "por plato" },
+  { id: "entrada", nombre: "Entradas", por: "por plato" }, { id: "refresco", nombre: "Refrescos", por: "por vaso" },
+  { id: "postre", nombre: "Postres", por: "por porción" }, { id: "fruta", nombre: "Frutas", por: "cada una" },
+];
+/* Recetario de ejemplo: cantidad por porción de una persona adulta (kilo, litro o unidad del producto).
+   Sopas y entradas en porción de menú. "cambio": plato del mismo tipo que se sugiere si ahorra. "aparte": lo que no se cotiza.
+   Las porciones son estimados a validar con caseras y cocineras reales. */
+const PLATOS = [
+  { id: "arroz-pollo", tipo: "segundo", nombre: "Arroz con pollo", emo: "🍗", aparte: ["culantro"],
+    ing: { pollo: 0.25, arroz: 0.1, arveja: 0.03, zanahoria: 0.03, choclo: 0.25, aji: 0.01, cebolla: 0.04, ajo: 0.005, aceite: 0.01 } },
+  { id: "lomo", tipo: "segundo", nombre: "Lomo saltado", emo: "🥩", cambio: "pollo-saltado", aparte: ["sillao", "vinagre"],
+    ing: { carne: 0.18, tomate: 0.1, cebolla: 0.1, "papa-blanca": 0.25, arroz: 0.1, aji: 0.01, ajo: 0.005, aceite: 0.04 } },
+  { id: "pollo-saltado", tipo: "segundo", nombre: "Pollo saltado", emo: "🍟", aparte: ["sillao", "vinagre"],
+    ing: { pollo: 0.2, tomate: 0.1, cebolla: 0.1, "papa-blanca": 0.25, arroz: 0.1, aji: 0.01, ajo: 0.005, aceite: 0.04 } },
+  { id: "aji-gallina", tipo: "segundo", nombre: "Ají de gallina", emo: "🍛", cambio: "estofado", aparte: ["pan", "queso parmesano"],
+    ing: { pollo: 0.2, aji: 0.04, cebolla: 0.05, leche: 0.25, "papa-amarilla": 0.15, arroz: 0.1, huevo: 0.03, ajo: 0.005, aceite: 0.01 } },
+  { id: "ceviche", tipo: "segundo", nombre: "Ceviche de jurel", emo: "🍋", cambio: "chaufa", aparte: ["ají limo", "culantro"],
+    ing: { jurel: 0.2, limon: 0.12, cebolla: 0.08, camote: 0.15, choclo: 0.25 } },
+  { id: "sudado", tipo: "segundo", nombre: "Sudado de jurel", emo: "🐟", cambio: "tallarines", aparte: ["culantro"],
+    ing: { jurel: 0.25, tomate: 0.1, cebolla: 0.1, aji: 0.01, arroz: 0.1, "papa-blanca": 0.1, ajo: 0.005, aceite: 0.01 } },
+  { id: "tallarines", tipo: "segundo", nombre: "Tallarines rojos con pollo", emo: "🍝", aparte: ["laurel"],
+    ing: { fideos: 0.12, pollo: 0.15, tomate: 0.15, cebolla: 0.05, zanahoria: 0.03, ajo: 0.005, aceite: 0.015 } },
+  { id: "lentejas", tipo: "segundo", nombre: "Lentejas con arroz y huevo", emo: "🥘", aparte: ["comino"],
+    ing: { lenteja: 0.08, arroz: 0.1, huevo: 0.06, cebolla: 0.04, tomate: 0.03, ajo: 0.005, aceite: 0.02 } },
+  { id: "estofado", tipo: "segundo", nombre: "Estofado de pollo", emo: "🍲", aparte: ["laurel"],
+    ing: { pollo: 0.25, "papa-blanca": 0.15, zanahoria: 0.05, arveja: 0.03, tomate: 0.08, cebolla: 0.05, arroz: 0.1, ajo: 0.005, aceite: 0.01 } },
+  { id: "locro", tipo: "segundo", nombre: "Locro de zapallo", emo: "🎃", aparte: ["huevo frito (opcional)"],
+    ing: { zapallo: 0.3, "papa-blanca": 0.15, choclo: 0.25, leche: 0.1, queso: 0.03, arveja: 0.02, arroz: 0.1, cebolla: 0.03, ajo: 0.005, aceite: 0.01 } },
+  { id: "chaufa", tipo: "segundo", nombre: "Arroz chaufa de pollo", emo: "🍳", aparte: ["cebolla china", "sillao", "kion"],
+    ing: { arroz: 0.12, pollo: 0.1, huevo: 0.06, cebolla: 0.03, ajo: 0.005, aceite: 0.02 } },
+
+  { id: "caldo-gallina", tipo: "sopa", nombre: "Caldo de gallina", emo: "🐔", aparte: ["kion", "cebolla china", "orégano"],
+    ing: { gallina: 0.2, fideos: 0.03, "papa-amarilla": 0.1, huevo: 0.06, limon: 0.01 } },
+  { id: "sopa-casa", tipo: "sopa", nombre: "Sopa de casa", emo: "🥣", aparte: ["apio", "culantro"],
+    ing: { pollo: 0.08, fideos: 0.03, "papa-blanca": 0.08, zanahoria: 0.03, zapallo: 0.04, choclo: 0.12, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
+  { id: "sopa-criolla", tipo: "sopa", nombre: "Sopa criolla", emo: "🍜", aparte: ["ají panca", "orégano", "pan tostado"],
+    ing: { carne: 0.06, fideos: 0.04, leche: 0.08, huevo: 0.06, tomate: 0.04, cebolla: 0.03, ajo: 0.003, aceite: 0.005 } },
+  { id: "aguadito", tipo: "sopa", nombre: "Aguadito de pollo", emo: "🍵", aparte: ["culantro"],
+    ing: { pollo: 0.08, arroz: 0.04, arveja: 0.02, zanahoria: 0.02, choclo: 0.12, "papa-amarilla": 0.06, aji: 0.008, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
+  { id: "chilcano", tipo: "sopa", nombre: "Chilcano de pescado", emo: "🐠", aparte: ["kion", "cebolla china", "culantro"],
+    ing: { jurel: 0.15, limon: 0.02, cebolla: 0.02, ajo: 0.003 } },
+  { id: "sopa-quinua", tipo: "sopa", nombre: "Sopa de quinua", emo: "🌾", aparte: ["apio", "orégano"],
+    ing: { quinua: 0.03, "papa-blanca": 0.08, zanahoria: 0.03, zapallo: 0.03, pollo: 0.05, queso: 0.01, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
+
+  { id: "huancaina", tipo: "entrada", nombre: "Papa a la huancaína", emo: "🧀", aparte: ["galletas de soda", "lechuga", "aceitunas"],
+    ing: { "papa-amarilla": 0.2, aji: 0.03, leche: 0.08, queso: 0.04, huevo: 0.03, aceite: 0.02 } },
+  { id: "causa", tipo: "entrada", nombre: "Causa rellena", emo: "🥔", aparte: ["mayonesa", "palta (opcional)"],
+    ing: { "papa-amarilla": 0.18, aji: 0.015, limon: 0.02, pollo: 0.05, huevo: 0.02, cebolla: 0.02, aceite: 0.02 } },
+
+  { id: "chicha", tipo: "refresco", nombre: "Chicha morada", emo: "🟣", aparte: ["canela", "clavo de olor"],
+    ing: { "maiz-morado": 0.03, pina: 0.04, manzana: 0.02, limon: 0.01, azucar: 0.025 } },
+  { id: "limonada", tipo: "refresco", nombre: "Limonada", emo: "🥤", ing: { limon: 0.05, azucar: 0.025 } },
+  { id: "maracuya-ref", tipo: "refresco", nombre: "Refresco de maracuyá", emo: "🧃", ing: { maracuya: 0.06, azucar: 0.025 } },
+
+  { id: "mazamorra", tipo: "postre", nombre: "Mazamorra morada", emo: "🍮", aparte: ["chuño", "canela", "pasas"],
+    ing: { "maiz-morado": 0.02, pina: 0.03, manzana: 0.02, azucar: 0.03 } },
+  { id: "arroz-leche", tipo: "postre", nombre: "Arroz con leche", emo: "🍚", aparte: ["canela", "clavo de olor"],
+    ing: { arroz: 0.03, leche: 0.15, azucar: 0.03 } },
+  { id: "ensalada-frutas", tipo: "postre", nombre: "Ensalada de frutas", emo: "🍉",
+    ing: { papaya: 0.06, platano: 0.05, pina: 0.04, manzana: 0.03 } },
+
+  { id: "f-platano", tipo: "fruta", nombre: "Plátano (1)", emo: "🍌", ing: { platano: 0.15 } },
+  { id: "f-manzana", tipo: "fruta", nombre: "Manzana (1)", emo: "🍎", ing: { manzana: 0.17 } },
+  { id: "f-mandarina", tipo: "fruta", nombre: "Mandarinas (2)", emo: "🟠", ing: { mandarina: 0.2 } },
+  { id: "f-papaya", tipo: "fruta", nombre: "Papaya (1 tajada)", emo: "🍈", ing: { papaya: 0.25 } },
+  { id: "f-jugo", tipo: "fruta", nombre: "Jugo de naranja (1 vaso)", emo: "🍊", ing: { naranja: 0.6 } },
+];
+const UNIDADES = ["kilo", "unidad", "litro", "lata", "atado", "ciento", "docena"];
+const POR = { kilo: "el kilo", unidad: "la unidad", litro: "el litro", lata: "la lata", atado: "el atado", ciento: "el ciento", docena: "la docena" };
+const porUnidad = (p) => POR[p.unidad] || p.unidad;
+const POR_CORTO = { kilo: "el kg", litro: "el litro", lata: "la lata", unidad: "c/u" };
+const LETRAS = [{ id: "normal", px: 19, nombre: "Normal" }, { id: "grande", px: 22, nombre: "Grande" }, { id: "enorme", px: 25, nombre: "Muy grande" }];
+const GRATIS = 3, AMPLIADO = 10;
+const PUNTOS = { foto: 20, fotoExtra: 5, fotoTope: 50, manual: 5, nohay: 10, confirmar: 2, puesto: 20, topeDia: 200 };
+
+/* ---------------------------- utilidades ---------------------------- */
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const soles = (n) => "S/ " + Number(n).toFixed(2);
+const hoy = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const hora = (ts) => new Date(ts).toLocaleTimeString("es-PE", { hour: "numeric", minute: "2-digit" });
+const norm = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const prod = (id) => PRODUCTOS.find((p) => p.id === id);
+const merc = (id) => MERCADOS.find((m) => m.id === id);
+function ruido(a, b) { let h = 0; for (const c of a + b) h = (h * 31 + c.charCodeAt(0)) >>> 0; return ((h % 1000) / 1000 - 0.5) * 0.08; }
+const r10 = (n) => Math.round(n * 10) / 10;
+/* Estimado de ejemplo: base × factor del mercado ± ruido estable. Semana pasada: más bajo en productos sensibles a El Niño. */
+const estimado = (p, m) => r10(p.base * m.f * (1 + ruido(p.id, m.id)));
+const semanaPasada = (p, m) => r10(estimado(p, m) / (p.riesgo ? 1.12 : 1 + ruido(m.id, p.id) / 2));
+const mediana = (xs) => { const s = [...xs].sort((a, b) => a - b); const k = Math.floor(s.length / 2); return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; };
+
+/* ---------------------------- estado ---------------------------- */
+const state = {
+  view: "bienvenida", paso: 1, perfil: null, puntos: { total: 0, pendientes: 0, historial: [], dia: hoy(), hoyGanados: 0 },
+  reportes: [], mercadoActivo: null, borrador: null, db: null, uid: null, sample: null, puedeFoto: false, ultimo: null,
+  semana: null, semPaso: null, volverA: null, semTipo: "segundo", rubroInicio: "todo",
+  resto: null, restoPaso: null, menuFoto: null, menuPrevio: null, copia: null, toast: null, desde: null,
+  idea: { nota: null, util: [], frecuencia: null, pago: null, texto: "", enviado: null },
+};
+const VERSION = "Prueba 0.4";
+/* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
+const WHATSAPP_OPINIONES = "";
+const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], distrito: MERCADOS[0].distrito, ampliadoHasta: null, puesto: null, acepto: false });
+/* La semana empieza el lunes: al cambiar de semana se borran las marcas de "ya tengo" y "comprado", no los platos. */
+function semanaClave() { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+const semanaVacia = () => ({ personas: 4, dias: {}, frutas: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
+const restoVacio = () => ({ menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vie", "sab"], precioMenu: 12, menu: {}, precios: {}, diaActivo: "lun", aportadoDia: null });
+
+/* Persistencia: base compartida del artefacto si está disponible; si no, solo este teléfono. */
+const LS = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+             set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+async function cargar() {
+  let perfil = null, puntos = null, semana = null, resto = null;
+  if (state.db && state.uid) {
+    try {
+      const [a, b, c, d] = await Promise.all(["perfil", "puntos", "semana", "resto"].map((k) => state.db.doc(`data/users/${state.uid}/${k}`).get()));
+      if (a.exists) perfil = a.data();
+      if (b.exists) puntos = b.data();
+      if (c.exists) semana = c.data();
+      if (d.exists) resto = d.data();
+    } catch (e) {}
+  }
+  perfil = perfil || LS.get("acuanto.perfil");
+  puntos = puntos || LS.get("acuanto.puntos");
+  semana = semana || LS.get("acuanto.semana");
+  resto = resto || LS.get("acuanto.resto");
+  state.resto = Object.assign(restoVacio(), resto ? structuredClone(resto) : {});
+  state.perfil = Object.assign(perfilVacio(), perfil ? structuredClone(perfil) : {});
+  state.puntos = Object.assign(state.puntos, puntos ? structuredClone(puntos) : {});
+  if (state.puntos.dia !== hoy()) { state.puntos.dia = hoy(); state.puntos.hoyGanados = 0; }
+  state.semana = Object.assign(semanaVacia(), semana ? structuredClone(semana) : {});
+  if (state.semana.clave !== semanaClave()) Object.assign(state.semana, { clave: semanaClave(), tengo: {}, compre: {}, modo: "planear" });
+}
+const tGuardar = {};
+function guardarDoc(k) {
+  LS.set("acuanto." + k, state[k]);
+  if (!(state.db && state.uid)) return;
+  clearTimeout(tGuardar[k]);
+  tGuardar[k] = setTimeout(() => {
+    const s = structuredClone(state[k]);
+    guardando = guardando.then(async () => { try { await state.db.doc(`data/users/${state.uid}/${k}`).set(s); } catch (e) {} });
+  }, 700);
+}
+const guardarSemana = () => guardarDoc("semana"), guardarResto = () => guardarDoc("resto");
+let guardando = Promise.resolve();
+function guardar() {
+  LS.set("acuanto.perfil", state.perfil); LS.set("acuanto.puntos", state.puntos);
+  if (!(state.db && state.uid)) return;
+  const perfil = structuredClone(state.perfil), puntos = structuredClone(state.puntos);
+  guardando = guardando.then(async () => {
+    try { await state.db.doc(`data/users/${state.uid}/perfil`).set(perfil); await state.db.doc(`data/users/${state.uid}/puntos`).set(puntos); } catch (e) {}
+  });
+}
+
+/* ---------------------------- precios ---------------------------- */
+function reportesDe(pid, mid) { return state.reportes.filter((r) => r.producto === pid && r.mercado === mid); }
+function precioHoy(p, m) {
+  const rs = reportesDe(p.id, m.id).filter((r) => r.fuente !== "nohay" && Number(r.precio) > 0);
+  const est = estimado(p, m);
+  if (rs.length) {
+    const ult = rs.reduce((a, r) => (r.ts > a ? r.ts : a), 0);
+    const puesto = rs.some((r) => r.fuente === "puesto");
+    return { precio: r10(mediana(rs.map((r) => Number(r.precio)))), observado: true, n: rs.length, ult, puesto };
+  }
+  return { precio: est, observado: false, n: 0 };
+}
+function escasez(p, m) { return reportesDe(p.id, m.id).filter((r) => r.fuente === "nohay").length; }
+function misMercados() { return (state.perfil.mercados || []).map(merc).filter(Boolean); }
+function limiteMercados() { const h = state.perfil.ampliadoHasta; return h && h >= hoy() ? AMPLIADO : GRATIS; }
+const corto = (m) => m.nombre.replace("Mercado ", "");
+
+/* ---------------------------- mi semana: cálculo ---------------------------- */
+const r2 = (n) => Math.round(n * 100) / 100;
+const plato = (id) => PLATOS.find((d) => d.id === id);
+const nPlatos = () => (state.semana ? DIAS.reduce((a, x) => a + ((state.semana.dias || {})[x.id] || []).length, 0) + Object.values(state.semana.frutas || {}).reduce((a, b) => a + b, 0) : 0);
+/* Costo de una porción con una función de precio y qué parte depende de productos que pueden subir por El Niño. */
+function costoPlatoCon(d, precio) {
+  let t = 0, r = 0;
+  for (const [pid, q] of Object.entries(d.ing)) { const p = prod(pid), c = q * precio(p); t += c; if (p.riesgo) r += c; }
+  return { t, r, riesgo: t ? r / t : 0 };
+}
+const costoPlato = (d, m) => costoPlatoCon(d, (p) => precioHoy(p, m).precio);
+const tipoDe = (id) => TIPOS.find((t) => t.id === id) || TIPOS[0];
+
+/* ---------------------------- plan restaurante: cálculo ---------------------------- */
+const DIAS = [{ id: "lun", c: "Lun", n: "lunes" }, { id: "mar", c: "Mar", n: "martes" }, { id: "mie", c: "Mié", n: "miércoles" },
+  { id: "jue", c: "Jue", n: "jueves" }, { id: "vie", c: "Vie", n: "viernes" }, { id: "sab", c: "Sáb", n: "sábado" }, { id: "dom", c: "Dom", n: "domingo" }];
+const dia = (id) => DIAS.find((x) => x.id === id);
+/* Ejemplo: referencia mayorista = precio de mercado × 0.78. En la app real viene del boletín diario de precios mayoristas de Lima. */
+const MERMA = 0.05, FACTOR_MAYORISTA = 0.78;
+const PROVEEDORES = [
+  { id: "verduras", emo: "🥬", nombre: "Verduras y frutas", quien: "Para tu casero del mercado mayorista", rubros: ["verduras", "frutas"] },
+  { id: "carnes", emo: "🍗", nombre: "Pollo, carnes y huevos", quien: "Para tu avícola o carnicería", rubros: ["carnes"] },
+  { id: "pescado", emo: "🐟", nombre: "Pescado", quien: "Para tu pescadero o el terminal pesquero", rubros: ["pescado"] },
+  { id: "abarrotes", emo: "🛒", nombre: "Abarrotes y lácteos", quien: "Para tu distribuidor de abarrotes", rubros: ["abarrotes"] },
+];
+const precioRef = (p) => r10(p.base * FACTOR_MAYORISTA * (1 + ruido(p.id, "mayorista")));
+const precioResto = (p) => { const x = Number(state.resto.precios[p.id]); return x > 0 ? x : precioRef(p); };
+const diaMenu = (id) => state.resto.menu[id] || { entrada: [], segundo: [], refresco: null, postre: null };
+function diaEditable(id) { const R = state.resto; if (!R.menu[id]) R.menu[id] = { entrada: [], segundo: [], refresco: null, postre: null }; return R.menu[id]; }
+const diasConMenu = () => state.resto.dias.filter((d) => diaMenu(d).segundo.length);
+function siguienteDia(id) { const ds = state.resto.dias, i = ds.indexOf(id); return i >= 0 && i < ds.length - 1 ? ds[i + 1] : null; }
+const semaforo = (fc) => (fc <= 0.4 ? "ok" : fc <= 0.5 ? "warn" : "bad");
+/* Costo de insumos de un menú del día: promedio de las entradas y segundos (los menús se reparten en partes iguales) + refresco + postre + merma. */
+function costoDia(id) {
+  const x = diaMenu(id), c = (pid) => costoPlatoCon(plato(pid), precioResto);
+  const prom = (ids, k) => (ids.length ? ids.reduce((a, i) => a + c(i)[k], 0) / ids.length : 0);
+  const sum = (k) => prom(x.entrada, k) + prom(x.segundo, k) + (x.refresco ? c(x.refresco)[k] : 0) + (x.postre ? c(x.postre)[k] : 0);
+  return { t: sum("t") * (1 + MERMA), r: sum("r") * (1 + MERMA), lleno: x.segundo.length > 0 };
+}
+function porcionesSemana() {
+  const R = state.resto, por = {};
+  const add = (id, n) => { por[id] = (por[id] || 0) + n; };
+  for (const d of diasConMenu()) {
+    const x = diaMenu(d), M = R.menusDia;
+    x.entrada.forEach((id) => add(id, M / x.entrada.length)); x.segundo.forEach((id) => add(id, M / x.segundo.length));
+    if (x.refresco) add(x.refresco, M); if (x.postre) add(x.postre, M);
+  }
+  return por;
+}
+/* El restaurante pide por kilo: de cuarto en cuarto si es poco, de medio en medio hasta 10 kilos y luego por kilo entero. */
+function redondeoResto(p, q) {
+  if (p.unidad === "kilo") return r2(q < 1 ? Math.ceil(q / 0.25 - 1e-9) * 0.25 : q < 10 ? Math.ceil(q / 0.5 - 1e-9) * 0.5 : Math.ceil(q - 1e-9));
+  if (p.unidad === "litro") return Math.max(1, Math.ceil(q - 1e-9));
+  return Math.max(1, Math.ceil(q - 1e-9));
+}
+function cantResto(p, q) {
+  let t = p.unidad === "kilo" ? (q < 1 ? `${Math.round(q * 1000)} g` : `${String(q).replace(/\.0+$/, "")} kg`)
+    : p.unidad === "litro" ? `${q} L` : `${q} ${q === 1 ? (p.cuenta || ["unidad"])[0] : (p.cuenta || [0, "unidades"])[1]}`;
+  if (p.id === "huevo") { const n = Math.round(q / p.pieza[0]); t += ` (≈ ${n} huevos, ${Math.ceil(n / 30)} ${Math.ceil(n / 30) === 1 ? "jaba" : "jabas"})`; }
+  else if (p.pieza && p.pieza[0] < 0.5) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` (≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]})`; }
+  return t;
+}
+function compraResto() {
+  const tot = {};
+  for (const [id, n] of Object.entries(porcionesSemana()))
+    for (const [pid, q] of Object.entries(plato(id).ing)) tot[pid] = (tot[pid] || 0) + q * n * (1 + MERMA);
+  return PRODUCTOS.filter((p) => tot[p.id]).map((p) => ({ p, q: tot[p.id], compra: redondeoResto(p, tot[p.id]) }));
+}
+/* Cambios de segundo que ahorran al menos S/ 5 en la semana con los precios del restaurante. */
+function sugResto() {
+  return Object.entries(porcionesSemana()).map(([id, n]) => {
+    const d = plato(id); if (!d.cambio) return null;
+    const alt = plato(d.cambio), ahorro = r2((costoPlatoCon(d, precioResto).t - costoPlatoCon(alt, precioResto).t) * n * (1 + MERMA));
+    const evita = Object.keys(d.ing).filter((pid) => prod(pid).riesgo && !(pid in alt.ing)).map((pid) => prod(pid).nombre.toLowerCase());
+    return { d, alt, ahorro, evita };
+  }).filter((s) => s && s.ahorro >= 5).sort((a, b) => b.ahorro - a.ahorro).slice(0, 2);
+}
+function textoPedido(pv, its) {
+  return `Hola, buen día. Le escribo para mi pedido de la semana (${diasConMenu().length} días):\n`
+    + its.map((it) => `• ${it.p.nombre}: ${cantResto(it.p, it.compra)}`).join("\n") + "\n¿Me confirma precio y día de entrega? Gracias.";
+}
+/* Se compra como se vende en el mercado: por cuarto de kilo (o de 50 en 50 gramos si es poquito), por medio litro o por unidad. */
+function redondeo(p, q) {
+  if (p.unidad === "kilo") return r2(q < 0.25 ? Math.max(0.05, Math.ceil(q / 0.05 - 1e-9) * 0.05) : Math.ceil(q / 0.25 - 1e-9) * 0.25);
+  if (p.unidad === "litro") return r2(Math.max(0.5, Math.ceil(q / 0.5 - 1e-9) * 0.5));
+  return Math.max(1, Math.ceil(q - 1e-9));
+}
+function fraccion(q, uno, varios) {
+  const e = Math.floor(q + 1e-9), f = Math.round((q - e) * 4), fr = ["", "cuarto", "medio", "tres cuartos"][f];
+  if (!e) return f === 2 ? `medio ${uno}` : f === 1 ? `un cuarto de ${uno}` : `tres cuartos de ${uno}`;
+  return `${e} ${e === 1 ? uno : varios}${f ? " y " + fr : ""}`;
+}
+function cantTxt(p, q) {
+  let t;
+  if (p.unidad === "kilo") t = q < 0.25 ? `${Math.round(q * 1000)} gramos` : fraccion(q, "kilo", "kilos");
+  else if (p.unidad === "litro") t = fraccion(q, "litro", "litros");
+  else { const [a, b] = p.cuenta || ["unidad", "unidades"]; t = `${q} ${q === 1 ? a : b}`; }
+  if (p.pieza) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` (≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]})`; }
+  return t;
+}
+/* La semana del hogar: un plan por día (hasta 3 cosas por día) + frutas aparte, para N personas. */
+const itemsDia = (id) => (state.semana.dias && state.semana.dias[id]) || [];
+const diasLlenos = () => DIAS.filter((d) => itemsDia(d.id).length).length;
+function compraSemana() {
+  const S = state.semana, tot = {};
+  const add = (d, veces) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * veces * S.personas; };
+  for (const x of DIAS) for (const id of itemsDia(x.id)) { const d = plato(id); if (d) add(d, 1); }
+  for (const [id, n] of Object.entries(S.frutas || {})) { const d = plato(id); if (d && n) add(d, n); }
+  return PRODUCTOS.filter((p) => tot[p.id]).map((p) => ({ p, q: tot[p.id], compra: redondeo(p, tot[p.id]) }));
+}
+const porComprar = () => compraSemana().filter((it) => !state.semana.tengo[it.p.id]);
+
+/* Supermercados de ejemplo: más caros en frescos y más baratos en abarrotes. En la app real: tiendas a menos de 2 km (GeoLeads) y su precio online. */
+const SUPERS = [
+  { id: "plazavea", nombre: "Plaza Vea", tipo: "super", fr: { verduras: 1.22, frutas: 1.2, carnes: 1.08, pescado: 1.18, abarrotes: 0.94 } },
+  { id: "tottus", nombre: "Tottus", tipo: "super", fr: { verduras: 1.2, frutas: 1.18, carnes: 1.1, pescado: 1.2, abarrotes: 0.95 } },
+  { id: "metro", nombre: "Metro", tipo: "super", fr: { verduras: 1.25, frutas: 1.22, carnes: 1.12, pescado: 1.22, abarrotes: 0.97 } },
+  { id: "mass", nombre: "Mass", tipo: "super", fr: { verduras: 1.15, frutas: 1.15, carnes: 1.05, pescado: 1.3, abarrotes: 0.9 } },
+  { id: "wong", nombre: "Wong", tipo: "super", fr: { verduras: 1.32, frutas: 1.3, carnes: 1.2, pescado: 1.25, abarrotes: 1.05 } },
+];
+/* Precios online reales (precios_super.json, generado por el recolector de GeoLeads). Si no hay archivo, se usan los de ejemplo. */
+const precioReal = (p, L) => { const x = state.superReal && state.superReal.cadenas[L.id] && state.superReal.cadenas[L.id].precios[p.id]; return x && x.precio > 0 ? x.precio : null; };
+const tieneReal = (L) => !!(state.superReal && state.superReal.cadenas[L.id] && Object.keys(state.superReal.cadenas[L.id].precios).length);
+function fechaCorta(iso) { try { return new Date(iso + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "short" }); } catch (e) { return iso; } }
+const lugar = (id) => merc(id) || SUPERS.find((s) => s.id === id);
+const lugares = () => [...misMercados(), ...SUPERS];
+const nombreLugar = (L) => (L.tipo === "super" ? L.nombre : corto(L));
+function precioLugar(p, L) {
+  if (L.tipo === "super") return precioReal(p, L) ?? r10(p.base * (L.fr[p.rubro] || 1) * (1 + ruido(p.id, L.id)));
+  return precioHoy(p, L).precio;
+}
+function totalEn(L, items) {
+  let t = 0, r = 0, vistos = 0, reales = 0;
+  for (const it of items) {
+    const pr = precioLugar(it.p, L), c = it.compra * pr; t += c; if (it.p.riesgo) r += c;
+    if (L.tipo !== "super" && precioHoy(it.p, L).observado) vistos++;
+    if (L.tipo === "super" && precioReal(it.p, L)) reales++;
+  }
+  return { m: L, t: r2(t), r: r2(r), vistos, reales, n: items.length };
+}
+const totalesSemana = (items) => lugares().map((L) => totalEn(L, items)).sort((a, b) => a.t - b.t);
+function mercLista() {
+  const S = state.semana, ls = lugares();
+  if (S.mercado && ls.some((L) => L.id === S.mercado)) return lugar(S.mercado);
+  return totalesSemana(porComprar())[0]?.m || ls[0];
+}
+/* Mejor combinación de 2 lugares: cada producto donde está más barato entre los dos. */
+function mejorCombo(items) {
+  const ls = lugares(); let best = null;
+  for (let i = 0; i < ls.length; i++) for (let j = i + 1; j < ls.length; j++) {
+    const a = ls[i], b = ls[j], asign = { [a.id]: [], [b.id]: [] }; let t = 0;
+    for (const it of items) { const pa = precioLugar(it.p, a), pb = precioLugar(it.p, b), L = pa <= pb ? a : b; t += it.compra * Math.min(pa, pb); asign[L.id].push(it); }
+    if (!best || t < best.t) best = { a, b, t: r2(t), asign };
+  }
+  return best;
+}
+/* Qué rubros conviene comprar en cada lugar del combo (por gasto). */
+function rubrosDe(combo) {
+  const out = { [combo.a.id]: [], [combo.b.id]: [] };
+  for (const r of RUBROS) {
+    const gasto = (L) => combo.asign[L.id].filter((it) => it.p.rubro === r.id).reduce((a, it) => a + it.compra * precioLugar(it.p, L), 0);
+    const ga = gasto(combo.a), gb = gasto(combo.b);
+    if (ga + gb > 0) out[ga >= gb ? combo.a.id : combo.b.id].push(r.corto.toLowerCase());
+  }
+  return out;
+}
+const veces = (id) => DIAS.filter((x) => itemsDia(x.id).includes(id)).length;
+/* Solo se sugiere un cambio si hoy ahorra al menos S/ 1 en la semana. */
+function sugerencias(L) {
+  const S = state.semana, usados = [...new Set(DIAS.flatMap((x) => itemsDia(x.id)))];
+  return usados.map(plato).filter((d) => d && d.cambio).map((d) => {
+    const alt = plato(d.cambio), precio = (p) => precioLugar(p, L);
+    const ahorro = r2((costoPlatoCon(d, precio).t - costoPlatoCon(alt, precio).t) * veces(d.id) * S.personas);
+    const evita = Object.keys(d.ing).filter((pid) => prod(pid).riesgo && !(pid in alt.ing)).map((pid) => prod(pid).nombre.toLowerCase());
+    return { d, alt, ahorro, evita };
+  }).filter((s) => s.ahorro >= 1).sort((a, b) => b.ahorro - a.ahorro).slice(0, 2);
+}
+/* Cantidad corta para el resumen: "1½ kg", "150 g", "4 choclos". */
+function cantCorta(p, q) {
+  if (p.unidad === "kilo") {
+    if (q < 0.25) return `${Math.round(q * 1000)} g`;
+    const e = Math.floor(q + 1e-9), f = ["", "¼", "½", "¾"][Math.round((q - e) * 4)];
+    return `${e || ""}${f} kg`;
+  }
+  if (p.unidad === "litro") { const e = Math.floor(q + 1e-9); return `${e || ""}${q - e > 0.01 ? "½" : ""} L`; }
+  const [a, b] = p.cuenta || ["unidad", "unidades"]; return `${q} ${q === 1 ? a : b}`;
+}
+
+/* ---------------------------- puntos ---------------------------- */
+function sumarPuntos(n, motivo, confirmado) {
+  const cupo = Math.max(0, PUNTOS.topeDia - state.puntos.hoyGanados);
+  const real = Math.min(n, cupo);
+  state.puntos.hoyGanados += real;
+  if (confirmado) state.puntos.total += real; else state.puntos.pendientes += real;
+  state.puntos.historial = [{ ts: Date.now(), n: real, motivo, confirmado }, ...(state.puntos.historial || [])].slice(0, 30);
+  guardar();
+  return real;
+}
+/* Validación de prueba: el precio debe estar entre la mitad y el doble del estimado. La app real suma consenso y ubicación. */
+const plausible = (p, m, precio) => { const e = estimado(p, m); return precio >= e * 0.5 && precio <= e * 2; };
+
+async function enviarReportes(items, fuente) {
+  const m = merc(state.mercadoActivo);
+  const docs = items.map((it) => ({ dia: hoy(), ts: Date.now(), mercado: m.id, producto: it.producto || null, libre: it.libre || null,
+    precio: it.precio ?? null, unidad: it.unidad || null, fuente, autor: state.uid || null }));
+  if (state.db) {
+    for (const d of docs) { try { await state.db.collection("reportes").add(d); } catch (e) { state.reportes.push(d); } }
+  } else { state.reportes.push(...docs); }
+  return docs;
+}
+
+/* ---------------------------- vistas ---------------------------- */
+const icono = { foto: "📷", escribir: "✍️", nohay: "🚫", compra: "🛒", puesto: "🏪" };
+
+function vBienvenida() {
+  const p = state.perfil;
+  if (state.paso === 1) return `
+    <div style="display:grid;gap:10px;padding-top:8px">
+      <h1>¿A cuánto está hoy?</h1>
+      <p class="muted">Mira el precio en tus mercados antes de salir. Lo cuentan las caseras y los caseros que compran y venden ahí.</p>
+    </div>
+    <h2>¿Cómo vas a usar la app?</h2>
+    <button class="choice" data-act="rol" data-v="compra" aria-pressed="${p.rol === "compra"}">
+      <span class="ic" aria-hidden="true">${icono.compra}</span><span><b>Compro en el mercado</b><span>Veo precios y aviso cuando algo cambia</span></span>
+    </button>
+    <button class="choice" data-act="rol" data-v="puesto" aria-pressed="${p.rol === "puesto"}">
+      <span class="ic" aria-hidden="true">${icono.puesto}</span><span><b>Tengo un puesto</b><span>Publico mis precios para que me encuentren</span></span>
+    </button>
+    <button class="choice" data-act="rol" data-v="resto" aria-pressed="${p.rol === "resto"}">
+      <span class="ic" aria-hidden="true">🍲</span><span><b>Tengo un restaurante o menú</b><span>Costo de mi menú y pedido a mis proveedores</span>
+        <span class="prem" style="margin-top:6px">PREMIUM · GRATIS EN LA PRUEBA</span></span>
+    </button>
+    <p class="note">Versión de prueba con precios de ejemplo. Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>`;
+  if (state.paso === 2) return `
+    <button class="back" data-act="paso" data-v="1">‹ Atrás</button>
+    <h1>¿Cómo lees mejor?</h1>
+    <p class="muted">Elige el tamaño de letra. Lo puedes cambiar cuando quieras con el botón Aa.</p>
+    <div class="list">${LETRAS.map((l) => `
+      <button class="choice" data-act="letra" data-v="${l.id}" aria-pressed="${p.letra === l.id}" style="grid-template-columns:1fr auto">
+        <span><b style="font-size:${l.px / 19}rem">${l.nombre}</b><span>Limón · el kilo</span></span>
+        <span class="tag"><span class="p" style="font-size:${(l.px / 19) * 1.45}rem">S/ 4.50</span></span>
+      </button>`).join("")}</div>
+    <button class="btn" data-act="paso" data-v="3">Seguir</button>`;
+  const enDistrito = MERCADOS.filter((m) => m.distrito === p.distrito);
+  const distritos = [...new Set(MERCADOS.map((m) => m.distrito))].sort();
+  return `
+    <button class="back" data-act="paso" data-v="2">‹ Atrás</button>
+    <h1>${p.rol === "compra" ? "Elige tus mercados" : "¿Qué mercados quieres ver?"}</h1>
+    <p class="muted">Gratis puedes seguir hasta ${GRATIS} mercados. Con puntos puedes ver más.</p>
+    <div><label class="lbl" for="sel-distrito">Distrito</label>
+      <select class="big" id="sel-distrito">${distritos.map((d) => `<option ${d === p.distrito ? "selected" : ""}>${esc(d)}</option>`).join("")}</select></div>
+    <div class="list">${enDistrito.map((m) => `
+      <button class="choice" data-act="mercado" data-v="${m.id}" aria-pressed="${p.mercados.includes(m.id)}" style="grid-template-columns:1fr auto;min-height:72px">
+        <span><b>${esc(m.nombre)}</b><span>${esc(m.distrito)}</span></span><span aria-hidden="true" style="font-size:1.5rem">${p.mercados.includes(m.id) ? "✔" : "＋"}</span>
+      </button>`).join("")}</div>
+    ${state.aviso ? `<p class="note" role="alert">${esc(state.aviso)}</p>` : ""}
+    <p class="status">${p.mercados.length} de ${limiteMercados()} elegidos${p.mercados.length ? ": " + misMercados().map((m) => esc(m.nombre)).join(", ") : ""}</p>
+    <p class="note">Lista de ejemplo. En la app real se muestran los mercados cerca de ti con tu ubicación.</p>
+    <p class="small muted">Tus aportes se publican sin tu nombre y tu número no se comparte. Al seguir aceptas el uso de tus aportes para calcular precios (Ley 29733).</p>
+    <button class="btn" data-act="empezar" ${p.mercados.length ? "" : "disabled"}>Empezar</button>`;
+}
+
+function filaProducto(p, m) {
+  const h = precioHoy(p, m), antes = semanaPasada(p, m), d = r10(h.precio - antes);
+  const est = d > 0.05 ? `<span class="pill up">▲ Subió ${soles(d)}</span>` : d < -0.05 ? `<span class="pill down">▼ Bajó ${soles(-d)}</span>` : `<span class="pill same">= Igual</span>`;
+  const src = h.observado ? `${h.n} ${h.n === 1 ? "persona lo vio" : "personas lo vieron"} hoy · ${hora(h.ult)}${h.puesto ? " · incluye puesto" : ""}` : "Estimado de ejemplo";
+  const otros = misMercados().filter((o) => o.id !== m.id).map((o) => ({ o, x: precioHoy(p, o).precio })).sort((a, b) => a.x - b.x);
+  const barato = otros.length && otros[0].x <= h.precio - 0.3 ? `<span class="cheap">Más barato en ${esc(otros[0].o.nombre.replace("Mercado ", ""))}: ${soles(otros[0].x)}</span>` : "";
+  const falta = escasez(p, m) ? `<span class="pill up">Reportan que no hay</span>` : "";
+  return `<button class="prod" data-act="producto" data-v="${p.id}">
+    <span class="emo" aria-hidden="true">${p.emo}</span>
+    <span class="name">${p.nombre}</span>
+    <span class="tag"><span class="p">${soles(h.precio)}</span><br><span class="u">${porUnidad(p)}</span></span>
+    <span class="meta">${est} ${falta} ${barato}<span class="src">${src}</span></span>
+  </button>`;
+}
+
+function chipsMercados() {
+  const ms = misMercados();
+  return `<div class="chips" role="group" aria-label="Tus mercados">${ms.map((m) => `
+    <button class="chip" data-act="activo" data-v="${m.id}" aria-pressed="${m.id === state.mercadoActivo}">${esc(m.nombre.replace("Mercado ", ""))}</button>`).join("")}
+    <button class="chip add" data-act="editar-mercados">+ Mercados</button></div>`;
+}
+
+function vInicio() {
+  const m = merc(state.mercadoActivo);
+  if (!m) return `<p>Elige un mercado para empezar.</p><button class="btn" data-act="editar-mercados">Elegir mercados</button>`;
+  const riesgo = PRODUCTOS.filter((p) => p.riesgo).map((p) => p.nombre.toLowerCase());
+  const observados = PRODUCTOS.filter((p) => precioHoy(p, m).observado).length;
+  let semanaBtn;
+  if (state.perfil.rol === "resto") {
+    const ds = diasConMenu(), prom = ds.length ? ds.reduce((a, d) => a + costoDia(d).t, 0) / ds.length : 0;
+    semanaBtn = `<button class="btn sec" data-go="semana">🍲 ${ds.length ? `Tu menú: ${soles(prom)} de insumos (${Math.round((prom / state.resto.precioMenu) * 100)}% del precio)` : "¿Cuánto te cuesta tu menú? Calcúlalo"}</button>`;
+  } else {
+    const best = nPlatos() ? totalesSemana(porComprar())[0] : null;
+    semanaBtn = best ? `<button class="btn sec" data-go="semana">🛒 Tu compra de la semana: ${soles(best.t)} en ${esc(corto(best.m))}</button>`
+      : `<button class="btn sec" data-go="semana">🛒 ¿Cuánto gastarás esta semana? Arma tu lista</button>`;
+  }
+  const filtro = state.rubroInicio || "todo";
+  return `${chipsMercados()}
+    <div class="alert" role="note"><span class="bang" aria-hidden="true">!</span>
+      <span><b>Por El Niño pueden subir:</b> ${riesgo.join(", ")}. Compra lo que necesitas y compara antes.</span></div>
+    ${semanaBtn}
+    <div style="display:grid;gap:4px"><h1>Hoy en ${esc(m.nombre.replace("Mercado ", ""))}</h1>
+      <p class="muted small">${observados ? `${observados} de ${PRODUCTOS.length} precios vistos hoy por la gente` : "Aún nadie aportó hoy aquí. Los precios son estimados de ejemplo."}</p></div>
+    ${observados ? "" : `<button class="btn sec" data-go="aportar">📷 Sé la primera: foto a una pizarra, +${PUNTOS.foto} puntos</button>`}
+    <div class="chips" role="group" aria-label="Ver productos">${[{ id: "todo", corto: "Todo" }, ...RUBROS].map((r) => `
+      <button class="chip" data-act="rubro-inicio" data-v="${r.id}" aria-pressed="${filtro === r.id}">${r.corto}</button>`).join("")}</div>
+    <div class="list">${RUBROS.filter((r) => filtro === "todo" || r.id === filtro).map((r) => { const ps = PRODUCTOS.filter((p) => p.rubro === r.id);
+      return ps.length ? `<h2 class="grp-t">${r.nombre}</h2>${ps.map((p) => filaProducto(p, m)).join("")}` : ""; }).join("")}</div>
+    <p class="note">Prototipo con datos de ejemplo. Los precios reales vendrán del mercado mayorista y de los aportes de la gente.</p>`;
+}
+
+function vProducto(pid) {
+  const p = prod(pid), ms = misMercados();
+  const filas = ms.map((m) => ({ m, h: precioHoy(p, m) })).sort((a, b) => a.h.precio - b.h.precio);
+  const m = merc(state.mercadoActivo), h = precioHoy(p, m), antes = semanaPasada(p, m);
+  const pts = [antes, r10((antes * 2 + h.precio) / 3), r10((antes + h.precio * 2) / 3), h.precio];
+  const lo = Math.min(...pts) * 0.97, hi = Math.max(...pts) * 1.03;
+  const y = (v) => 64 - ((v - lo) / (hi - lo || 1)) * 56;
+  const linea = pts.map((v, i) => `${10 + i * 93},${y(v).toFixed(1)}`).join(" ");
+  return `<button class="back" data-go="inicio">‹ Volver a precios</button>
+    <div style="display:flex;gap:14px;align-items:center"><span style="font-size:3rem" aria-hidden="true">${p.emo}</span><h1>${p.nombre}</h1></div>
+    <div class="card"><h2>En tus mercados hoy</h2>${filas.map((f, i) => `
+      <div class="mrow"><span><b>${esc(f.m.nombre)}</b><br><span class="small muted">${f.h.observado ? `${f.h.n} lo vieron hoy` : "Estimado de ejemplo"}</span>
+      ${i === 0 && filas.length > 1 ? `<br><span class="cheap">Más barato</span>` : ""}</span>
+      <span class="tag"><span class="p">${soles(f.h.precio)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}
+    </div>
+    <div class="card"><h2>En supermercados cercanos</h2>${SUPERS.map((L) => ({ L, x: precioLugar(p, L) })).sort((a, b) => a.x - b.x).map((s) => `
+      <div class="mrow"><span><b>${esc(s.L.nombre)}</b><br><span class="small muted">${precioReal(p, s.L) ? `Online, ${fechaCorta(state.superReal.fecha)}` : "Precio online de ejemplo"}${s.x < filas[0].h.precio ? " · más barato que tus mercados" : ""}</span></span>
+      <span class="tag"><span class="p">${soles(s.x)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}</div>
+    <div class="card"><h2>En ${esc(m.nombre.replace("Mercado ", ""))}, esta semana</h2>
+      <svg viewBox="0 0 300 76" role="img" aria-label="Pasó de ${soles(antes)} hace una semana a ${soles(h.precio)} hoy" style="width:100%;height:auto">
+        <polyline points="${linea}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="289" cy="${y(h.precio).toFixed(1)}" r="6" fill="var(--green)"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between" class="small"><span>Hace 7 días<br><b>${soles(antes)}</b></span><span style="text-align:right">Hoy<br><b>${soles(h.precio)}</b></span></div>
+    </div>
+    <div class="card"><h2>¿Este precio está bien?</h2><p class="muted small">Si estás en el mercado, confírmalo y ganas ${PUNTOS.confirmar} puntos.</p>
+      <div class="row2"><button class="btn sec" data-act="confirmar" data-v="${p.id}">Sí, está bien</button>
+      <button class="btn sec" data-act="corregir" data-v="${p.id}">No, es otro</button></div></div>`;
+}
+
+function vAportar() {
+  const ms = misMercados();
+  return `<h1>¿Qué quieres aportar?</h1>
+    <div><p class="lbl">¿En qué mercado estás?</p>${chipsMercados()}</div>
+    ${state.puedeFoto ? `<button class="choice" data-act="ir-foto"><span class="ic" aria-hidden="true">${icono.foto}</span>
+      <span><b>Foto a una pizarra</b><span>La app lee los precios por ti · +${PUNTOS.foto} puntos o más</span></span></button>` : ""}
+    <button class="choice" data-act="ir-manual"><span class="ic" aria-hidden="true">${icono.escribir}</span>
+      <span><b>Escribir un precio</b><span>Producto, precio y listo · +${PUNTOS.manual} puntos</span></span></button>
+    <button class="choice" data-act="ir-nohay"><span class="ic" aria-hidden="true">${icono.nohay}</span>
+      <span><b>No encontré un producto</b><span>Avisa si no hay o hay poco · +${PUNTOS.nohay} puntos</span></span></button>
+    ${state.puedeFoto ? "" : `<p class="note">La lectura de fotos no está disponible en esta vista. Puedes escribir los precios.</p>`}
+    <p class="note">En la app real se verifica que estés en el mercado con tu ubicación.</p>`;
+}
+
+function vFoto() {
+  const b = state.borrador || {};
+  if (b.estado === "leyendo") return `<button class="back" data-act="cancelar-foto">‹ Cancelar</button>
+    ${b.url ? `<img class="photo" src="${b.url}" alt="Tu foto de la pizarra">` : ""}
+    <div class="spin" role="progressbar" aria-label="Leyendo"></div><p class="status" style="text-align:center">Leyendo la pizarra… tarda unos segundos.</p>`;
+  if (b.estado === "lista") return `<button class="back" data-go="aportar">‹ Atrás</button>
+    <h1>Revisa los precios</h1><p class="muted">Corrige lo que la app leyó mal. Quita lo que no sea de hoy.</p>
+    ${b.url ? `<img class="photo" src="${b.url}" alt="Tu foto de la pizarra">` : ""}
+    <div class="list">${b.items.map((it, i) => editorItem(it, i)).join("") || `<p class="note">No se pudo leer ningún precio. Prueba otra foto con más luz o escribe el precio.</p>`}</div>
+    <button class="btn quiet" data-act="agregar-item">+ Agregar otro producto</button>
+    <button class="btn" data-act="enviar-foto" ${b.items.length ? "" : "disabled"}>Enviar ${b.items.length} ${b.items.length === 1 ? "precio" : "precios"}</button>`;
+  return `<button class="back" data-go="aportar">‹ Atrás</button>
+    <h1>Foto a una pizarra</h1>
+    <p class="muted">Acércate a la pizarra o al cartón de precios del puesto. Que se lean los números.</p>
+    <label class="btn" for="in-foto">${icono.foto} Abrir la cámara</label>
+    <input id="in-foto" class="sr" type="file" accept="image/*" capture="environment">
+    ${b.error ? `<p class="note" role="alert">${esc(b.error)}</p>` : ""}`;
+}
+
+function editorItem(it, i) {
+  const p = it.producto ? prod(it.producto) : null;
+  return `<div class="item"><div class="hd"><span>${p ? p.emo + " " + p.nombre : "Nuevo: " + esc(it.libre)}</span>
+      <button class="x" data-act="quitar-item" data-v="${i}" aria-label="Quitar ${p ? p.nombre : esc(it.libre)}">✕</button></div>
+    <div class="money"><button type="button" data-act="menos" data-v="${i}" aria-label="Diez céntimos menos">−</button>
+      <input class="big" inputmode="decimal" data-precio="${i}" value="${Number(it.precio || 0).toFixed(2)}" aria-label="Precio en soles">
+      <button type="button" data-act="mas" data-v="${i}" aria-label="Diez céntimos más">+</button></div>
+    <select class="big" data-unidad="${i}" aria-label="Unidad">${UNIDADES.map((u) => `<option ${u === (it.unidad || (p && p.unidad) || "kilo") ? "selected" : ""}>${u}</option>`).join("")}</select></div>`;
+}
+
+function vManual() {
+  const b = state.borrador || { items: [] };
+  if (!b.items.length) return `<button class="back" ${b.volverFoto ? 'data-act="volver-foto"' : 'data-go="aportar"'}>‹ Atrás</button><h1>¿Qué producto?</h1>
+    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-manual" data-v="${p.id}"><span class="emo" aria-hidden="true">${p.emo}</span>${p.nombre}</button>`).join("")}</div>`;
+  const ma = merc(state.mercadoActivo);
+  return `${state.volverA === "semana" ? `<button class="back" data-go="semana">‹ Volver a mi lista</button>` : `<button class="back" data-act="ir-manual">‹ Otro producto</button>`}
+    <div style="display:grid;gap:4px"><h1>¿A cuánto está?</h1>${ma ? `<p class="muted">En ${esc(ma.nombre)}</p>` : ""}</div>
+    <div class="list">${editorItem(b.items[0], 0)}</div>
+    <button class="btn" data-act="enviar-manual">Enviar precio</button>`;
+}
+
+function vNoHay() {
+  const b = state.borrador || {};
+  if (!b.producto) return `<button class="back" data-go="aportar">‹ Atrás</button><h1>¿Qué no encontraste?</h1>
+    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-nohay" data-v="${p.id}"><span class="emo" aria-hidden="true">${p.emo}</span>${p.nombre}</button>`).join("")}</div>`;
+  const p = prod(b.producto);
+  return `<button class="back" data-act="ir-nohay">‹ Otro producto</button><h1>${p.emo} ${p.nombre}</h1>
+    <div class="list"><button class="choice" data-act="enviar-nohay" data-v="no-hay" style="grid-template-columns:1fr"><span><b>No había</b><span>Ningún puesto lo tenía</span></span></button>
+    <button class="choice" data-act="enviar-nohay" data-v="poco" style="grid-template-columns:1fr"><span><b>Había poco</b><span>Solo en uno o dos puestos</span></span></button></div>`;
+}
+
+function vGracias() {
+  const u = state.ultimo || { n: 0, confirmado: true };
+  return `<div class="done"><div class="ok" aria-hidden="true">✓</div><h1>¡Gracias!</h1>
+    <p class="pts">+${u.n} puntos</p>
+    <p>${u.confirmado ? "Tu aporte ya se ve en el mercado." : "Tu aporte está en revisión. Los puntos se confirman cuando otra persona lo vea igual."}</p>
+    ${u.n === 0 ? `<p class="note">Llegaste al tope de puntos de hoy. Tus aportes igual ayudan.</p>` : ""}</div>
+    ${state.volverA === "semana" ? `<button class="btn" data-go="semana">Volver a mi lista</button>`
+      : `<button class="btn" data-go="aportar">Aportar otro</button><button class="btn sec" data-go="inicio">Ver precios</button>`}`;
+}
+
+/* ---------------------------- mi semana: vistas ---------------------------- */
+function vSemana() {
+  if (state.perfil.rol === "resto") return vResto();
+  if (!misMercados().length) return `<h1>Tu compra de la semana</h1><p class="muted">Primero elige tus mercados.</p>
+    <button class="btn" data-act="editar-mercados">Elegir mercados</button>`;
+  const paso = state.semPaso || (nPlatos() ? "lista" : "personas");
+  return paso === "personas" ? semPersonas() : paso === "platos" ? semDias() : paso === "elegir" ? semElegir() : paso === "frutas" ? semFrutas() : semLista();
+}
+
+const numFs = (n) => (String(n).length >= 3 ? ' style="font-size:2.3rem"' : "");
+
+function semPersonas() {
+  const S = state.semana;
+  return `${nPlatos() ? `<button class="back" data-act="sem-paso" data-v="lista">‹ Volver a mi lista</button>` : ""}
+    <div style="display:grid;gap:6px"><h1>¿Para cuántas personas cocinas?</h1>
+      <p class="muted">Te decimos qué comprar en la semana y cuánto te costará en tus mercados.</p></div>
+    <div class="bigstep" role="group" aria-label="Personas">
+      <button type="button" data-act="sem-per" data-v="-1" aria-label="Una persona menos" ${S.personas > 1 ? "" : "disabled"}>−</button>
+      <output${numFs(S.personas)}>${S.personas}</output>
+      <button type="button" data-act="sem-per" data-v="1" aria-label="Una persona más">+</button></div>
+    <p style="text-align:center;margin-top:-8px" class="muted">${S.personas === 1 ? "persona" : "personas"}</p>
+    <div class="chips wrap" role="group" aria-label="Elegir rápido">${[1, 2, 3, 4, 5, 6].map((n) => `
+      <button class="chip" data-act="sem-per-fijo" data-v="${n}" aria-pressed="${S.personas === n}" style="min-width:52px">${n}</button>`).join("")}
+      <button class="chip" data-act="sem-per-fijo" data-v="50" aria-pressed="${S.personas === 50}">Olla común: 50</button></div>
+    <p class="note">Contamos la porción de una persona adulta. Dos niños pequeños cuentan como una persona.</p>
+    <button class="btn" data-act="sem-paso" data-v="platos">Seguir</button>`;
+}
+
+/* Estado de la lectura de la foto del menú (casa o restaurante). */
+function bloqueFotoMenu(boton) {
+  const f = state.menuFoto;
+  if (!f) return boton;
+  if (f.estado === "leyendo") return `<div class="card" style="justify-items:center;text-align:center">${f.url ? `<img class="photo" src="${f.url}" alt="Tu foto del menú">` : ""}
+    <div class="spin" role="progressbar" aria-label="Leyendo"></div><p class="status">Leyendo tu menú… tarda unos segundos.</p>
+    <button class="btn quiet" data-act="menu-cancelar">Cancelar</button></div>`;
+  if (f.estado === "lista") return `<div class="card" role="status"><h2>📷 Listo</h2><p>${esc(f.resumen)}</p>
+    ${f.desconocidos.length ? `<p class="small muted">No tenemos receta de: ${esc(f.desconocidos.join(", "))}. Pronto podrás agregarlas.</p>` : ""}
+    <div class="row2"><button class="btn sec" data-act="menu-deshacer">Deshacer</button><button class="btn" data-act="menu-ok">Está bien</button></div></div>`;
+  return `<p class="note" role="alert">${esc(f.error || "No se pudo leer la foto.")}</p>${boton}`;
+}
+const botonFotoMenu = (txt, ayuda) => (state.puedeFoto ? `<label class="btn sec" for="in-menu">📷 ${txt}</label>
+  <input id="in-menu" class="sr" type="file" accept="image/*" capture="environment">
+  <p class="small muted" style="margin-top:-8px">${ayuda}</p>` : "");
+
+/* Paso 2: la semana día por día. */
+function semDias() {
+  const S = state.semana, llenos = diasLlenos();
+  return `<button class="back" data-act="sem-paso" data-v="personas">‹ ${S.personas} ${S.personas === 1 ? "persona" : "personas"}</button>
+    <div style="display:grid;gap:6px"><h1>¿Qué cocinarás cada día?</h1>
+      <p class="muted">Elige el plato de cada día. Puedes dejar días vacíos.</p></div>
+    ${bloqueFotoMenu(botonFotoMenu("Foto de tu menú de la semana", "Si lo tienes escrito en un papel o pizarra, la app llena los días por ti."))}
+    ${state.aviso ? `<p class="note" role="status">${esc(state.aviso)}</p>` : ""}
+    <div class="dias">${DIAS.map((x) => {
+      const its = itemsDia(x.id);
+      return `<div class="dia${its.length ? " on" : ""}"><b class="dn">${x.n}</b>
+        <div class="dchips">${its.map((id) => { const d = plato(id); return `<span class="dchip"><span aria-hidden="true">${d.emo}</span> ${d.nombre}
+          <button type="button" data-act="sem-quitar" data-v="${x.id}:${id}" aria-label="Quitar ${d.nombre} del ${x.n}">✕</button></span>`; }).join("")}
+          ${its.length < 3 ? `<button type="button" class="dadd" data-act="sem-elegir" data-v="${x.id}">${its.length ? "+ Sopa, refresco u otro" : "+ Elegir plato"}</button>` : ""}</div></div>`;
+    }).join("")}</div>
+    ${llenos < 7 ? `<button class="btn sec" data-act="sem-economica">💡 Llenar los días vacíos con platos económicos</button>` : ""}
+    ${llenos ? `<div class="stick"><button class="btn" data-act="sem-paso" data-v="lista">Ver mi canasta · ${llenos} de 7 días</button></div>`
+      : `<p class="note">Elige al menos un día para ver tu canasta.</p>`}`;
+}
+
+/* Elegir un plato para un día: una sola decisión por pantalla. */
+function semElegir() {
+  const id = state.semDia, x = dia(id), its = itemsDia(id), tipo = state.semTipo || "segundo", ls = lugares();
+  const tipos = TIPOS.filter((t) => t.id !== "fruta");
+  return `<button class="back" data-act="sem-paso" data-v="platos">‹ Volver a la semana</button>
+    <div style="display:grid;gap:6px"><h1 style="text-transform:none">${x.n[0].toUpperCase() + x.n.slice(1)}: ¿qué vas a cocinar?</h1>
+      <p class="muted">Toca un plato y vuelves a tu semana.</p></div>
+    <div class="chips wrap" role="group" aria-label="Tipo de plato">${tipos.map((t) => `
+      <button class="chip" data-act="sem-tipo" data-v="${t.id}" aria-pressed="${tipo === t.id}">${t.nombre}</button>`).join("")}</div>
+    <div class="opts">${PLATOS.filter((d) => d.tipo === tipo).map((d) => {
+      const c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0], on = its.includes(d.id);
+      return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}">
+        <span class="emo" aria-hidden="true">${d.emo}</span><span class="name">${d.nombre}</span>
+        <span class="meta"><span>≈ ${soles(c.t)} ${tipoDe(d.tipo).por}</span>${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}</span>
+        <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
+    }).join("")}</div>
+    <p class="small muted">Precio por persona en el lugar más barato hoy (ejemplo).</p>`;
+}
+
+/* Frutas: sección aparte para no mezclar con los platos. */
+function semFrutas() {
+  const S = state.semana, ls = lugares();
+  return `<button class="back" data-act="sem-paso" data-v="lista">‹ Volver a mi canasta</button>
+    <div style="display:grid;gap:6px"><h1>Frutas de la semana</h1>
+      <p class="muted">¿Cuántas por persona a la semana? Por ejemplo, 7 es una al día.</p></div>
+    <div class="list">${PLATOS.filter((d) => d.tipo === "fruta").map((d) => {
+      const v = S.frutas[d.id] || 0, c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L)).t).sort((a, b) => a - b)[0];
+      return `<div class="plato" data-on="${v > 0}"><span class="emo" aria-hidden="true">${d.emo}</span><b class="name">${d.nombre}</b>
+        <div class="fila"><span class="meta"><span>≈ ${soles(c)} cada una</span></span>
+          <span class="step" role="group" aria-label="${d.nombre}: por persona a la semana">
+            <button type="button" data-act="fruta-menos" data-v="${d.id}" aria-label="Una menos" ${v ? "" : "disabled"}>−</button>
+            <output>${v}</output>
+            <button type="button" data-act="fruta-mas" data-v="${d.id}" aria-label="Una más ${d.nombre}">+</button></span></div></div>`;
+    }).join("")}</div>
+    <button class="btn" data-act="sem-paso" data-v="lista">Listo, volver a mi canasta</button>`;
+}
+
+function filaLista(it, mL) {
+  const S = state.semana, pr = precioLugar(it.p, mL), tengo = !!S.tengo[it.p.id], compre = !!S.compre[it.p.id];
+  const visto = mL.tipo !== "super" && precioHoy(it.p, mL).observado;
+  const planear = S.modo !== "comprar", off = planear ? tengo : compre;
+  return `<div class="lrow${off ? " off" : ""}">
+    <span class="emo" aria-hidden="true">${it.p.emo}</span>
+    <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantTxt(it.p, it.compra)}</span><br>
+      <span class="small muted">a ${soles(pr)} ${porUnidad(it.p)}${visto ? " · visto hoy" : ""}</span></span>
+    <span class="pr">${planear && tengo ? "—" : soles(it.compra * pr)}</span>
+    <span class="act">${planear
+      ? `<button class="chip" data-act="sem-tengo" data-v="${it.p.id}" aria-pressed="${tengo}">${tengo ? "✓ Ya tengo" : "Ya tengo en casa"}</button>`
+      : `<button class="chip" data-act="sem-compre" data-v="${it.p.id}" aria-pressed="${compre}">${compre ? "✓ Comprado" : "Lo compré"}</button>${compre && mL.tipo !== "super"
+        ? `<button class="chip add" data-act="sem-reportar" data-v="${it.p.id}">¿A cuánto estaba? +${PUNTOS.manual}</button>` : ""}`}</span>
+  </div>`;
+}
+
+/* Paso 3: la canasta. Primero el total y lo que te llevas en corto; el detalle, solo si lo pides. */
+function semLista() {
+  const S = state.semana, todos = compraSemana(), items = todos.filter((it) => !S.tengo[it.p.id]);
+  const tot = totalesSemana(items), best = tot[0], worst = tot[tot.length - 1];
+  const mL = mercLista(), planear = S.modo !== "comprar", llenos = diasLlenos();
+  const combo = items.length && lugares().length > 1 ? mejorCombo(items) : null;
+  const comboOk = combo && best.t - combo.t >= 5 && combo.asign[combo.a.id].length && combo.asign[combo.b.id].length;
+  const riesgo = items.filter((it) => it.p.riesgo).map((it) => it.p.nombre.toLowerCase());
+  const sug = sugerencias(best.m);
+  const aparte = [...new Set(DIAS.flatMap((x) => itemsDia(x.id)).flatMap((id) => (plato(id) && plato(id).aparte) || []))];
+  const falta = items.filter((it) => !S.compre[it.p.id]);
+  const faltaT = r2(falta.reduce((a, it) => a + it.compra * precioLugar(it.p, mL), 0));
+  const ocultos = todos.length - items.length;
+  const frutas = Object.entries(S.frutas || {}).filter(([, n]) => n).map(([id, n]) => `${plato(id).nombre.replace(/ \(.*\)$/, "").toLowerCase()} ${n}`);
+  const frutasT = items.filter((it) => it.p.rubro === "frutas").reduce((a, it) => a + it.compra * precioLugar(it.p, best.m), 0);
+  const resumen = RUBROS.map((r) => {
+    const its = items.filter((it) => it.p.rubro === r.id); if (!its.length) return "";
+    const costo = (it) => it.compra * precioLugar(it.p, best.m), sub = its.reduce((a, it) => a + costo(it), 0);
+    const top = [...its].sort((a, b) => costo(b) - costo(a)).slice(0, 3).map((it) => `${it.p.nombre.replace(/ \(.*\)$/, "").toLowerCase()} ${cantCorta(it.p, it.compra)}`);
+    return `<div class="lleva"><span class="emo" aria-hidden="true">${r.emo}</span>
+      <span><b>${r.corto}</b> <span class="muted">(${its.length})</span><br><span class="small muted">${esc(top.join(", "))}${its.length > 3 ? ` y ${its.length - 3} más` : ""}</span></span>
+      <b class="pr">${soles(sub)}</b></div>`;
+  }).join("");
+  return `<div style="display:grid;gap:6px"><h1>Tu canasta de la semana</h1>
+      <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"} · ${llenos} de 7 días con plato</p>
+      <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="sem-paso" data-v="platos">Cambiar platos</button>
+        <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas</button></div></div>
+
+    ${items.length ? `<div class="card" style="gap:8px">
+      <span class="small muted">Lo más barato para toda tu canasta</span>
+      <span class="tag big" style="justify-self:start"><span class="p">${soles(best.t)}</span></span>
+      <p><b>en ${esc(best.m.tipo === "super" ? "el súper " + best.m.nombre : best.m.nombre)}</b><br><span class="muted">≈ ${soles(best.t / S.personas)} por persona a la semana</span></p></div>
+    <div class="card"><h2>Lo que te llevas</h2>${resumen}
+      <button class="btn quiet" data-act="sem-ver-lista">${state.semVerLista ? "Ocultar la lista" : "Ver la lista para ir a comprar"}</button></div>`
+      : `<div class="card"><h2>Ya tienes todo en casa</h2><p class="muted">No hay nada que comprar con lo que elegiste.</p></div>`}
+
+    ${state.semVerLista && todos.length ? `<div class="card"><h2>Tu lista</h2>
+      <div class="seg" role="group" aria-label="Cómo usar la lista">
+        <button type="button" data-act="sem-modo" data-v="planear" aria-pressed="${planear}">Antes de salir</button>
+        <button type="button" data-act="sem-modo" data-v="comprar" aria-pressed="${!planear}">En el mercado</button></div>
+      <p class="small muted">${planear ? "Marca lo que ya tienes en casa y no lo sumamos." : "Ve marcando lo que compras. Si nos dices a cuánto estaba, ganas puntos."}</p>
+      <div><p class="lbl">Precios de:</p><div class="chips" role="group" aria-label="Lugar de la lista">${tot.map((x) => `
+        <button class="chip" data-act="sem-merc" data-v="${x.m.id}" aria-pressed="${x.m.id === mL.id}">${esc(nombreLugar(x.m))}</button>`).join("")}</div></div>
+      ${!planear ? `<p class="status">${falta.length ? `Te falta comprar ${falta.length} ${falta.length === 1 ? "cosa" : "cosas"}: ${soles(faltaT)}` : "¡Compraste todo!"}</p>` : ""}
+      ${RUBROS.map((r) => { const its = todos.filter((it) => it.p.rubro === r.id && (planear || !S.tengo[it.p.id]));
+        return its.length ? `<div class="grp"><h3>${r.nombre}</h3>${its.map((it) => filaLista(it, mL)).join("")}</div>` : ""; }).join("")}
+      ${!planear && ocultos ? `<p class="small muted">No mostramos ${ocultos} ${ocultos === 1 ? "cosa que ya tienes" : "cosas que ya tienes"} en casa.</p>` : ""}
+    </div>` : ""}
+
+    ${items.length ? `<div class="card"><h2>¿Dónde te sale más barato?</h2>${tot.slice(0, state.semVerLugares ? tot.length : 3).map((x, i) => `
+      <div class="mrow"><span><b>${esc(nombreLugar(x.m))}</b><br>
+        <span class="small muted">${x.m.tipo === "super" ? (!x.reales ? "Súper · ejemplo" : x.reales === x.n ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : `Súper · online del ${fechaCorta(state.superReal.fecha)} en ${x.reales} de ${x.n} productos`) : "Mercado"}${x.vistos ? ` · ${x.vistos} precios vistos hoy` : ""}${i ? ` · ${soles(x.t - best.t)} más` : ""}</span>
+        ${i === 0 ? `<br><span class="cheap">Más barato</span>` : ""}</span>
+        <span class="tag"><span class="p">${soles(x.t)}</span></span></div>`).join("")}
+      ${tot.length > 3 ? `<button class="btn quiet" data-act="sem-ver-lugares">${state.semVerLugares ? "Ver solo los 3 más baratos" : `Ver los ${tot.length} lugares`}</button>` : ""}
+      ${comboOk ? (() => { const rb = rubrosDe(combo); return `<p>💡 <b>Combina y ahorra ${soles(best.t - combo.t)}:</b> ${esc(rb[combo.a.id].join(", ") || "algunas cosas")} en ${esc(nombreLugar(combo.a))}
+        y ${esc(rb[combo.b.id].join(", ") || "lo demás")} en ${esc(nombreLugar(combo.b))}. Pagas ${soles(combo.t)}.</p>`; })()
+        : worst.t - best.t >= 1 ? `<p>Ahorras <b>${soles(worst.t - best.t)}</b> si compras en ${esc(nombreLugar(best.m))} y no en ${esc(nombreLugar(worst.m))}.</p>` : ""}
+      <p class="small muted">${state.superReal ? `Los súper marcados "online" usan el precio de su tienda virtual (${fechaCorta(state.superReal.fecha)}); en el local puede variar. Lo demás es de ejemplo.` : "Precios de ejemplo de tus mercados y de supermercados cercanos."}${limiteMercados() === GRATIS ? ` Con tus puntos puedes comparar hasta ${AMPLIADO} mercados.` : ""}</p></div>` : ""}
+
+    <div class="card"><h2>🍎 Frutas de la semana</h2>
+      ${frutas.length ? `<p>${esc(frutas.join(", "))} por persona · <b>${soles(frutasT)}</b> (ya sumado)</p>
+        <button class="btn quiet" data-act="sem-paso" data-v="frutas">Cambiar frutas</button>`
+        : `<p class="muted">Van aparte para no mezclar con los platos.</p><button class="btn sec" data-act="sem-paso" data-v="frutas">Agregar frutas</button>`}</div>
+
+    ${best.r > 0 ? `<div class="alert" role="note"><span class="bang" aria-hidden="true">!</span>
+      <span><b>${soles(best.r)} de tu canasta</b> (${Math.round((best.r / best.t) * 100)}%) puede subir por El Niño: ${esc(riesgo.join(", "))}.
+      Si sube 20%, pagarías ${soles(best.t + best.r * 0.2)}.</span></div>` : ""}
+    ${sug.map((s) => `<div class="card sug"><p>💡 Cambia <b>${esc(s.d.nombre.toLowerCase())}</b> por <b>${esc(s.alt.nombre.toLowerCase())}</b>:
+      ahorras cerca de <b>${soles(s.ahorro)}</b> en la semana${s.evita.length ? ` y no dependes de ${esc(s.evita.join(" ni "))}` : ""}.</p>
+      <button class="btn sec" data-act="sem-cambiar" data-v="${s.d.id}">Cambiar</button></div>`).join("")}
+
+    <p class="note">No incluye: ${esc([...aparte, "sal y condimentos"].join(", "))}. Porciones caseras aproximadas, redondeadas a como se vende
+      (cuarto, medio kilo). Precios de mercados y supermercados de ejemplo.</p>
+    <button class="btn quiet" data-act="sem-limpiar">Empezar otra semana desde cero</button>
+    <button class="btn sec" data-act="ir-ideas">💬 ¿Te sirvió? Danos tu opinión</button>`;
+}
+
+/* ---------------------------- plan restaurante: vistas ---------------------------- */
+const sello = `<span class="prem">PLAN RESTAURANTE · PREMIUM GRATIS EN LA PRUEBA</span>`;
+function vResto() {
+  const paso = state.restoPaso || (diasConMenu().length ? "costos" : "negocio");
+  return paso === "negocio" ? restoNegocio() : paso === "menu" ? restoMenu() : restoCostos();
+}
+
+function restoNegocio() {
+  const R = state.resto;
+  return `<div style="display:grid;gap:8px">${sello}<h1>Tu negocio</h1>
+      <p class="muted">Con esto calculamos cuánto te cuesta cada menú y armamos el pedido para tus proveedores de siempre.</p></div>
+    <div class="card"><p class="lbl">¿Cuántos menús vendes al día?</p>
+      <div class="bigstep" role="group" aria-label="Menús al día">
+        <button type="button" data-act="resto-menus" data-v="-1" aria-label="Cinco menús menos" ${R.menusDia > 5 ? "" : "disabled"}>−</button>
+        <output${numFs(R.menusDia)}>${R.menusDia}</output>
+        <button type="button" data-act="resto-menus" data-v="1" aria-label="Cinco menús más">+</button></div>
+      <p class="small muted" style="text-align:center">menús al día (de 5 en 5)</p></div>
+    <div class="card"><p class="lbl">¿Qué días atiendes?</p>
+      <div class="chips wrap" role="group" aria-label="Días que atiendes">${DIAS.map((d) => `
+        <button class="chip" data-act="resto-dia-on" data-v="${d.id}" aria-pressed="${R.dias.includes(d.id)}" style="min-width:64px">${d.c}</button>`).join("")}</div></div>
+    <div class="card"><label class="lbl" for="rp-precio">¿A cuánto vendes el menú?</label>
+      <div class="money"><button type="button" data-act="resto-precio" data-v="-1" aria-label="Cincuenta céntimos menos">−</button>
+        <input class="big" id="rp-precio" inputmode="decimal" value="${R.precioMenu.toFixed(2)}" aria-label="Precio del menú en soles">
+        <button type="button" data-act="resto-precio" data-v="1" aria-label="Cincuenta céntimos más">+</button></div></div>
+    <button class="btn" data-act="resto-paso" data-v="menu" ${R.dias.length ? "" : "disabled"}>Seguir: arma tu menú de la semana</button>`;
+}
+
+function opcion(p, campo, on, multi) {
+  const k = costoPlatoCon(p, precioResto);
+  return `<button class="opt" data-act="${multi ? "resto-toggle" : "resto-unico"}" data-v="${campo}:${p.id}" aria-pressed="${on}">
+    <span class="emo" aria-hidden="true">${p.emo}</span><span class="name">${p.nombre}</span>
+    <span class="meta"><span>${soles(k.t)} por porción</span>${k.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}</span>
+    <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
+}
+
+function restoMenu() {
+  const R = state.resto;
+  if (!R.dias.includes(R.diaActivo)) R.diaActivo = R.dias[0];
+  const d = R.diaActivo, x = diaMenu(d), c = costoDia(d), sig = siguienteDia(d), lleno = diasConMenu().length;
+  const lista = (tipos, campo, multi) => PLATOS.filter((p) => tipos.includes(p.tipo))
+    .map((p) => opcion(p, campo, multi ? x[campo].includes(p.id) : x[campo] === p.id, multi)).join("");
+  const ninguno = (campo, txt) => `<button class="opt" data-act="resto-unico" data-v="${campo}:" aria-pressed="${!x[campo]}">
+    <span class="emo" aria-hidden="true">–</span><span class="name">${txt}</span><span class="meta"></span><span class="chk" aria-hidden="true">${!x[campo] ? "✓" : ""}</span></button>`;
+  return `<button class="back" data-act="resto-paso" data-v="negocio">‹ Tu negocio</button>
+    <div style="display:grid;gap:6px">${sello}<h1>Menú de la semana</h1><p class="muted">${R.menusDia} menús al día a ${soles(R.precioMenu)}</p></div>
+    ${bloqueFotoMenu(botonFotoMenu("Foto de tu pizarra de menú", "Sirve la del día o la de toda la semana. La app arma el menú por ti."))}
+    <div class="chips wrap" role="group" aria-label="Día">${R.dias.map((id) => `
+      <button class="chip" data-act="resto-dia" data-v="${id}" aria-pressed="${id === d}" style="min-width:64px">${dia(id).c}${diaMenu(id).segundo.length ? " ✓" : ""}</button>`).join("")}</div>
+    <div class="card" style="gap:6px"><h2 style="text-transform:capitalize">${dia(d).n}</h2>
+      <p>${c.lleno ? `Insumos por menú: <b>${soles(c.t)}</b> · <span class="semaf ${semaforo(c.t / R.precioMenu)}">${Math.round((c.t / R.precioMenu) * 100)}% del precio</span>` : "Marca al menos un segundo."}</p></div>
+    <h2>Entrada</h2><p class="small muted" style="margin-top:-10px">Sopa, caldo o entrada fría. Puedes marcar varias.</p>
+    <div class="opts">${lista(["sopa", "entrada"], "entrada", true)}</div>
+    <h2>Segundo</h2><p class="small muted" style="margin-top:-10px">Puedes marcar varios.</p>
+    <div class="opts">${lista(["segundo"], "segundo", true)}</div>
+    <h2>Refresco</h2><div class="opts">${ninguno("refresco", "Sin refresco")}${lista(["refresco"], "refresco", false)}</div>
+    <h2>Postre</h2><div class="opts">${ninguno("postre", "Sin postre")}${lista(["postre"], "postre", false)}</div>
+    ${sig && c.lleno ? `<button class="btn quiet" data-act="resto-copiar-dia">Copiar este menú al ${dia(sig).n}</button>` : ""}
+    <p class="small muted">Repartimos los menús del día en partes iguales entre las entradas y segundos que marques. Sumamos 5% de merma.
+      Los precios son la referencia mayorista de ejemplo, o lo que te cobra tu proveedor si lo escribes en el pedido.</p>
+    ${lleno ? `<div class="stick"><button class="btn" data-act="resto-paso" data-v="costos">Ver costos y pedido de la semana</button></div>` : ""}`;
+}
+
+function filaPedido(it) {
+  const R = state.resto, ref = precioRef(it.p), mio = Number(R.precios[it.p.id]) || 0, pu = mio || ref;
+  const dif = mio ? (mio - ref) / ref : 0;
+  const pill = !mio ? "" : dif > 0.05 ? `<span class="pill up">${Math.round(dif * 100)}% sobre la referencia</span>`
+    : dif < -0.05 ? `<span class="pill down">${Math.round(-dif * 100)}% bajo la referencia</span>` : `<span class="pill same">En precio</span>`;
+  return `<div class="prow"><span class="emo" aria-hidden="true">${it.p.emo}</span>
+    <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantResto(it.p, it.compra)}</span></span>
+    <span class="sub">${soles(it.compra * pu)}</span>
+    <span class="inp"><label for="tp-${it.p.id}">Te cobra S/</label><input id="tp-${it.p.id}" inputmode="decimal" data-tprecio="${it.p.id}" value="${mio ? mio.toFixed(2) : ""}" placeholder="¿cuánto?"
+      aria-describedby="rf-${it.p.id}"> <span>${POR_CORTO[it.p.unidad] || porUnidad(it.p)}</span>
+      <span id="rf-${it.p.id}">· ref. ${soles(ref)}</span> ${pill}</span></div>`;
+}
+
+function restoCostos() {
+  const R = state.resto, ds = diasConMenu();
+  if (!ds.length) return `<div style="display:grid;gap:8px">${sello}<h1>Tu semana en números</h1></div>
+    <p class="muted">Primero arma el menú de al menos un día.</p><button class="btn" data-act="resto-paso" data-v="menu">Armar mi menú</button>`;
+  const pd = ds.map((d) => ({ d, ...costoDia(d) }));
+  const prom = pd.reduce((a, x) => a + x.t, 0) / pd.length, promR = pd.reduce((a, x) => a + x.r, 0) / pd.length;
+  const fc = prom / R.precioMenu, sem = semaforo(fc);
+  const gan = pd.reduce((a, x) => a + (R.precioMenu - x.t) * R.menusDia, 0);
+  const items = compraResto(), total = items.reduce((a, it) => a + it.compra * precioResto(it.p), 0);
+  const subida = promR * 0.2, sugerido = Math.ceil((R.precioMenu + subida) * 2) / 2;
+  const caro = pd.reduce((a, x) => (x.t > a.t ? x : a));
+  const sug = sugResto();
+  const conPrecio = items.filter((it) => Number(R.precios[it.p.id]) > 0);
+  const dif = conPrecio.reduce((a, it) => a + (precioResto(it.p) - precioRef(it.p)) * it.compra, 0);
+  const baseRef = conPrecio.reduce((a, it) => a + precioRef(it.p) * it.compra, 0);
+  const caros = conPrecio.map((it) => ({ it, d: (precioResto(it.p) - precioRef(it.p)) / precioRef(it.p) })).filter((x) => x.d > 0.05).sort((a, b) => b.d - a.d).slice(0, 3);
+  const nombres = (d) => { const x = diaMenu(d); return [...x.entrada, ...x.segundo].map((id) => plato(id).nombre).join(", "); };
+  const aparte = [...new Set(Object.keys(porcionesSemana()).flatMap((id) => plato(id).aparte || []))];
+  return `<div style="display:grid;gap:6px">${sello}<h1>Tu semana en números</h1>
+      <p class="muted">${ds.length} ${ds.length === 1 ? "día" : "días"} · ${R.menusDia} menús al día · ${soles(R.precioMenu)} el menú</p>
+      <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="resto-paso" data-v="menu">Cambiar menú</button>
+        <button class="link" data-act="resto-paso" data-v="negocio">Cambiar negocio</button></div></div>
+    <div class="kpis">
+      <div class="kpi ${sem}"><span class="small muted">Insumos por menú</span><b>${soles(prom)}</b>
+        <span class="semaf ${sem}">${Math.round(fc * 100)}% · ${sem === "ok" ? "Bien" : sem === "warn" ? "Ajustado" : "Alto"}</span></div>
+      <div class="kpi"><span class="small muted">Te queda por menú</span><b>${soles(R.precioMenu - prom)}</b><span class="small muted">para gas, personal y alquiler</span></div>
+      <div class="kpi"><span class="small muted">Compra de la semana</span><b>${soles(total)}</b><span class="small muted">${ds.length * R.menusDia} menús</span></div>
+      <div class="kpi"><span class="small muted">Te queda en la semana</span><b>${soles(gan)}</b><span class="small muted">antes de otros gastos</span></div>
+    </div>
+    <p class="small muted">En un menú económico, si los insumos pasan de la mitad del precio queda muy poco para gas, personal y alquiler.</p>
+    <div class="card"><h2>Día por día</h2>${pd.map((x) => `
+      <div class="drow"><span><b style="text-transform:capitalize">${dia(x.d).n}</b><br><span class="small muted">${esc(nombres(x.d))}</span></span>
+        <span>${soles(x.t)}</span><span class="semaf ${semaforo(x.t / R.precioMenu)}">${Math.round((x.t / R.precioMenu) * 100)}%</span></div>`).join("")}
+      ${pd.length > 1 ? `<p>Tu día más caro es el <b>${dia(caro.d).n}</b>.</p>` : ""}</div>
+    ${promR > 0 ? `<div class="alert" role="note"><span class="bang" aria-hidden="true">!</span><span><b>${Math.round((promR / prom) * 100)}% del costo de tu menú</b>
+      depende de productos que pueden subir por El Niño. Si suben 20%, cada menú te costaría ${soles(prom + subida)}.
+      ${sugerido > R.precioMenu ? `Para ganar lo mismo, cobrarías ${soles(sugerido)}.` : "Tu precio aguanta esa subida."}</span></div>` : ""}
+    ${sug.map((s) => `<div class="card sug"><p>💡 Cambia <b>${esc(s.d.nombre.toLowerCase())}</b> por <b>${esc(s.alt.nombre.toLowerCase())}</b>:
+      ahorras cerca de <b>${soles(s.ahorro)}</b> en la semana${s.evita.length ? ` y no dependes de ${esc(s.evita.join(" ni "))}` : ""}.</p>
+      <button class="btn sec" data-act="resto-cambiar" data-v="${s.d.id}">Cambiar en todo el menú</button></div>`).join("")}
+
+    <div style="display:grid;gap:4px"><h2>Pedido para tus proveedores</h2>
+      <p class="small muted">Ya incluye 5% de merma. Mientras no escribas tu precio, usamos la referencia mayorista (ref.). Escribe lo que te cobra tu proveedor y toca <b>Recalcular</b>: verás tu costo real y si te cobra justo.</p></div>
+    ${PROVEEDORES.map((pv) => {
+      const its = items.filter((it) => pv.rubros.includes(it.p.rubro)); if (!its.length) return "";
+      const sub = its.reduce((a, it) => a + it.compra * precioResto(it.p), 0), texto = textoPedido(pv, its);
+      return `<div class="card"><div><h2>${pv.emo} ${pv.nombre}</h2><p class="small muted">${pv.quien}</p></div>
+        <div>${its.map(filaPedido).join("")}</div>
+        <p class="status">Subtotal: ${soles(sub)}</p>
+        <div class="row2"><a class="btn sec" href="https://wa.me/?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+          <button class="btn quiet" data-act="resto-copiar" data-v="${pv.id}">Copiar pedido</button></div>
+        ${state.copia && state.copia.id === pv.id ? `<textarea class="big" readonly aria-label="Pedido para copiar">${esc(state.copia.texto)}</textarea>
+          <p class="small muted" role="status">${state.copia.ok ? "Copiado ✓ Pégalo en el chat de tu proveedor." : "Mantén presionado el texto para copiarlo."}</p>` : ""}</div>`;
+    }).join("")}
+    <button class="btn" data-act="resto-recalcular">Recalcular con mis precios</button>
+
+    <div class="card"><h2>¿Tu proveedor te cobra justo?</h2>
+      ${conPrecio.length ? `<p>${dif > 0.5 ? `En los ${conPrecio.length} productos con tu precio pagas <b>${soles(dif)} más</b> (${Math.round((dif / baseRef) * 100)}%) que la referencia mayorista esta semana.`
+        : "Con los precios que escribiste, tus proveedores están en la referencia o por debajo. ¡Bien negociado!"}</p>
+        ${caros.length ? `<p class="small">Para conversar con tu proveedor: ${caros.map((x) => `${esc(x.it.p.nombre.toLowerCase())} (+${Math.round(x.d * 100)}%)`).join(", ")}.</p>` : ""}
+        <button class="btn sec" data-act="resto-aportar" ${R.aportadoDia === hoy() ? "disabled" : ""}>${R.aportadoDia === hoy() ? "Ya aportaste hoy ✓" : "Aportar mis precios (anónimo) · +10 puntos"}</button>
+        <p class="small muted">Se publican sin tu nombre ni el de tu proveedor. Ayudan a que otros restaurantes negocien mejor.</p>`
+      : `<p class="muted">Escribe en el pedido lo que te cobra tu proveedor y aquí verás si estás pagando de más.</p>`}</div>
+    <p class="note">No incluye: ${esc([...aparte, "sal, condimentos y gas"].join(", "))}. Porciones de menú aproximadas; la referencia mayorista es de ejemplo
+      (en la app real sale del boletín diario de precios mayoristas de Lima).</p>
+    <button class="btn sec" data-act="ir-ideas">💬 ¿Te sirvió? Danos tu opinión</button>`;
+}
+
+/* ---------------------------- opiniones de quienes prueban ---------------------------- */
+const UTILES = ["Precios del día", "Mi semana", "Comparar mercados", "Puntos", "Foto de pizarra", "Costos del menú", "Pedido al proveedor"];
+function textoIdea() {
+  const I = state.idea, nota = { mal: "😕 No me sirvió", bien: "🙂 Está bien", super: "😍 Me encantó" }[I.nota] || "-";
+  return `Mi opinión sobre Acuánto (${VERSION}):\nMe pareció: ${nota}\nMe sirvió: ${I.util.join(", ") || "-"}\nLa usaría cada semana: ${I.frecuencia || "-"}`
+    + (I.pago ? `\nPagaría al mes: ${I.pago}` : "") + `\nIdea: ${I.texto.trim() || "-"}`;
+}
+function vIdeas() {
+  const I = state.idea, esResto = state.perfil.rol === "resto";
+  if (I.enviado) {
+    const texto = textoIdea();
+    return `<div class="done"><div class="ok" aria-hidden="true">✓</div><h1>¡Gracias!</h1>
+        <p>${I.enviado === "db" ? "Recibimos tu opinión. Nos ayuda a decidir qué mejorar primero." : (WHATSAPP_OPINIONES ? "Ahora envíala por WhatsApp: el mensaje ya va listo." : "Ahora envíala por WhatsApp a quien te pasó la app.")}</p></div>
+      ${I.enviado === "share" ? `<a class="btn" href="https://wa.me/${WHATSAPP_OPINIONES}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+        <button class="btn quiet" data-act="idea-copiar">Copiar texto</button>
+        ${state.copia && state.copia.id === "idea" ? `<textarea class="big" readonly aria-label="Tu opinión para copiar">${esc(texto)}</textarea>
+          <p class="small muted" role="status">${state.copia.ok ? "Copiado ✓" : "Mantén presionado el texto para copiarlo."}</p>` : ""}` : ""}
+      <button class="btn sec" data-act="ideas-volver">Volver a la app</button>`;
+  }
+  const chip = (act, v, txt, on) => `<button class="chip" data-act="${act}" data-v="${esc(v)}" aria-pressed="${on}">${txt}</button>`;
+  return `<button class="back" data-act="ideas-volver">‹ Volver</button>
+    <div style="display:grid;gap:6px"><h1>¿Qué te pareció?</h1><p class="muted">Es una versión de prueba. Tu opinión decide qué mejoramos primero.</p></div>
+    <div class="chips wrap" role="group" aria-label="Qué te pareció">${[["mal", "😕 No me sirvió"], ["bien", "🙂 Está bien"], ["super", "😍 Me encantó"]]
+      .map(([v, t]) => chip("idea-nota", v, t, I.nota === v)).join("")}</div>
+    <div><p class="lbl">¿Qué te sirvió más?</p><div class="chips wrap" role="group" aria-label="Lo más útil">${UTILES
+      .filter((u) => esResto || !["Costos del menú", "Pedido al proveedor"].includes(u)).map((u) => chip("idea-util", u, u, I.util.includes(u))).join("")}</div></div>
+    <div><p class="lbl">¿La usarías cada semana?</p><div class="chips wrap" role="group" aria-label="Frecuencia">${["Sí", "Tal vez", "No"]
+      .map((v) => chip("idea-frec", v, v, I.frecuencia === v)).join("")}</div></div>
+    ${esResto ? `<div><p class="lbl">Después de la prueba, ¿cuánto pagarías al mes por el plan restaurante?</p><div class="chips wrap" role="group" aria-label="Cuánto pagarías">${["Nada", "S/ 19", "S/ 29", "S/ 49 o más"]
+      .map((v) => chip("idea-pago", v, v, I.pago === v)).join("")}</div></div>` : ""}
+    <div><label class="lbl" for="idea-txt">¿Qué le agregarías o cambiarías?</label>
+      <textarea class="big" id="idea-txt" maxlength="1000" placeholder="Escribe aquí tu idea…">${esc(I.texto)}</textarea></div>
+    <p class="small muted">Tu opinión se guarda sin tu nombre.</p>
+    <button class="btn" data-act="idea-enviar">Enviar mi opinión</button>`;
+}
+
+function vPuntos() {
+  const pt = state.puntos, ampl = state.perfil.ampliadoHasta && state.perfil.ampliadoHasta >= hoy();
+  const nivel = pt.total >= 500 ? "Casera de confianza" : pt.total >= 100 ? "Casera activa" : "Casera nueva";
+  return `<div class="card points"><span class="small muted">Tus puntos</span><span class="n">${pt.total}</span>
+      <span>${nivel}${pt.pendientes ? ` · ${pt.pendientes} en revisión` : ""}</span></div>
+    <h2>Canjea tus puntos</h2>
+    <div class="card">
+      <div class="reward"><span><b>Ver 10 mercados por 7 días</b><br><span class="small muted">${ampl ? "Activo hasta el " + state.perfil.ampliadoHasta : "Más mercados y comparar dónde está más barato"}</span></span>
+        <button class="btn" data-act="canjear" ${pt.total >= 100 && !ampl ? "" : "disabled"}>100 pts</button></div>
+      <div class="reward"><span><b>Recarga de S/ 5</b><br><span class="small muted">La paga una marca auspiciadora</span></span><button class="btn sec" disabled>Pronto</button></div>
+      <div class="reward"><span><b>Sorteo de una canasta</b><br><span class="small muted">Cada mes, entre quienes aportan</span></span><button class="btn sec" disabled>Pronto</button></div>
+    </div>
+    <h2>Cómo ganar puntos</h2>
+    <div class="card small"><div class="hist">
+      <div><span>Foto a una pizarra</span><b>+${PUNTOS.foto} y +${PUNTOS.fotoExtra} por precio extra</b></div>
+      <div><span>Avisar que no hay un producto</span><b>+${PUNTOS.nohay}</b></div>
+      <div><span>Escribir un precio</span><b>+${PUNTOS.manual}</b></div>
+      <div><span>Confirmar un precio</span><b>+${PUNTOS.confirmar}</b></div>
+      <div><span>Publicar los precios de tu puesto</span><b>+${PUNTOS.puesto}</b></div></div>
+      <p class="muted">Tope de ${PUNTOS.topeDia} puntos al día.</p></div>
+    ${pt.historial && pt.historial.length ? `<h2>Últimos movimientos</h2><div class="card hist">${pt.historial.slice(0, 8).map((h) => `
+      <div><span>${esc(h.motivo)}</span><b>${h.n >= 0 ? "+" : ""}${h.n}${h.confirmado ? "" : " (revisión)"}</b></div>`).join("")}</div>` : ""}
+    <h2>Ajustes</h2>
+    <div class="card"><button class="btn quiet" data-act="editar-mercados">Cambiar mis mercados</button>
+      <button class="btn quiet" data-act="cambiar-rol">Cambiar cómo uso la app</button>
+      <button class="btn sec" data-act="ir-ideas">💬 Dar mi opinión</button>
+      ${state.db && state.uid ? `<p class="small muted">Tus puntos se guardan en tu cuenta.</p>` : `<p class="small muted">Modo de prueba: tus datos se guardan solo en este teléfono.</p>`}
+      <p class="small muted">${VERSION}</p></div>`;
+}
+
+function vPuesto() {
+  const pu = state.perfil.puesto;
+  if (!pu || state.borrador?.registro) {
+    const r = state.borrador?.registro || { mercado: state.perfil.mercados[0] || MERCADOS[0].id, numero: "", rubros: [] };
+    state.borrador = { registro: r };
+    return `<h1>Registra tu puesto</h1><p class="muted">Así tus caseras ven tus precios con el nombre de tu puesto.</p>
+      <div><label class="lbl" for="pu-mercado">Mercado</label><select class="big" id="pu-mercado">${MERCADOS.map((m) => `<option value="${m.id}" ${m.id === r.mercado ? "selected" : ""}>${esc(m.nombre)}</option>`).join("")}</select></div>
+      <div><label class="lbl" for="pu-num">Número de puesto</label><input class="big" id="pu-num" inputmode="numeric" placeholder="Ejemplo: 45" value="${esc(r.numero)}"></div>
+      <div><p class="lbl">¿Qué vendes?</p><div class="list">${RUBROS.map((x) => `
+        <button class="choice" data-act="rubro" data-v="${x.id}" aria-pressed="${r.rubros.includes(x.id)}" style="grid-template-columns:1fr;min-height:64px"><span><b>${x.nombre}</b></span></button>`).join("")}</div></div>
+      <button class="btn" data-act="guardar-puesto">Guardar mi puesto</button>`;
+  }
+  const m = merc(pu.mercado), mios = PRODUCTOS.filter((p) => pu.rubros.includes(p.rubro));
+  const precios = state.borrador?.precios || Object.fromEntries(mios.map((p) => [p.id, pu.precios?.[p.id] ?? estimado(p, m)]));
+  const sinStock = state.borrador?.sinStock || {};
+  state.borrador = { precios, sinStock };
+  return `<div style="display:grid;gap:4px"><h1>Puesto ${esc(pu.numero)}</h1><p class="muted">${esc(m.nombre)}</p></div>
+    <div class="alert" role="note"><span class="bang" aria-hidden="true">i</span><span>Cada mañana, actualiza tus precios en un minuto. Ganas ${PUNTOS.puesto} puntos y las caseras te encuentran.</span></div>
+    ${state.puedeFoto ? `<button class="btn sec" data-act="ir-foto-puesto">${icono.foto} Mejor, tomo foto a mi pizarra</button>` : ""}
+    <h2>Mis precios de hoy</h2>
+    <div class="list">${mios.map((p) => `<div class="item"><div class="hd"><span>${p.emo} ${p.nombre} <span class="small muted">(${p.unidad === "kilo" ? "kilo" : p.unidad})</span></span>
+        <button class="chip" data-act="sin-stock" data-v="${p.id}" aria-pressed="${!!sinStock[p.id]}" style="min-height:48px;font-size:0.8rem">${sinStock[p.id] ? "Hoy no tengo" : "Sí tengo"}</button></div>
+      ${sinStock[p.id] ? "" : `<div class="money"><button type="button" data-act="pmenos" data-v="${p.id}" aria-label="Diez céntimos menos">−</button>
+        <input class="big" inputmode="decimal" data-pprecio="${p.id}" value="${Number(precios[p.id]).toFixed(2)}" aria-label="Precio de ${p.nombre}">
+        <button type="button" data-act="pmas" data-v="${p.id}" aria-label="Diez céntimos más">+</button></div>`}</div>`).join("")}</div>
+    <button class="btn" data-act="publicar-puesto">Publicar mis precios</button>
+    <button class="btn quiet" data-act="editar-puesto">Cambiar datos del puesto</button>
+    ${pu.publicado ? `<p class="small muted">Última publicación: ${esc(pu.publicado)}</p>` : ""}`;
+}
+
+/* ---------------------------- render y navegación ---------------------------- */
+function render() {
+  const v = state.view;
+  document.documentElement.style.fontSize = (LETRAS.find((l) => l.id === state.perfil.letra) || LETRAS[0]).px + "px";
+  const html = v === "bienvenida" ? vBienvenida() : v === "inicio" ? vInicio() : v === "producto" ? vProducto(state.productoActivo)
+    : v === "aportar" ? vAportar() : v === "foto" ? vFoto() : v === "manual" ? vManual() : v === "nohay" ? vNoHay()
+    : v === "gracias" ? vGracias() : v === "puntos" ? vPuntos() : v === "puesto" ? vPuesto() : v === "semana" ? vSemana()
+    : v === "ideas" ? vIdeas() : vInicio();
+  $("#main").innerHTML = html;
+  state.aviso = null;
+  const enApp = v !== "bienvenida" && !(v === "ideas" && state.desde === "bienvenida");
+  $("#bar").hidden = !enApp;
+  if (enApp) document.documentElement.style.setProperty("--nav-h", $("#bar").offsetHeight + "px");
+  const esPuesto = state.perfil.rol === "puesto";
+  $("#nav-aportar-txt").textContent = esPuesto ? "Mi puesto" : "Aportar";
+  $("#nav-semana-txt").textContent = state.perfil.rol === "resto" ? "Mi menú" : "Mi semana";
+  const im = $("#in-menu"); if (im) im.addEventListener("change", (e) => leerMenu(e, state.perfil.rol === "resto" ? "resto" : "casa"));
+  if (state.toast) { toast(state.toast); state.toast = null; }
+  let tab = { inicio: "inicio", producto: "inicio", aportar: "aportar", foto: "aportar", manual: "aportar", nohay: "aportar", gracias: "aportar", puesto: "aportar", puntos: "puntos", semana: "semana" }[v];
+  if (state.volverA === "semana" && (v === "manual" || v === "gracias")) tab = "semana";
+  ["inicio", "semana", "aportar", "puntos"].forEach((t) => { const b = $("#nav-" + t); if (t === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  const foto = $("#in-foto"); if (foto) foto.addEventListener("change", leerFoto);
+  const sd = $("#sel-distrito"); if (sd) sd.addEventListener("change", (e) => { state.perfil.distrito = e.target.value; render(); });
+}
+function ir(view) {
+  if (view === "aportar" && state.perfil.rol === "puesto") view = "puesto";
+  if (["aportar", "puesto", "inicio", "puntos", "semana"].includes(view)) { state.borrador = null; state.volverA = null; }
+  if (view === "semana") { state.semPaso = nPlatos() ? "lista" : "personas"; state.restoPaso = null; state.menuFoto = null; state.copia = null; }
+  state.view = view; render(); window.scrollTo(0, 0); enfocarTitulo();
+}
+let tToast = null;
+function toast(t) {
+  let el = $("#toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.append(el); }
+  el.textContent = t; el.hidden = false; clearTimeout(tToast); tToast = setTimeout(() => { el.hidden = true; }, 4500);
+}
+/* Al cambiar de pantalla, el lector de pantalla empieza por el título. */
+function enfocarTitulo() { const h = $("#main h1"); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); } }
+const avisarSR = (t) => { const s = $("#sr"); s.textContent = ""; setTimeout(() => { s.textContent = t; }, 30); };
+
+/* ---------------------------- foto de pizarra ---------------------------- */
+let ctl = null;
+async function leerFoto(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  state.borrador = { estado: "leyendo", url, fuente: state.borrador?.fuente || "foto", items: [] };
+  render();
+  ctl = new AbortController();
+  const catalogo = PRODUCTOS.map((p) => p.nombre.toLowerCase()).join(", ");
+  try {
+    const res = await state.sample.json(
+      "La imagen es una foto de la pizarra o cartel de precios de un puesto en un mercado de Lima, Perú. " +
+      "Extrae cada producto con su precio en soles. Usa estos nombres cuando corresponda: " + catalogo + ". " +
+      'Responde solo un arreglo JSON como [{"producto":"limón","precio":4.5,"unidad":"kilo"}]. ' +
+      "La unidad es una de: " + UNIDADES.join(", ") + " (si no se ve, usa kilo). Si no se lee ningún precio, responde [].",
+      { images: [file], modelTier: "quick", signal: ctl.signal });
+    const items = (Array.isArray(res) ? res : []).map((r) => {
+      const n = norm(r.producto), precio = Number(r.precio);
+      const p = PRODUCTOS.find((x) => norm(x.nombre) === n) || (n.length >= 3 && PRODUCTOS.find((x) => n.includes(norm(x.nombre)) || norm(x.nombre).includes(n)))
+        || (n.includes("limon") && prod("limon")) || (n.includes("cebolla") && prod("cebolla")) || (n.includes("aji") && prod("aji"))
+        || (n.includes("papa") && (n.includes("amarill") ? prod("papa-amarilla") : prod("papa-blanca")))
+        || ((n.includes("carne") || n.includes("bistec") || n.includes("lomo")) && prod("carne")) || ((n.includes("fideo") || n.includes("tallar")) && prod("fideos"))
+        || (n.includes("lenteja") && prod("lenteja")) || (n.includes("aceite") && prod("aceite")) || (n.includes("leche") && prod("leche")) || (n.includes("arveja") && prod("arveja"));
+      return precio > 0 && precio < 1000 ? { producto: p ? p.id : null, libre: p ? null : String(r.producto || "").slice(0, 40), precio: r10(precio), unidad: UNIDADES.includes(r.unidad) ? r.unidad : (p ? p.unidad : "kilo") } : null;
+    }).filter(Boolean).slice(0, 20);
+    state.borrador = { estado: "lista", url, fuente: state.borrador.fuente, items };
+  } catch (err) {
+    const msg = err && err.code === "cancelled" ? null
+      : err && (err.code === "not_granted" || err.code === "sampling_disabled") ? "La lectura de fotos no está permitida. Puedes escribir los precios."
+      : err && err.code === "image_rejected" ? "No se pudo usar esa foto. Prueba con otra."
+      : err && err.code === "rate_limited" ? "Muchas fotos seguidas. Espera un momento e inténtalo de nuevo."
+      : "No se pudo leer la foto. Inténtalo otra vez o escribe el precio.";
+    state.borrador = { estado: null, fuente: state.borrador?.fuente, error: msg };
+    if (err && (err.code === "not_granted" || err.code === "sampling_disabled")) state.puedeFoto = false;
+  }
+  render();
+}
+
+/* ---------------------------- foto del menú (casa o restaurante) ---------------------------- */
+function diaDe(t) { const n = norm(t); return n ? DIAS.find((d) => norm(d.n) === n || norm(d.c) === n.slice(0, 3)) : null; }
+function platoDe(pl) {
+  let d = plato(pl && pl.id);
+  if (!d && pl && pl.nombre) { const n = norm(pl.nombre); d = n.length >= 4 && PLATOS.find((x) => norm(x.nombre) === n || norm(x.nombre).includes(n) || n.includes(norm(x.nombre).replace(/ \(.*\)$/, ""))); }
+  return d || null;
+}
+async function leerMenu(e, modo) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  state.menuFoto = { estado: "leyendo", url: URL.createObjectURL(file) };
+  render();
+  ctl = new AbortController();
+  const catalogo = PLATOS.filter((d) => d.tipo !== "fruta").map((d) => `${d.id}: ${d.nombre}`).join("; ");
+  try {
+    const res = await state.sample.json(
+      "La imagen es una foto de una pizarra, cartel o cuaderno con el menú " + (modo === "resto" ? "de un restaurante de menú" : "de comidas de una familia") + " en Perú. " +
+      "Puede ser de un solo día o de toda la semana. Recetario (id: nombre): " + catalogo + ". " +
+      'Responde solo JSON con esta forma: {"dias":[{"dia":"lunes","platos":[{"id":"arroz-pollo","nombre":"Arroz con pollo","tipo":"segundo"}]}]}. ' +
+      'En "dia" usa lunes, martes, miercoles, jueves, viernes, sabado o domingo; si la foto no dice el día, usa null. ' +
+      'En "id" pon el id del recetario que corresponde al plato, o null si ninguno se parece. "tipo" es entrada, sopa, segundo, refresco o postre. ' +
+      'Si no se lee ningún plato, responde {"dias":[]}.',
+      { images: [file], modelTier: "quick", signal: ctl.signal });
+    const dias = Array.isArray(res && res.dias) ? res.dias : [];
+    const desconocidos = new Set(); let nPl = 0, nDias = 0;
+    const leidos = dias.map((x) => ({ dia: diaDe(x && x.dia), platos: (Array.isArray(x && x.platos) ? x.platos : []).map((pl) => {
+      const d = platoDe(pl); if (d) nPl++; else if (pl && pl.nombre) desconocidos.add(String(pl.nombre).slice(0, 40)); return d; }).filter(Boolean) }))
+      .filter((x) => x.platos.length);
+    if (modo === "resto") {
+      const R = state.resto; state.menuPrevio = { modo, menu: structuredClone(R.menu), dias: [...R.dias] };
+      for (const x of leidos) {
+        const id = x.dia ? x.dia.id : R.diaActivo;
+        if (!R.dias.includes(id)) R.dias = DIAS.map((d) => d.id).filter((d) => d === id || R.dias.includes(d));
+        const m = { entrada: [], segundo: [], refresco: null, postre: null };
+        for (const d of x.platos) {
+          if (d.tipo === "segundo" && !m.segundo.includes(d.id)) m.segundo.push(d.id);
+          else if ((d.tipo === "sopa" || d.tipo === "entrada") && !m.entrada.includes(d.id)) m.entrada.push(d.id);
+          else if (d.tipo === "refresco") m.refresco = m.refresco || d.id;
+          else if (d.tipo === "postre") m.postre = m.postre || d.id;
+        }
+        m.entrada = m.entrada.slice(0, 4); m.segundo = m.segundo.slice(0, 5);
+        R.menu[id] = m; nDias++;
+      }
+      if (leidos.length && !leidos.some((x) => x.dia)) nDias = 1;
+      guardarResto();
+    } else {
+      /* Con día: va a ese día. Sin día: cada plato principal ocupa el siguiente día vacío. */
+      const S = state.semana; state.menuPrevio = { modo, dias: structuredClone(S.dias) };
+      const dias = { ...S.dias }, vacio = () => DIAS.find((x) => !(dias[x.id] || []).length);
+      for (const x of leidos) {
+        const comidas = x.platos.filter((d) => d.tipo !== "fruta");
+        if (x.dia) { dias[x.dia.id] = [...new Set(comidas.map((d) => d.id))].slice(0, 3); nDias++; continue; }
+        for (const d of comidas) { if (d.tipo === "refresco" || d.tipo === "postre") continue; const v = vacio(); if (!v) break; dias[v.id] = [d.id]; nDias++; }
+      }
+      if (nPl) S.dias = dias;
+      guardarSemana();
+    }
+    state.menuFoto = nPl ? { estado: "lista", resumen: `Leímos ${nPl} ${nPl === 1 ? "plato" : "platos"}${nDias > 1 ? ` de ${nDias} días` : ""} y ya los pusimos en tu ${modo === "resto" ? "menú" : "semana"}. Revisa y corrige lo que haga falta.`, desconocidos: [...desconocidos].slice(0, 8) }
+      : { estado: "error", error: desconocidos.size ? `Leímos ${[...desconocidos].slice(0, 5).join(", ")}, pero aún no tenemos esas recetas.` : "No pudimos leer platos en la foto. Prueba con más luz y más cerca." };
+  } catch (err) {
+    state.menuFoto = err && err.code === "cancelled" ? null : { estado: "error", error:
+      err && (err.code === "not_granted" || err.code === "sampling_disabled") ? "La lectura de fotos no está permitida en esta vista. Puedes elegir los platos a mano."
+      : err && err.code === "image_rejected" ? "No se pudo usar esa foto. Prueba con otra."
+      : err && err.code === "rate_limited" ? "Muchas fotos seguidas. Espera un momento e inténtalo de nuevo."
+      : "No se pudo leer la foto. Inténtalo otra vez o elige los platos a mano." };
+    if (err && (err.code === "not_granted" || err.code === "sampling_disabled")) state.puedeFoto = false;
+  }
+  render();
+}
+
+/* ---------------------------- acciones ---------------------------- */
+function leerTPrecios() {
+  document.querySelectorAll("[data-tprecio]").forEach((inp) => {
+    const v = parseFloat(inp.value.replace(",", ".")), id = inp.dataset.tprecio;
+    if (v > 0 && v < 1000) state.resto.precios[id] = r2(v); else delete state.resto.precios[id];
+  });
+}
+function leerPrecioMenu() { const i = $("#rp-precio"); if (i) { const v = parseFloat(i.value.replace(",", ".")); if (v > 0 && v < 500) state.resto.precioMenu = r10(v); } }
+async function copiar(id, texto) {
+  state.copia = { id, texto, ok: false };
+  try { await navigator.clipboard.writeText(texto); state.copia.ok = true; } catch (e) {}
+}
+function leerPrecios() {
+  document.querySelectorAll("[data-precio]").forEach((inp) => { const i = +inp.dataset.precio; const v = parseFloat(inp.value.replace(",", ".")); if (state.borrador.items[i] && v > 0) state.borrador.items[i].precio = r10(v); });
+  document.querySelectorAll("[data-unidad]").forEach((s) => { const i = +s.dataset.unidad; if (state.borrador.items[i]) state.borrador.items[i].unidad = s.value; });
+  document.querySelectorAll("[data-pprecio]").forEach((inp) => { const v = parseFloat(inp.value.replace(",", ".")); if (v > 0) state.borrador.precios[inp.dataset.pprecio] = r10(v); });
+}
+
+async function accion(act, v) {
+  const P = state.perfil;
+  switch (act) {
+    case "rol": P.rol = v; state.paso = 2; guardar(); break;
+    case "paso": state.paso = +v; break;
+    case "letra": P.letra = v; guardar(); break;
+    case "mercado": {
+      const i = P.mercados.indexOf(v);
+      if (i >= 0) P.mercados.splice(i, 1); else if (P.mercados.length < limiteMercados()) P.mercados.push(v);
+      else state.aviso = `Puedes seguir hasta ${limiteMercados()} mercados. Quita uno para cambiarlo, o canjea puntos para ver más.`;
+      guardar(); break;
+    }
+    case "empezar": P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar(); return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
+    case "activo": state.mercadoActivo = v; break;
+    case "editar-mercados": state.paso = 3; state.view = "bienvenida"; break;
+    case "producto": state.productoActivo = v; state.view = "producto"; window.scrollTo(0, 0); break;
+    case "confirmar": {
+      const p = prod(v), m = merc(state.mercadoActivo);
+      await enviarReportes([{ producto: p.id, precio: precioHoy(p, m).precio, unidad: p.unidad }], "confirmacion");
+      const n = sumarPuntos(PUNTOS.confirmar, `Confirmaste ${p.nombre.toLowerCase()}`, true);
+      state.ultimo = { n, confirmado: true }; return ir("gracias");
+    }
+    case "corregir": { const p = prod(v); state.view = "manual"; state.borrador = { items: [{ producto: p.id, precio: precioHoy(p, merc(state.mercadoActivo)).precio, unidad: p.unidad }] }; break; }
+    case "ir-foto": state.view = "foto"; state.borrador = { fuente: "foto" }; break;
+    case "ir-foto-puesto": state.mercadoActivo = P.puesto.mercado; state.view = "foto"; state.borrador = { fuente: "puesto" }; break;
+    case "cancelar-foto": if (ctl) ctl.abort(); state.view = "foto"; state.borrador = { fuente: state.borrador?.fuente || "foto" }; break;
+    case "ir-manual": state.view = "manual"; state.borrador = { items: [] }; break;
+    case "elegir-manual": {
+      const p = prod(v), it = { producto: p.id, precio: precioHoy(p, merc(state.mercadoActivo)).precio, unidad: p.unidad };
+      if (state.borrador?.volverFoto) { const f = state.borrador.volverFoto; f.items.push(it); state.borrador = f; state.view = "foto"; break; }
+      state.borrador = { items: [it] }; break;
+    }
+    case "ir-nohay": state.view = "nohay"; state.borrador = {}; break;
+    case "volver-foto": state.borrador = state.borrador.volverFoto; state.view = "foto"; break;
+    case "elegir-nohay": state.borrador = { producto: v }; break;
+    case "menos": case "mas": leerPrecios(); { const it = state.borrador.items[+v]; it.precio = Math.max(0.1, r10((it.precio || 0) + (act === "mas" ? 0.1 : -0.1))); } break;
+    case "quitar-item": leerPrecios(); state.borrador.items.splice(+v, 1); break;
+    case "agregar-item": leerPrecios(); state.view = "manual"; state.borrador = { items: [], volverFoto: state.borrador }; break;
+    case "enviar-foto": case "enviar-manual": {
+      leerPrecios();
+      const items = state.borrador.items.filter((it) => it.precio > 0);
+      if (!items.length) break;
+      const m = merc(state.mercadoActivo), fuente = act === "enviar-foto" ? (state.borrador.fuente === "puesto" ? "puesto" : "foto") : "manual";
+      await enviarReportes(items, fuente);
+      const ok = items.every((it) => !it.producto || plausible(prod(it.producto), m, it.precio)) && items.some((it) => it.producto);
+      const base = fuente === "manual" ? PUNTOS.manual * items.length : Math.min(PUNTOS.fotoTope, PUNTOS.foto + PUNTOS.fotoExtra * Math.max(0, items.length - 1));
+      const n = sumarPuntos(base, fuente === "manual" ? `Precio en ${m.nombre.replace("Mercado ", "")}` : `Foto de pizarra (${items.length} precios)`, ok);
+      state.ultimo = { n, confirmado: ok }; return ir("gracias");
+    }
+    case "enviar-nohay": {
+      const p = prod(state.borrador.producto);
+      await enviarReportes([{ producto: p.id, precio: null, unidad: v }], "nohay");
+      const n = sumarPuntos(PUNTOS.nohay, `Aviso: ${v === "poco" ? "poco" : "no hay"} ${p.nombre.toLowerCase()}`, false);
+      state.ultimo = { n, confirmado: false }; return ir("gracias");
+    }
+    case "canjear": {
+      if (state.puntos.total < 100) break;
+      state.puntos.total -= 100;
+      const d = new Date(); d.setDate(d.getDate() + 7);
+      P.ampliadoHasta = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      state.puntos.historial = [{ ts: Date.now(), n: -100, motivo: "Canje: 10 mercados por 7 días", confirmado: true }, ...state.puntos.historial].slice(0, 30);
+      guardar(); break;
+    }
+    case "cambiar-rol": state.paso = 1; state.view = "bienvenida"; window.scrollTo(0, 0); break;
+    case "rubro": {
+      const r = state.borrador.registro; r.mercado = $("#pu-mercado").value; r.numero = $("#pu-num").value;
+      r.rubros = r.rubros.includes(v) ? r.rubros.filter((x) => x !== v) : [...r.rubros, v]; break;
+    }
+    case "guardar-puesto": {
+      const r = state.borrador.registro; r.mercado = $("#pu-mercado").value; r.numero = $("#pu-num").value.trim();
+      if (!r.numero || !r.rubros.length) { alertaInline("Escribe el número de tu puesto y elige qué vendes."); return; }
+      P.puesto = { mercado: r.mercado, numero: r.numero, rubros: r.rubros, precios: P.puesto?.precios || {} };
+      if (!P.mercados.includes(r.mercado)) P.mercados = [r.mercado, ...P.mercados].slice(0, limiteMercados());
+      state.mercadoActivo = r.mercado; state.borrador = null; guardar(); break;
+    }
+    case "sem-paso": state.semPaso = v; state.menuFoto = null; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "sem-per": case "sem-per-fijo": {
+      const S = state.semana, paso = S.personas >= 20 ? 5 : 1;
+      S.personas = act === "sem-per-fijo" ? +v : Math.min(150, Math.max(1, S.personas + (+v) * paso));
+      guardarSemana(); avisarSR(`${S.personas} ${S.personas === 1 ? "persona" : "personas"}`); break;
+    }
+    case "sem-elegir": state.semDia = v; state.semPaso = "elegir"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "sem-tipo": state.semTipo = v; break;
+    case "sem-poner": {
+      const [d, id] = v.split(":"), S = state.semana, its = [...itemsDia(d)], i = its.indexOf(id);
+      if (i >= 0) its.splice(i, 1); else if (its.length < 3) its.push(id);
+      S.dias = { ...S.dias, [d]: its }; guardarSemana();
+      state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo();
+      avisarSR(`${dia(d).n}: ${its.map((x) => plato(x).nombre).join(", ") || "sin plato"}`); return;
+    }
+    case "sem-quitar": {
+      const [d, id] = v.split(":"), S = state.semana;
+      S.dias = { ...S.dias, [d]: itemsDia(d).filter((x) => x !== id) }; guardarSemana(); avisarSR(`Quitado del ${dia(d).n}`); break;
+    }
+    case "fruta-mas": case "fruta-menos": {
+      const S = state.semana, x = Math.min(21, Math.max(0, (S.frutas[v] || 0) + (act === "fruta-mas" ? 1 : -1)));
+      S.frutas = { ...S.frutas }; if (x) S.frutas[v] = x; else delete S.frutas[v];
+      guardarSemana(); avisarSR(`${plato(v).nombre}: ${x} por persona`); break;
+    }
+    case "sem-economica": {
+      const ls = lugares(), S = state.semana;
+      const baratos = PLATOS.filter((d) => d.tipo === "segundo").map((d) => ({ d, c: ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0] }))
+        .filter((x) => x.c.riesgo < 0.35).sort((a, b) => a.c.t - b.c.t).map((x) => x.d.id);
+      const vacios = DIAS.filter((x) => !itemsDia(x.id).length); let k = 0;
+      S.dias = { ...S.dias }; for (const x of vacios) S.dias[x.id] = [baratos[k++ % baratos.length]];
+      state.aviso = `Llenamos ${vacios.length} ${vacios.length === 1 ? "día" : "días"} con platos baratos que no dependen de lo que sube por El Niño. Cámbialos si quieres.`;
+      guardarSemana(); avisarSR(state.aviso); break;
+    }
+    case "sem-ver-lista": state.semVerLista = !state.semVerLista; break;
+    case "sem-ver-lugares": state.semVerLugares = !state.semVerLugares; break;
+    case "sem-tengo": case "sem-compre": {
+      const k = act === "sem-tengo" ? "tengo" : "compre", S = state.semana;
+      if (S[k][v]) delete S[k][v]; else S[k][v] = true;
+      guardarSemana(); break;
+    }
+    case "sem-modo": state.semana.modo = v; guardarSemana(); break;
+    case "sem-merc": state.semana.mercado = v; guardarSemana(); break;
+    case "sem-cambiar": {
+      const S = state.semana, d = plato(v), alt = plato(d.cambio);
+      S.dias = Object.fromEntries(Object.entries(S.dias).map(([k, its]) => [k, [...new Set(its.map((x) => (x === d.id ? alt.id : x)))]]));
+      state.toast = `Listo: cambiamos ${d.nombre.toLowerCase()} por ${alt.nombre.toLowerCase()}.`;
+      guardarSemana(); break;
+    }
+    case "sem-limpiar": Object.assign(state.semana, { dias: {}, frutas: {}, tengo: {}, compre: {}, modo: "planear" }); guardarSemana(); state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "sem-reportar": {
+      const p = prod(v), m = mercLista();
+      if (!m || m.tipo === "super") break;
+      state.mercadoActivo = m.id; state.volverA = "semana"; state.view = "manual";
+      state.borrador = { items: [{ producto: p.id, precio: precioHoy(p, m).precio, unidad: p.unidad }] };
+      render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    }
+    case "menu-cancelar": if (ctl) ctl.abort(); state.menuFoto = null; break;
+    case "menu-ok": state.menuFoto = null; break;
+    case "menu-deshacer": {
+      const prev = state.menuPrevio;
+      if (prev && prev.modo === "resto") { state.resto.menu = prev.menu; state.resto.dias = prev.dias; guardarResto(); }
+      else if (prev) { state.semana.dias = prev.dias; guardarSemana(); }
+      state.menuFoto = null; state.toast = "Listo, dejamos todo como estaba."; break;
+    }
+    case "rubro-inicio": state.rubroInicio = v; break;
+
+    /* Plan Restaurante */
+    case "resto-paso": leerPrecioMenu(); leerTPrecios(); state.restoPaso = v; state.menuFoto = null; state.copia = null; guardarResto(); render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "resto-menus": { const R = state.resto; leerPrecioMenu(); R.menusDia = Math.min(500, Math.max(5, R.menusDia + (+v) * 5)); guardarResto(); avisarSR(`${R.menusDia} menús al día`); break; }
+    case "resto-dia-on": {
+      const R = state.resto; leerPrecioMenu();
+      R.dias = R.dias.includes(v) ? R.dias.filter((x) => x !== v) : DIAS.map((d) => d.id).filter((d) => d === v || R.dias.includes(d));
+      if (!R.dias.includes(R.diaActivo)) R.diaActivo = R.dias[0] || "lun";
+      guardarResto(); break;
+    }
+    case "resto-precio": { const R = state.resto; leerPrecioMenu(); R.precioMenu = Math.max(1, r10(R.precioMenu + (+v) * 0.5)); guardarResto(); avisarSR(`Menú a ${soles(R.precioMenu)}`); break; }
+    case "resto-dia": state.resto.diaActivo = v; guardarResto(); break;
+    case "resto-toggle": {
+      const [campo, id] = v.split(":"), x = diaEditable(state.resto.diaActivo), arr = x[campo], i = arr.indexOf(id), max = campo === "entrada" ? 4 : 5;
+      if (i >= 0) arr.splice(i, 1); else if (arr.length < max) arr.push(id); else state.toast = `Puedes marcar hasta ${max} opciones.`;
+      guardarResto(); break;
+    }
+    case "resto-unico": { const [campo, id] = v.split(":"), x = diaEditable(state.resto.diaActivo); x[campo] = id || null; guardarResto(); break; }
+    case "resto-copiar-dia": {
+      const R = state.resto, sig = siguienteDia(R.diaActivo);
+      if (sig) { R.menu[sig] = structuredClone(diaMenu(R.diaActivo)); R.diaActivo = sig; state.toast = `Copiado al ${dia(sig).n}. Cámbialo si quieres.`; guardarResto(); }
+      render(); window.scrollTo(0, 0); return;
+    }
+    case "resto-cambiar": {
+      const R = state.resto, d = plato(v);
+      for (const x of Object.values(R.menu)) { const i = x.segundo.indexOf(d.id); if (i >= 0) { if (x.segundo.includes(d.cambio)) x.segundo.splice(i, 1); else x.segundo[i] = d.cambio; } }
+      state.toast = `Listo: cambiamos ${d.nombre.toLowerCase()} por ${plato(d.cambio).nombre.toLowerCase()} en todo el menú.`; guardarResto(); break;
+    }
+    case "resto-copiar": {
+      leerTPrecios(); const pv = PROVEEDORES.find((x) => x.id === v), its = compraResto().filter((it) => pv.rubros.includes(it.p.rubro));
+      await copiar(v, textoPedido(pv, its)); break;
+    }
+    case "resto-recalcular": leerTPrecios(); guardarResto(); state.toast = "Listo, recalculamos con tus precios."; break;
+    case "resto-aportar": {
+      leerTPrecios(); const R = state.resto, its = compraResto().filter((it) => Number(R.precios[it.p.id]) > 0);
+      if (!its.length || R.aportadoDia === hoy()) break;
+      const docs = its.map((it) => ({ dia: hoy(), ts: Date.now(), mercado: "proveedor-lima", producto: it.p.id, libre: null, precio: Number(R.precios[it.p.id]), unidad: it.p.unidad, fuente: "proveedor", autor: null }));
+      if (state.db) { for (const d of docs) { try { await state.db.collection("reportes").add(d); } catch (e) {} } }
+      R.aportadoDia = hoy(); guardarResto();
+      const n = sumarPuntos(10, `Precios de proveedor (${its.length})`, false);
+      state.toast = `Gracias. Aportaste ${its.length} precios (+${n} puntos en revisión).`; break;
+    }
+
+    /* Opiniones */
+    case "ir-ideas": abrirIdeas(); return;
+    case "ideas-volver": {
+      const I = state.idea; if (I.enviado) state.idea = { nota: null, util: [], frecuencia: null, pago: null, texto: "", enviado: null };
+      state.view = state.desde && state.desde !== "ideas" ? state.desde : "inicio"; state.copia = null; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    }
+    case "idea-nota": state.idea.nota = v; break;
+    case "idea-frec": state.idea.frecuencia = v; break;
+    case "idea-pago": state.idea.pago = v; break;
+    case "idea-util": { const u = state.idea.util; state.idea.util = u.includes(v) ? u.filter((x) => x !== v) : [...u, v]; break; }
+    case "idea-copiar": await copiar("idea", textoIdea()); break;
+    case "idea-enviar": {
+      const I = state.idea, t = $("#idea-txt"); if (t) I.texto = t.value;
+      if (!I.nota && !I.texto.trim() && !I.util.length) { alertaInline("Marca una carita o escribe tu idea antes de enviar."); return; }
+      if (state.db) {
+        try {
+          await state.db.collection("ideas").add({ ts: Date.now(), version: VERSION, rol: state.perfil.rol || null, nota: I.nota, util: I.util,
+            frecuencia: I.frecuencia, pago: I.pago, texto: I.texto.trim().slice(0, 1000) });
+          I.enviado = "db"; if (state.perfil.acepto) sumarPuntos(10, "Tu opinión", true);
+        } catch (e) { I.enviado = "share"; }
+      } else I.enviado = "share";
+      render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    }
+    case "editar-puesto": state.borrador = { registro: { mercado: P.puesto.mercado, numero: P.puesto.numero, rubros: [...P.puesto.rubros] } }; break;
+    case "sin-stock": leerPrecios(); state.borrador.sinStock[v] = !state.borrador.sinStock[v]; break;
+    case "pmenos": case "pmas": leerPrecios(); state.borrador.precios[v] = Math.max(0.1, r10(state.borrador.precios[v] + (act === "pmas" ? 0.1 : -0.1))); break;
+    case "publicar-puesto": {
+      leerPrecios();
+      const pu = P.puesto, b = state.borrador;
+      const items = Object.entries(b.precios).filter(([id]) => !b.sinStock[id]).map(([id, precio]) => ({ producto: id, precio, unidad: prod(id).unidad }));
+      const faltan = Object.keys(b.sinStock).filter((id) => b.sinStock[id]);
+      state.mercadoActivo = pu.mercado;
+      await enviarReportes(items, "puesto");
+      if (faltan.length) await enviarReportes(faltan.map((id) => ({ producto: id, precio: null, unidad: "no-hay" })), "nohay");
+      pu.precios = Object.fromEntries(items.map((i) => [i.producto, i.precio]));
+      pu.publicado = new Date().toLocaleString("es-PE", { weekday: "long", hour: "numeric", minute: "2-digit" });
+      if (state.db && state.uid) { try { await state.db.doc("puestos/" + state.uid).set({ mercado: pu.mercado, numero: pu.numero, rubros: pu.rubros, precios: pu.precios, dia: hoy(), ts: Date.now() }); } catch (e) {} }
+      const n = sumarPuntos(PUNTOS.puesto, `Publicaste tus precios (puesto ${pu.numero})`, true);
+      state.ultimo = { n, confirmado: true }; return ir("gracias");
+    }
+  }
+  render();
+}
+function alertaInline(t) { const p = document.createElement("p"); p.className = "note"; p.setAttribute("role", "alert"); p.textContent = t; $("#main").append(p); p.scrollIntoView({ block: "center" }); }
+
+document.addEventListener("click", async (e) => {
+  const go = e.target.closest("[data-go]"); if (go) { ir(go.dataset.go); return; }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const { act, v } = a.dataset, teclado = e.detail === 0, y = window.scrollY;
+  await accion(act, v);
+  /* Con teclado, el foco vuelve al mismo botón después de redibujar (pasos − / +, marcas de la lista). */
+  if (teclado && state.view === "semana") {
+    const sel = `[data-act="${act}"]` + (v != null ? `[data-v="${CSS.escape(v)}"]` : "");
+    const b = document.querySelector(sel); if (b && !b.disabled) { b.focus({ preventScroll: true }); window.scrollTo(0, y); }
+  }
+});
+function abrirIdeas() {
+  if (state.view !== "ideas") state.desde = state.view;
+  state.view = "ideas"; state.copia = null; render(); window.scrollTo(0, 0); enfocarTitulo();
+}
+$("#btn-opinar").addEventListener("click", abrirIdeas);
+document.addEventListener("input", (e) => { if (e.target.id === "idea-txt") state.idea.texto = e.target.value; });
+/* Precios que escribe el restaurante: se guardan al salir del campo, sin redibujar (no se cierra el teclado). */
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset && t.dataset.tprecio) { leerTPrecios(); guardarResto(); }
+  if (t.id === "rp-precio") { leerPrecioMenu(); guardarResto(); }
+});
+$("#btn-letra").addEventListener("click", () => {
+  const i = LETRAS.findIndex((l) => l.id === state.perfil.letra);
+  state.perfil.letra = LETRAS[(i + 1) % LETRAS.length].id; guardar(); render();
+});
+
+/* ---------------------------- arranque ---------------------------- */
+async function cargarPreciosSuper() {
+  if (window.claude || !/^https?:$/.test(location.protocol)) return;  // dentro de Claude no hay archivo de precios
+  try {
+    const ctl2 = new AbortController(), t = setTimeout(() => ctl2.abort(), 4000);
+    const r = await fetch("precios_super.json", { cache: "no-cache", signal: ctl2.signal }); clearTimeout(t);
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && d.fecha && d.cadenas && typeof d.cadenas === "object") state.superReal = d;
+  } catch (e) {}
+}
+(async function inicio() {
+  state.perfil = perfilVacio(); state.semana = semanaVacia(); state.resto = restoVacio();
+  render();
+  const cl = window.claude;
+  const [db, user, sample] = cl ? await Promise.all([cl.use("db"), cl.use("user"), cl.use("sample")]) : [null, null, null];
+  state.db = db; state.sample = sample;
+  state.uid = user ? await user.id() : null;
+  if (sample) { try { const lim = await sample.limits(); state.puedeFoto = !!lim.images; } catch (e) { state.puedeFoto = false; } }
+  await cargar();
+  await cargarPreciosSuper();
+  if (state.perfil.acepto && state.perfil.mercados.length) {
+    state.mercadoActivo = state.perfil.rol === "puesto" && state.perfil.puesto ? state.perfil.puesto.mercado : state.perfil.mercados[0];
+    state.view = state.perfil.rol === "puesto" ? "puesto" : state.perfil.rol === "resto" ? "semana" : "inicio";
+  }
+  render();
+  if (db) {
+    db.collection("reportes").where("dia", "==", hoy()).onSnapshot((snap) => {
+      state.reportes = snap.docs.map((d) => d.data());
+      if (["inicio", "producto"].includes(state.view)) render();
+    }, () => {});
+  }
+})();
+</script>
+
+<script>
+/* Versión web: funciona sin conexión y se puede "Agregar a la pantalla de inicio". */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
