@@ -236,12 +236,13 @@ class Cliente:
         rp = self._robots[base]
         return bool(rp and rp.can_fetch(USER_AGENT, base.rstrip("/") + ruta))
 
-    def buscar(self, cadena: str, base: str, texto: str, maximo: int = 30) -> list[dict]:
+    def buscar(self, cadena: str, base: str, texto: str, maximo: int = 50) -> list[dict]:
         clave = re.sub(r"[^a-z0-9]+", "-", norm(texto)).strip("-")
         if self.desde_cache:
             f = self.desde_cache / f"{cadena}__{clave}.json"
             return json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
-        q = urllib.parse.urlencode({"ft": texto, "_from": 0, "_to": maximo - 1})
+        # La búsqueda de VTEX falla con varias palabras: se usa una sola (el filtro de la canasta elige el producto).
+        q = urllib.parse.urlencode({"ft": texto.split()[0] if texto.split() else texto, "_from": 0, "_to": min(maximo, 50) - 1})
         datos = json.loads(self._get(f"{base.rstrip('/')}{RUTA_BUSQUEDA}?{q}").decode("utf-8"))
         if self.cache_dir:
             self.cache_dir.mkdir(parents=True, exist_ok=True)

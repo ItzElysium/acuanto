@@ -13,7 +13,7 @@ cadenas:
   # tottus usa otra plataforma (no VTEX): queda para una segunda fase.
 
 # Canasta de Acuánto. Para cada producto:
-#   buscar:     texto de búsqueda en la tienda
+#   buscar:     UNA palabra de búsqueda (la tienda falla con dos o más); el filtro "incluir" elige el producto
 #   unidad:     kilo | litro | lata | unidad  (como lo muestra Acuánto)
 #   categoria:  palabras que deben aparecer en alguna categoría del producto (sin tildes)
 #   incluir:    expresión regular que debe cumplir el nombre (sin tildes, minúsculas)
@@ -22,35 +22,35 @@ cadenas:
 #   kg_por_unidad: para convertir "15un" o "x unidad" a kilos (huevos, choclo, piña)
 canasta:
   limon:         { buscar: "limon",          unidad: kilo,   categoria: [fruta, verdura], incluir: "^limon (acido|sutil|criollo)?", excluir: "tahiti|deshidrat|jugo|zumo", rango: [1, 20] }
-  tomate:        { buscar: "tomate",         unidad: kilo,   categoria: [fruta, verdura], incluir: "^tomate", excluir: "cherry|pure|pasta|salsa|seco|lata", rango: [1, 15] }
-  cebolla:       { buscar: "cebolla roja",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^cebolla roja", excluir: "china|blanca|encurt", rango: [0.8, 12] }
-  papa-amarilla: { buscar: "papa amarilla",  unidad: kilo,   categoria: [fruta, verdura], incluir: "^papa amarilla", excluir: "frita|chips|pre", rango: [1, 15] }
-  papa-blanca:   { buscar: "papa blanca",    unidad: kilo,   categoria: [fruta, verdura], incluir: "^papa (blanca|canchan|yungay|unica)", excluir: "frita|chips|pre", rango: [0.8, 10] }
-  aji:           { buscar: "aji amarillo",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^aji amarillo", excluir: "pasta|crema|molido|salsa", rango: [2, 30] }
+  tomate:        { buscar: "tomate",         unidad: kilo,   categoria: [fruta, verdura], incluir: "^tomate", excluir: "cherry|pure|pasta|salsa|seco|lata|congelad", rango: [1, 15] }
+  cebolla:       { buscar: "cebolla",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^cebolla roja", excluir: "china|blanca|encurt", rango: [0.8, 12] }
+  papa-amarilla: { buscar: "papa",  unidad: kilo,   categoria: [fruta, verdura], incluir: "^papa amarilla", excluir: "frita|chips|pre", rango: [1, 15] }
+  papa-blanca:   { buscar: "papa",    unidad: kilo,   categoria: [fruta, verdura], incluir: "^papa (blanca|canchan|yungay|unica)", excluir: "frita|chips|pre", rango: [0.8, 10] }
+  aji:           { buscar: "aji",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^aji amarillo", excluir: "pasta|crema|molido|salsa", rango: [2, 30] }
   zapallo:       { buscar: "zapallo",        unidad: kilo,   categoria: [fruta, verdura], incluir: "^zapallo (macre|loche)?", excluir: "italiano|crema", rango: [0.8, 12] }
   choclo:        { buscar: "choclo",         unidad: unidad, categoria: [fruta, verdura], incluir: "^choclo", excluir: "desgranado|lata|congel", rango: [0.5, 6], kg_por_unidad: 0.35 }
   camote:        { buscar: "camote",         unidad: kilo,   categoria: [fruta, verdura], incluir: "^camote", excluir: "chips|frito", rango: [0.8, 10] }
-  zanahoria:     { buscar: "zanahoria",      unidad: kilo,   categoria: [fruta, verdura], incluir: "^zanahoria", excluir: "baby|rallada", rango: [0.8, 10] }
-  arveja:        { buscar: "arveja verde",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^arveja", excluir: "lata|partida|seca|congel", rango: [2, 25] }
+  zanahoria:     { buscar: "zanahoria",      unidad: kilo,   categoria: [fruta, verdura], incluir: "^zanahoria", excluir: "baby|rallada|congelad", rango: [0.8, 10] }
+  arveja:        { buscar: "arveja",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^arveja", excluir: "lata|partida|seca|congel", rango: [2, 25] }
   ajo:           { buscar: "ajo",            unidad: kilo,   categoria: [fruta, verdura], incluir: "^ajo", excluir: "molido|pasta|polvo|sal|aceite", rango: [4, 45] }
-  platano:       { buscar: "platano de seda", unidad: kilo,  categoria: [fruta],          incluir: "^platano (de )?seda", excluir: "chips|frito", rango: [1, 12] }
+  platano:       { buscar: "platano", unidad: kilo,  categoria: [fruta],          incluir: "^platano (de )?seda", excluir: "chips|frito", rango: [1, 12] }
   manzana:       { buscar: "manzana",        unidad: kilo,   categoria: [fruta],          incluir: "^manzana", excluir: "jugo|compota|vinagre", rango: [1.5, 18] }
   mandarina:     { buscar: "mandarina",      unidad: kilo,   categoria: [fruta],          incluir: "^mandarina", excluir: "jugo", rango: [1.5, 15] }
-  naranja:       { buscar: "naranja",        unidad: kilo,   categoria: [fruta],          incluir: "^naranja", excluir: "jugo|nectar|mermelada", rango: [1, 10] }
+  naranja:       { buscar: "naranja",        unidad: kilo,   categoria: [fruta],          incluir: "^naranja", excluir: "jugo|nectar|mermelada|importad", rango: [1, 10] }
   papaya:        { buscar: "papaya",         unidad: kilo,   categoria: [fruta],          incluir: "^papaya", excluir: "jugo|picada", rango: [1, 12] }
   pina:          { buscar: "pina",           unidad: kilo,   categoria: [fruta],          incluir: "^pina", excluir: "jugo|lata|almibar|picada", rango: [1, 12], kg_por_unidad: 1.5 }
   maracuya:      { buscar: "maracuya",       unidad: kilo,   categoria: [fruta],          incluir: "^maracuya", excluir: "jugo|pulpa|nectar", rango: [1.5, 20] }
-  pollo:         { buscar: "pollo entero",   unidad: kilo,   categoria: [pollo, ave, carne], incluir: "^pollo entero", excluir: "rostizado|horneado|apanado", rango: [5, 25] }
+  pollo:         { buscar: "pollo",   unidad: kilo,   categoria: [pollo, ave, carne], incluir: "^pollo entero", excluir: "rostizado|horneado|apanado", rango: [5, 25] }
   gallina:       { buscar: "gallina",        unidad: kilo,   categoria: [pollo, ave, carne], incluir: "^gallina", excluir: "caldo|cubito", rango: [6, 35] }
-  carne:         { buscar: "bistec de res",  unidad: kilo,   categoria: [carne, res, vacuno], incluir: "^bistec", excluir: "pollo|cerdo|apanado", rango: [15, 80] }
+  carne:         { buscar: "bistec",  unidad: kilo,   categoria: [carne, res, vacuno], incluir: "^bistec", excluir: "pollo|cerdo|apanado", rango: [15, 80] }
   huevo:         { buscar: "huevos",         unidad: kilo,   categoria: [huevo],          incluir: "^huevos? (pardos?|rosados?|blancos?)?", excluir: "codorniz|chocolate|pascua", rango: [4, 22], kg_por_unidad: 0.06 }
   jurel:         { buscar: "jurel",          unidad: kilo,   categoria: [pescado, marisco], incluir: "^jurel", excluir: "lata|conserva|filete en", rango: [4, 30] }
-  arroz:         { buscar: "arroz extra",    unidad: kilo,   categoria: [arroz, abarrote], incluir: "^arroz (extra|superior|anejo)", excluir: "olla|integral|chaufa|preparado|harina", rango: [2.5, 12] }
+  arroz:         { buscar: "arroz",    unidad: kilo,   categoria: [arroz, abarrote], incluir: "^arroz (extra|superior|anejo)", excluir: "olla|integral|chaufa|preparado|harina", rango: [2.5, 12] }
   lenteja:       { buscar: "lenteja",        unidad: kilo,   categoria: [menestra, abarrote], incluir: "^lentejas?", excluir: "sopa|preparad", rango: [3, 22] }
-  fideos:        { buscar: "fideo tallarin", unidad: kilo,   categoria: [fideo, pasta, abarrote], incluir: "^(fideos?|tallarin)", excluir: "instantaneo|ramen|sopa", rango: [3, 20] }
-  quinua:        { buscar: "quinua",         unidad: kilo,   categoria: [cereal, menestra, abarrote, grano], incluir: "^quinua", excluir: "hojuela|harina|galleta|barra|pop|bebida", rango: [6, 45] }
-  maiz-morado:   { buscar: "maiz morado",    unidad: kilo,   categoria: [abarrote, cereal, grano, fruta, verdura], incluir: "^maiz morado", excluir: "chicha|refresco|mazamorra|bebida", rango: [3, 25] }
-  azucar:        { buscar: "azucar rubia",   unidad: kilo,   categoria: [azucar, endulzante, abarrote], incluir: "^azucar rubia", excluir: "impalpable|light|stevia", rango: [2.5, 10] }
-  aceite:        { buscar: "aceite vegetal", unidad: litro,  categoria: [aceite, abarrote], incluir: "^aceite (vegetal|de soya|de girasol)", excluir: "oliva|sesamo|coco|spray|motor", rango: [5, 25] }
-  leche:         { buscar: "leche evaporada", unidad: lata,  categoria: [leche, lacteo], incluir: "^leche (evaporada|reconstituida)", excluir: "condensada|polvo|bolsa|caja|deslactosada", rango: [2, 8] }
-  queso:         { buscar: "queso fresco",   unidad: kilo,   categoria: [queso, lacteo], incluir: "^queso fresco", excluir: "rallado|crema", rango: [10, 60] }
+  fideos:        { buscar: "tallarin", unidad: kilo,   categoria: [fideo, pasta, abarrote], incluir: "^(fideos?|tallarin)", excluir: "instantaneo|ramen|sopa", rango: [3, 20] }
+  quinua:        { buscar: "quinua",         unidad: kilo,   categoria: [cereal, menestra, abarrote, grano], incluir: "^quinua", excluir: "hojuela|harina|galleta|barra|pop|bebida|avena|mezcla|instantane", rango: [6, 45] }
+  maiz-morado:   { buscar: "morado",    unidad: kilo,   categoria: [abarrote, cereal, grano, fruta, verdura], incluir: "^maiz morado", excluir: "chicha|refresco|mazamorra|bebida", rango: [3, 25] }
+  azucar:        { buscar: "azucar",   unidad: kilo,   categoria: [azucar, endulzante, abarrote], incluir: "^azucar rubia", excluir: "impalpable|light|stevia", rango: [2.5, 10] }
+  aceite:        { buscar: "aceite", unidad: litro,  categoria: [aceite, abarrote], incluir: "^aceite (vegetal|de soya|de girasol)", excluir: "oliva|sesamo|coco|spray|motor", rango: [5, 25] }
+  leche:         { buscar: "evaporada", unidad: lata,  categoria: [leche, lacteo], incluir: "^leche (evaporada|reconstituida)", excluir: "condensada|polvo|bolsa|caja|deslactosada", rango: [2, 8] }
+  queso:         { buscar: "queso",   unidad: kilo,   categoria: [queso, lacteo], incluir: "^queso fresco", excluir: "rallado|crema", rango: [10, 60] }
