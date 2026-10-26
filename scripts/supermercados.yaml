@@ -32,6 +32,7 @@ canasta:
   camote:        { buscar: "camote",         unidad: kilo,   categoria: [fruta, verdura], incluir: "^camote", excluir: "chips|frito", rango: [0.8, 10] }
   zanahoria:     { buscar: "zanahoria",      unidad: kilo,   categoria: [fruta, verdura], incluir: "^zanahoria", excluir: "baby|rallada|congelad", rango: [0.8, 10] }
   arveja:        { buscar: "arveja",   unidad: kilo,   categoria: [fruta, verdura], incluir: "^arveja", excluir: "lata|partida|seca|congel", rango: [2, 25] }
+  olluco:        { buscar: "olluco",         unidad: kilo,   categoria: [fruta, verdura], incluir: "^olluco", excluir: "picado|congelad|conserva", rango: [1.5, 15] }
   ajo:           { buscar: "ajo",            unidad: kilo,   categoria: [fruta, verdura], incluir: "^ajo", excluir: "molido|pasta|polvo|sal|aceite", rango: [4, 45] }
   platano:       { buscar: "platano", unidad: kilo,  categoria: [fruta],          incluir: "^platano (de )?seda", excluir: "chips|frito", rango: [1, 12] }
   manzana:       { buscar: "manzana",        unidad: kilo,   categoria: [fruta],          incluir: "^manzana", excluir: "jugo|compota|vinagre", rango: [1.5, 18] }
@@ -47,6 +48,7 @@ canasta:
   jurel:         { buscar: "jurel",          unidad: kilo,   categoria: [pescado, marisco], incluir: "^jurel", excluir: "lata|conserva|filete en", rango: [4, 30] }
   arroz:         { buscar: "arroz",    unidad: kilo,   categoria: [arroz, abarrote], incluir: "^arroz (extra|superior|anejo)", excluir: "olla|integral|chaufa|preparado|harina", rango: [2.5, 12] }
   lenteja:       { buscar: "lenteja",        unidad: kilo,   categoria: [menestra, abarrote], incluir: "^lentejas?", excluir: "sopa|preparad", rango: [3, 22] }
+  frejol:        { buscar: "frejol",         unidad: kilo,   categoria: [menestra, abarrote], incluir: "^frejol (canario|panamito|bayo)?", excluir: "lata|cocido|harina|sopa", rango: [4, 25] }
   fideos:        { buscar: "tallarin", unidad: kilo,   categoria: [fideo, pasta, abarrote], incluir: "^(fideos?|tallarin)", excluir: "instantaneo|ramen|sopa", rango: [3, 20] }
   quinua:        { buscar: "quinua",         unidad: kilo,   categoria: [cereal, menestra, abarrote, grano], incluir: "^quinua", excluir: "hojuela|harina|galleta|barra|pop|bebida|avena|mezcla|instantane", rango: [6, 45] }
   maiz-morado:   { buscar: "morado",    unidad: kilo,   categoria: [abarrote, cereal, grano, fruta, verdura], incluir: "^maiz morado", excluir: "chicha|refresco|mazamorra|bebida", rango: [3, 25] }
