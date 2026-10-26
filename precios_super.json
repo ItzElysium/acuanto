@@ -1,0 +1,511 @@
+{
+ "fecha": "2026-10-25",
+ "generado": "2026-10-25T22:23-05:00",
+ "fuente": "Catálogo online público de cada supermercado (VTEX)",
+ "cadenas": {
+  "plazavea": {
+   "nombre": "Plaza Vea",
+   "precios": {
+    "limon": {
+     "precio": 3.4,
+     "unidad": "kilo",
+     "mediana": 3.4,
+     "item": "Limón Ácido x kg",
+     "url": "https://www.plazavea.com.pe/limon-acido-x-k-g-1/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "tomate": {
+     "precio": 5.48,
+     "unidad": "kilo",
+     "mediana": 6.5,
+     "item": "Tomate Italiano x kg",
+     "url": "https://www.plazavea.com.pe/tomate-italiano-xk-g-1/p",
+     "oferta": true,
+     "candidatos": 3
+    },
+    "zapallo": {
+     "precio": 3.79,
+     "unidad": "kilo",
+     "mediana": 3.79,
+     "item": "Zapallo Macre x kg",
+     "url": "https://www.plazavea.com.pe/zapallo-macre-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "choclo": {
+     "precio": 2.6,
+     "unidad": "unidad",
+     "mediana": 2.6,
+     "item": "Choclo Entero x und.",
+     "url": "https://www.plazavea.com.pe/choclo-entero-x-und-1/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "camote": {
+     "precio": 2.58,
+     "unidad": "kilo",
+     "mediana": 3.19,
+     "item": "Camote Amarillo Procesado x kg",
+     "url": "https://www.plazavea.com.pe/camote-amarillo-procesado-x-k-g-1/p",
+     "oferta": true,
+     "candidatos": 2
+    },
+    "zanahoria": {
+     "precio": 9.0,
+     "unidad": "kilo",
+     "mediana": 9.0,
+     "item": "Zanahoria Congelada BELL'S Bolsa 500g",
+     "url": "https://www.plazavea.com.pe/zanahoria-congelada-bells-bolsa-500g/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "manzana": {
+     "precio": 5.99,
+     "unidad": "kilo",
+     "mediana": 7.96,
+     "item": "Manzana Delicia x kg",
+     "url": "https://www.plazavea.com.pe/manzana-delicia-xk-g-1/p",
+     "oferta": false,
+     "candidatos": 5
+    },
+    "mandarina": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 3.99,
+     "item": "Mandarina W MURCOTT x kg",
+     "url": "https://www.plazavea.com.pe/mandarina-w-murcott-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "naranja": {
+     "precio": 9.79,
+     "unidad": "kilo",
+     "mediana": 9.79,
+     "item": "Naranja de Mesa Importada x kg",
+     "url": "https://www.plazavea.com.pe/naranja-de-mesa-importada-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "papaya": {
+     "precio": 5.69,
+     "unidad": "kilo",
+     "mediana": 5.69,
+     "item": "Papaya x kg",
+     "url": "https://www.plazavea.com.pe/papaya/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "pina": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 5.29,
+     "item": "Piña Hawai x kg",
+     "url": "https://www.plazavea.com.pe/pina-hawai-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 3
+    },
+    "maracuya": {
+     "precio": 9.9,
+     "unidad": "kilo",
+     "mediana": 9.9,
+     "item": "Maracuyá x kg",
+     "url": "https://www.plazavea.com.pe/maracuya-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "gallina": {
+     "precio": 7.9,
+     "unidad": "kilo",
+     "mediana": 7.9,
+     "item": "Gallina sin Menudencia SADIA x Kg",
+     "url": "https://www.plazavea.com.pe/gallina-sin-menudencia-sadia-x-kg-20497844/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "huevo": {
+     "precio": 9.39,
+     "unidad": "kilo",
+     "mediana": 13.15,
+     "item": "Huevos Pardos BELL'S Bandeja 30un",
+     "url": "https://www.plazavea.com.pe/huevos-pardos-bells-bandeja-30un-20353008/p",
+     "oferta": true,
+     "candidatos": 12
+    },
+    "lenteja": {
+     "precio": 7.8,
+     "unidad": "kilo",
+     "mediana": 11.8,
+     "item": "Lenteja Bebé BELL'S Bolsa 500g",
+     "url": "https://www.plazavea.com.pe/lenteja-bebe-bells-bolsa-500g-20220358/p",
+     "oferta": true,
+     "candidatos": 9
+    },
+    "quinua": {
+     "precio": 11.0,
+     "unidad": "kilo",
+     "mediana": 17.69,
+     "item": "Quinua Avena 3 OSITOS Bolsa 900g",
+     "url": "https://www.plazavea.com.pe/quinua-avena-3-ositos-bolsa-900g/p",
+     "oferta": true,
+     "candidatos": 12
+    }
+   },
+   "sin_precio": [
+    "cebolla",
+    "papa-amarilla",
+    "papa-blanca",
+    "aji",
+    "arveja",
+    "ajo",
+    "platano",
+    "pollo",
+    "carne",
+    "jurel",
+    "arroz",
+    "fideos",
+    "maiz-morado",
+    "azucar",
+    "aceite",
+    "leche",
+    "queso"
+   ]
+  },
+  "metro": {
+   "nombre": "Metro",
+   "precios": {
+    "limon": {
+     "precio": 3.49,
+     "unidad": "kilo",
+     "mediana": 3.49,
+     "item": "Limón Sútil x kg",
+     "url": "https://www.metro.pe/limon-sutil-x-kg-140-2/p",
+     "oferta": false,
+     "candidatos": 3
+    },
+    "tomate": {
+     "precio": 6.49,
+     "unidad": "kilo",
+     "mediana": 6.49,
+     "item": "Tomate Italiano Metro x kg",
+     "url": "https://www.metro.pe/tomate-italiano-metro-x-kg-2-2/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "zapallo": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 6.24,
+     "item": "Zapallo Macre x kg",
+     "url": "https://www.metro.pe/zapallo-macre-x-kg-4050-2/p",
+     "oferta": false,
+     "candidatos": 2
+    },
+    "choclo": {
+     "precio": 4.6,
+     "unidad": "unidad",
+     "mediana": 4.67,
+     "item": "Choclo Especial x unid",
+     "url": "https://www.metro.pe/choclo-especial-x-unid-2/p",
+     "oferta": false,
+     "candidatos": 2
+    },
+    "camote": {
+     "precio": 3.1,
+     "unidad": "kilo",
+     "mediana": 4.35,
+     "item": "Camote Amarillo Metro x kg",
+     "url": "https://www.metro.pe/camote-amarillo-metro-x-kg-108-2/p",
+     "oferta": false,
+     "candidatos": 6
+    },
+    "zanahoria": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 4.99,
+     "item": "Zanahoria Especial x kg",
+     "url": "https://www.metro.pe/zanahoria-especial-x-kg-2-2/p",
+     "oferta": false,
+     "candidatos": 2
+    },
+    "manzana": {
+     "precio": 3.79,
+     "unidad": "kilo",
+     "mediana": 8.99,
+     "item": "Manzana Israel Añawi Metro x kg",
+     "url": "https://www.metro.pe/manzana-israel-anawi-metro-x-kg-2/p",
+     "oferta": true,
+     "candidatos": 11
+    },
+    "mandarina": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 4.49,
+     "item": "Mandarina Sin Pepas 1.5kg",
+     "url": "https://www.metro.pe/mandarina-sin-pepas-1-5kg-1068520/p",
+     "oferta": false,
+     "candidatos": 3
+    },
+    "naranja": {
+     "precio": 3.4,
+     "unidad": "kilo",
+     "mediana": 6.04,
+     "item": "Naranja Selva Malla 5kg",
+     "url": "https://www.metro.pe/naranja-selva-malla-5kg-969553/p",
+     "oferta": true,
+     "candidatos": 2
+    },
+    "papaya": {
+     "precio": 5.69,
+     "unidad": "kilo",
+     "mediana": 5.74,
+     "item": "Papaya Metro x kg",
+     "url": "https://www.metro.pe/papaya-metro-x-kg-2/p",
+     "oferta": true,
+     "candidatos": 4
+    },
+    "pina": {
+     "precio": 10.99,
+     "unidad": "kilo",
+     "mediana": 10.99,
+     "item": "Piña Golden Madura Metro x kg",
+     "url": "https://www.metro.pe/pina-golden-madura-metro-x-kg-1039019/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "maracuya": {
+     "precio": 8.99,
+     "unidad": "kilo",
+     "mediana": 8.99,
+     "item": "Maracuyá Metro x kg",
+     "url": "https://www.metro.pe/maracuya-metro-x-kg-71090-2/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "gallina": {
+     "precio": 9.5,
+     "unidad": "kilo",
+     "mediana": 9.5,
+     "item": "Gallina Sin Menudencia Sadia x kg",
+     "url": "https://www.metro.pe/gallina-sin-menudencia-sadia-x-kg-773633/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "huevo": {
+     "precio": 8.31,
+     "unidad": "kilo",
+     "mediana": 11.89,
+     "item": "Huevos Pardos Metro Bandeja 90 Unid",
+     "url": "https://www.metro.pe/huevos-pardos-metro-bandeja-90-unid-2/p",
+     "oferta": false,
+     "candidatos": 16
+    },
+    "lenteja": {
+     "precio": 9.0,
+     "unidad": "kilo",
+     "mediana": 11.0,
+     "item": "Lenteja Bebé Cuisine & Co 500g",
+     "url": "https://www.metro.pe/lenteja-bebe-cuisine-co-500g-753565/p",
+     "oferta": false,
+     "candidatos": 15
+    },
+    "quinua": {
+     "precio": 11.0,
+     "unidad": "kilo",
+     "mediana": 19.4,
+     "item": "Quinua Avena 3 Ositos 900g",
+     "url": "https://www.metro.pe/quinua-avena-3-ositos-900g/p",
+     "oferta": true,
+     "candidatos": 15
+    }
+   },
+   "sin_precio": [
+    "cebolla",
+    "papa-amarilla",
+    "papa-blanca",
+    "aji",
+    "arveja",
+    "ajo",
+    "platano",
+    "pollo",
+    "carne",
+    "jurel",
+    "arroz",
+    "fideos",
+    "maiz-morado",
+    "azucar",
+    "aceite",
+    "leche",
+    "queso"
+   ]
+  },
+  "wong": {
+   "nombre": "Wong",
+   "precios": {
+    "limon": {
+     "precio": 4.7,
+     "unidad": "kilo",
+     "mediana": 4.7,
+     "item": "Limón x kg",
+     "url": "https://www.wong.pe/lim-n-x-kg-4029/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "tomate": {
+     "precio": 7.39,
+     "unidad": "kilo",
+     "mediana": 7.39,
+     "item": "Tomate Italiano x kg",
+     "url": "https://www.wong.pe/tomate-italiano-x-kg-4044/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "zapallo": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 3.99,
+     "item": "Zapallo Macre x kg",
+     "url": "https://www.wong.pe/zapallo-macre-x-kg-4050/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "choclo": {
+     "precio": 3.7,
+     "unidad": "unidad",
+     "mediana": 4.7,
+     "item": "Choclo Imperial x unid",
+     "url": "https://www.wong.pe/choclo-imperial-x-unid-390334-2-2/p",
+     "oferta": true,
+     "candidatos": 3
+    },
+    "camote": {
+     "precio": 3.59,
+     "unidad": "kilo",
+     "mediana": 4.19,
+     "item": "Camote Amarillo x kg",
+     "url": "https://www.wong.pe/camote-amarillo-x-kg-4008/p",
+     "oferta": false,
+     "candidatos": 7
+    },
+    "zanahoria": {
+     "precio": 6.6,
+     "unidad": "kilo",
+     "mediana": 8.0,
+     "item": "Zanahoria x kg",
+     "url": "https://www.wong.pe/zanahoria-x-kg-4047/p",
+     "oferta": false,
+     "candidatos": 2
+    },
+    "manzana": {
+     "precio": 5.69,
+     "unidad": "kilo",
+     "mediana": 8.99,
+     "item": "Manzana Israel x kg",
+     "url": "https://www.wong.pe/manzana-israel-x-kg-3920/p",
+     "oferta": false,
+     "candidatos": 9
+    },
+    "mandarina": {
+     "precio": 3.99,
+     "unidad": "kilo",
+     "mediana": 5.37,
+     "item": "Mandarina Sin Pepas 1.5kg",
+     "url": "https://www.wong.pe/mandarina-sin-pepas-1-5kg-1068520/p",
+     "oferta": false,
+     "candidatos": 6
+    },
+    "naranja": {
+     "precio": 3.8,
+     "unidad": "kilo",
+     "mediana": 6.74,
+     "item": "Naranja Selva Malla 5kg",
+     "url": "https://www.wong.pe/naranja-selva-malla-5kg-969553/p",
+     "oferta": false,
+     "candidatos": 2
+    },
+    "papaya": {
+     "precio": 5.99,
+     "unidad": "kilo",
+     "mediana": 6.74,
+     "item": "Papaya x kg",
+     "url": "https://www.wong.pe/papaya-x-kg-3936/p",
+     "oferta": true,
+     "candidatos": 2
+    },
+    "pina": {
+     "precio": 5.89,
+     "unidad": "kilo",
+     "mediana": 5.89,
+     "item": "Piña Golden Wong x kg",
+     "url": "https://www.wong.pe/pina-golden-wong-x-kg-18363/p",
+     "oferta": true,
+     "candidatos": 1
+    },
+    "maracuya": {
+     "precio": 11.99,
+     "unidad": "kilo",
+     "mediana": 11.99,
+     "item": "Maracuyá x kg",
+     "url": "https://www.wong.pe/maracuya-x-kg-3924/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "gallina": {
+     "precio": 11.9,
+     "unidad": "kilo",
+     "mediana": 11.9,
+     "item": "Gallina Sin Menudencia Sadia x kg",
+     "url": "https://www.wong.pe/gallina-sin-menudencia-sadia-x-kg-773633/p",
+     "oferta": false,
+     "candidatos": 1
+    },
+    "huevo": {
+     "precio": 9.28,
+     "unidad": "kilo",
+     "mediana": 16.96,
+     "item": "Huevos Pardos Wong 30un",
+     "url": "https://www.wong.pe/huevos-pardos-wong-30un-1035228/p",
+     "oferta": false,
+     "candidatos": 14
+    },
+    "lenteja": {
+     "precio": 9.0,
+     "unidad": "kilo",
+     "mediana": 11.0,
+     "item": "Lenteja Bebé Cuisine & Co 500g",
+     "url": "https://www.wong.pe/lenteja-bebe-cuisine-co-500g-753565/p",
+     "oferta": false,
+     "candidatos": 9
+    },
+    "quinua": {
+     "precio": 11.0,
+     "unidad": "kilo",
+     "mediana": 33.5,
+     "item": "Quinua Avena 3 Ositos 900g",
+     "url": "https://www.wong.pe/quinua-avena-3-ositos-900g/p",
+     "oferta": true,
+     "candidatos": 14
+    }
+   },
+   "sin_precio": [
+    "cebolla",
+    "papa-amarilla",
+    "papa-blanca",
+    "aji",
+    "arveja",
+    "ajo",
+    "platano",
+    "pollo",
+    "carne",
+    "jurel",
+    "arroz",
+    "fideos",
+    "maiz-morado",
+    "azucar",
+    "aceite",
+    "leche",
+    "queso"
+   ]
+  }
+ }
+}
