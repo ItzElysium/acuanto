@@ -192,6 +192,7 @@
   /* Las rejillas no crecen con el contenido: las tiras de chips se desplazan dentro de su caja. */
   main, .card, .list, .grp { grid-template-columns: minmax(0, 1fr); }
   .chips.wrap { flex-wrap: wrap; overflow: visible; }
+  .chips.wrap .chip { white-space: normal; max-width: 100%; text-align: left; }
   .grp-t { font-size: 1rem; color: var(--muted); margin-top: 6px; }
 
   /* Mi semana */
@@ -278,6 +279,19 @@
   .lleva { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .lleva .emo { font-size: 1.5rem; line-height: 1; text-align: center; }
   .lleva .pr { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ico { width: 1em; height: 1em; display: inline-block; vertical-align: -0.12em; }
+  .emo2 { position: relative; display: inline-block; line-height: 1; }
+  .emo2 .sub { position: absolute; right: -0.38em; bottom: -0.22em; font-size: 0.55em; line-height: 1; }
+  .srow { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; grid-template-areas: "emo txt pr" ". btn btn"; gap: 6px 10px; align-items: center;
+          padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .srow:last-of-type { border-bottom: none; }
+  .srow .emo { grid-area: emo; font-size: 1.5rem; text-align: center; align-self: start; }
+  .srow .txt { grid-area: txt; min-width: 0; } .srow .pr { grid-area: pr; font-weight: 700; color: var(--green); white-space: nowrap; align-self: start; }
+  .srow .btnw { grid-area: btn; display: flex; flex-wrap: wrap; gap: 8px; }
+  .srow .btnw .chip, .best + .mrow .chip { white-space: normal; text-align: left; max-width: 100%; }
+  .best { display: grid; gap: 6px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
+  .preview { width: 100%; max-height: 520px; object-fit: contain; border: 2px solid var(--line); border-radius: var(--radius); background: #fff; }
+  .hint { font-size: 0.82rem; font-weight: 700; color: var(--green); }
   .toast { position: fixed; left: 16px; right: 16px; bottom: calc(var(--nav-h, 96px) + 12px); max-width: 448px; margin: 0 auto; z-index: 40;
            background: var(--ink); color: var(--bg); padding: 14px 16px; border-radius: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
 </style>
@@ -334,6 +348,7 @@ const PRODUCTOS = [
   { id: "zanahoria", nombre: "Zanahoria", emo: "🥕", unidad: "kilo", base: 2.0, riesgo: false, rubro: "verduras" },
   { id: "arveja", nombre: "Arveja verde", emo: "🟢", unidad: "kilo", base: 7.0, riesgo: false, rubro: "verduras" },
   { id: "ajo", nombre: "Ajos", emo: "🧄", unidad: "kilo", base: 12.0, riesgo: false, rubro: "verduras" },
+  { id: "olluco", nombre: "Olluco", emo: "🥔", unidad: "kilo", base: 4.0, riesgo: false, rubro: "verduras" },
   { id: "platano", nombre: "Plátano de seda", emo: "🍌", unidad: "kilo", base: 3.5, riesgo: false, rubro: "frutas", pieza: [0.15, "plátano", "plátanos"] },
   { id: "manzana", nombre: "Manzana", emo: "🍎", unidad: "kilo", base: 5.0, riesgo: false, rubro: "frutas", pieza: [0.17, "manzana", "manzanas"] },
   { id: "mandarina", nombre: "Mandarina", emo: "🟠", unidad: "kilo", base: 4.0, riesgo: false, rubro: "frutas", pieza: [0.1, "mandarina", "mandarinas"] },
@@ -348,6 +363,7 @@ const PRODUCTOS = [
   { id: "jurel", nombre: "Jurel", emo: "🐟", unidad: "kilo", base: 8.0, riesgo: true, rubro: "pescado" },
   { id: "arroz", nombre: "Arroz", emo: "🍚", unidad: "kilo", base: 4.2, riesgo: false, rubro: "abarrotes" },
   { id: "lenteja", nombre: "Lenteja", emo: "🟤", unidad: "kilo", base: 7.5, riesgo: false, rubro: "abarrotes" },
+  { id: "frejol", nombre: "Frejol canario", emo: "🟡", unidad: "kilo", base: 9.0, riesgo: false, rubro: "abarrotes" },
   { id: "fideos", nombre: "Fideos", emo: "🍝", unidad: "kilo", base: 6.0, riesgo: false, rubro: "abarrotes" },
   { id: "quinua", nombre: "Quinua", emo: "🌾", unidad: "kilo", base: 12.0, riesgo: false, rubro: "abarrotes" },
   { id: "maiz-morado", nombre: "Maíz morado", emo: "🟣", unidad: "kilo", base: 5.0, riesgo: false, rubro: "abarrotes" },
@@ -370,6 +386,8 @@ const MERCADOS = [
   { id: "magdalena", nombre: "Mercado de Magdalena", distrito: "Magdalena del Mar", f: 1.06 },
   { id: "lobaton", nombre: "Mercado Lobatón", distrito: "Lince", f: 1.04 },
   { id: "caja-de-agua", nombre: "Mercado Caja de Agua", distrito: "San Juan de Lurigancho", f: 0.93 },
+  { id: "central", nombre: "Mercado Central de Lima", distrito: "Cercado de Lima", f: 0.95 },
+  { id: "productores", nombre: "Mercado de Productores", distrito: "Santa Anita", f: 0.86 },
 ];
 const TIPOS = [
   { id: "segundo", nombre: "Segundos", por: "por plato" }, { id: "sopa", nombre: "Caldos y sopas", por: "por plato" },
@@ -380,65 +398,138 @@ const TIPOS = [
    Sopas y entradas en porción de menú. "cambio": plato del mismo tipo que se sugiere si ahorra. "aparte": lo que no se cotiza.
    Las porciones son estimados a validar con caseras y cocineras reales. */
 const PLATOS = [
-  { id: "arroz-pollo", tipo: "segundo", nombre: "Arroz con pollo", emo: "🍗", aparte: ["culantro"],
+  { id: "arroz-pollo", tipo: "segundo", nombre: "Arroz con pollo", emo: "🍚|🍗", aparte: ["culantro"],
     ing: { pollo: 0.25, arroz: 0.1, arveja: 0.03, zanahoria: 0.03, choclo: 0.25, aji: 0.01, cebolla: 0.04, ajo: 0.005, aceite: 0.01 } },
-  { id: "lomo", tipo: "segundo", nombre: "Lomo saltado", emo: "🥩", cambio: "pollo-saltado", aparte: ["sillao", "vinagre"],
+  { id: "lomo", tipo: "segundo", nombre: "Lomo saltado", emo: "🥩|🍟", cambio: "pollo-saltado", aparte: ["sillao", "vinagre"],
     ing: { carne: 0.18, tomate: 0.1, cebolla: 0.1, "papa-blanca": 0.25, arroz: 0.1, aji: 0.01, ajo: 0.005, aceite: 0.04 } },
-  { id: "pollo-saltado", tipo: "segundo", nombre: "Pollo saltado", emo: "🍟", aparte: ["sillao", "vinagre"],
+  { id: "pollo-saltado", tipo: "segundo", nombre: "Pollo saltado", emo: "🍗|🍟", aparte: ["sillao", "vinagre"],
     ing: { pollo: 0.2, tomate: 0.1, cebolla: 0.1, "papa-blanca": 0.25, arroz: 0.1, aji: 0.01, ajo: 0.005, aceite: 0.04 } },
-  { id: "aji-gallina", tipo: "segundo", nombre: "Ají de gallina", emo: "🍛", cambio: "estofado", aparte: ["pan", "queso parmesano"],
+  { id: "aji-gallina", tipo: "segundo", nombre: "Ají de gallina", emo: "🍛|🌶️", cambio: "estofado", aparte: ["pan", "queso parmesano"],
     ing: { pollo: 0.2, aji: 0.04, cebolla: 0.05, leche: 0.25, "papa-amarilla": 0.15, arroz: 0.1, huevo: 0.03, ajo: 0.005, aceite: 0.01 } },
-  { id: "ceviche", tipo: "segundo", nombre: "Ceviche de jurel", emo: "🍋", cambio: "chaufa", aparte: ["ají limo", "culantro"],
+  { id: "ceviche", tipo: "segundo", nombre: "Ceviche de jurel", emo: "🐟|🍋", cambio: "chaufa", aparte: ["ají limo", "culantro"],
     ing: { jurel: 0.2, limon: 0.12, cebolla: 0.08, camote: 0.15, choclo: 0.25 } },
-  { id: "sudado", tipo: "segundo", nombre: "Sudado de jurel", emo: "🐟", cambio: "tallarines", aparte: ["culantro"],
+  { id: "sudado", tipo: "segundo", nombre: "Sudado de jurel", emo: "🍲|🐟", cambio: "tallarines", aparte: ["culantro"],
     ing: { jurel: 0.25, tomate: 0.1, cebolla: 0.1, aji: 0.01, arroz: 0.1, "papa-blanca": 0.1, ajo: 0.005, aceite: 0.01 } },
-  { id: "tallarines", tipo: "segundo", nombre: "Tallarines rojos con pollo", emo: "🍝", aparte: ["laurel"],
+  { id: "tallarines", tipo: "segundo", nombre: "Tallarines rojos con pollo", emo: "🍝|🍗", aparte: ["laurel"],
     ing: { fideos: 0.12, pollo: 0.15, tomate: 0.15, cebolla: 0.05, zanahoria: 0.03, ajo: 0.005, aceite: 0.015 } },
-  { id: "lentejas", tipo: "segundo", nombre: "Lentejas con arroz y huevo", emo: "🥘", aparte: ["comino"],
+  { id: "lentejas", tipo: "segundo", nombre: "Lentejas con arroz y huevo", emo: "🥘|🥚", aparte: ["comino"],
     ing: { lenteja: 0.08, arroz: 0.1, huevo: 0.06, cebolla: 0.04, tomate: 0.03, ajo: 0.005, aceite: 0.02 } },
-  { id: "estofado", tipo: "segundo", nombre: "Estofado de pollo", emo: "🍲", aparte: ["laurel"],
+  { id: "estofado", tipo: "segundo", nombre: "Estofado de pollo", emo: "🍲|🥕", aparte: ["laurel"],
     ing: { pollo: 0.25, "papa-blanca": 0.15, zanahoria: 0.05, arveja: 0.03, tomate: 0.08, cebolla: 0.05, arroz: 0.1, ajo: 0.005, aceite: 0.01 } },
-  { id: "locro", tipo: "segundo", nombre: "Locro de zapallo", emo: "🎃", aparte: ["huevo frito (opcional)"],
+  { id: "locro", tipo: "segundo", nombre: "Locro de zapallo", emo: "🎃|🧀", aparte: ["huevo frito (opcional)"],
     ing: { zapallo: 0.3, "papa-blanca": 0.15, choclo: 0.25, leche: 0.1, queso: 0.03, arveja: 0.02, arroz: 0.1, cebolla: 0.03, ajo: 0.005, aceite: 0.01 } },
-  { id: "chaufa", tipo: "segundo", nombre: "Arroz chaufa de pollo", emo: "🍳", aparte: ["cebolla china", "sillao", "kion"],
+  { id: "chaufa", tipo: "segundo", nombre: "Arroz chaufa de pollo", emo: "🍚|🥢", aparte: ["cebolla china", "sillao", "kion"],
     ing: { arroz: 0.12, pollo: 0.1, huevo: 0.06, cebolla: 0.03, ajo: 0.005, aceite: 0.02 } },
 
-  { id: "caldo-gallina", tipo: "sopa", nombre: "Caldo de gallina", emo: "🐔", aparte: ["kion", "cebolla china", "orégano"],
+  { id: "seco-pollo", tipo: "segundo", nombre: "Seco de pollo con frejoles", emo: "🍛|🌿", aparte: ["culantro", "chicha de jora (opcional)"],
+    ing: { pollo: 0.25, frejol: 0.06, arroz: 0.1, cebolla: 0.05, aji: 0.01, zapallo: 0.03, ajo: 0.005, aceite: 0.015 } },
+  { id: "pescado-frito", tipo: "segundo", nombre: "Pescado frito con arroz", emo: "🐟|🍚", cambio: "tortilla", aparte: ["harina", "sarsa criolla"],
+    ing: { jurel: 0.25, arroz: 0.1, "papa-blanca": 0.15, limon: 0.02, aceite: 0.05 } },
+  { id: "tortilla", tipo: "segundo", nombre: "Tortilla de verduras con arroz", emo: "🍳|🥕",
+    ing: { huevo: 0.12, zanahoria: 0.04, cebolla: 0.03, tomate: 0.03, arveja: 0.02, arroz: 0.1, aceite: 0.02 } },
+  { id: "tacu-tacu", tipo: "segundo", nombre: "Tacu tacu con huevo", emo: "🍚|🍳", aparte: ["orégano"],
+    ing: { frejol: 0.07, arroz: 0.12, huevo: 0.06, cebolla: 0.03, aji: 0.01, ajo: 0.005, aceite: 0.03 } },
+  { id: "pollo-plancha", tipo: "segundo", nombre: "Pollo a la plancha con ensalada", emo: "🍗|🥗", aparte: ["lechuga", "pepino"],
+    ing: { pollo: 0.2, tomate: 0.08, cebolla: 0.03, limon: 0.02, "papa-blanca": 0.2, aceite: 0.01 } },
+  { id: "olluquito", tipo: "segundo", nombre: "Olluquito con carne", emo: "🥘|🥩", cambio: "tortilla", aparte: ["perejil"],
+    ing: { olluco: 0.25, carne: 0.08, aji: 0.01, cebolla: 0.04, ajo: 0.005, arroz: 0.1, aceite: 0.01 } },
+
+  { id: "caldo-gallina", tipo: "sopa", nombre: "Caldo de gallina", emo: "🍜|🐔", aparte: ["kion", "cebolla china", "orégano"],
     ing: { gallina: 0.2, fideos: 0.03, "papa-amarilla": 0.1, huevo: 0.06, limon: 0.01 } },
-  { id: "sopa-casa", tipo: "sopa", nombre: "Sopa de casa", emo: "🥣", aparte: ["apio", "culantro"],
+  { id: "sopa-casa", tipo: "sopa", nombre: "Sopa de casa", emo: "🥣|🥕", aparte: ["apio", "culantro"],
     ing: { pollo: 0.08, fideos: 0.03, "papa-blanca": 0.08, zanahoria: 0.03, zapallo: 0.04, choclo: 0.12, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
-  { id: "sopa-criolla", tipo: "sopa", nombre: "Sopa criolla", emo: "🍜", aparte: ["ají panca", "orégano", "pan tostado"],
+  { id: "sopa-criolla", tipo: "sopa", nombre: "Sopa criolla", emo: "🍜|🥩", aparte: ["ají panca", "orégano", "pan tostado"],
     ing: { carne: 0.06, fideos: 0.04, leche: 0.08, huevo: 0.06, tomate: 0.04, cebolla: 0.03, ajo: 0.003, aceite: 0.005 } },
-  { id: "aguadito", tipo: "sopa", nombre: "Aguadito de pollo", emo: "🍵", aparte: ["culantro"],
+  { id: "aguadito", tipo: "sopa", nombre: "Aguadito de pollo", emo: "🥣|🌿", aparte: ["culantro"],
     ing: { pollo: 0.08, arroz: 0.04, arveja: 0.02, zanahoria: 0.02, choclo: 0.12, "papa-amarilla": 0.06, aji: 0.008, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
-  { id: "chilcano", tipo: "sopa", nombre: "Chilcano de pescado", emo: "🐠", aparte: ["kion", "cebolla china", "culantro"],
+  { id: "chilcano", tipo: "sopa", nombre: "Chilcano de pescado", emo: "🥣|🐟", aparte: ["kion", "cebolla china", "culantro"],
     ing: { jurel: 0.15, limon: 0.02, cebolla: 0.02, ajo: 0.003 } },
-  { id: "sopa-quinua", tipo: "sopa", nombre: "Sopa de quinua", emo: "🌾", aparte: ["apio", "orégano"],
+  { id: "sopa-quinua", tipo: "sopa", nombre: "Sopa de quinua", emo: "🥣|🌾", aparte: ["apio", "orégano"],
     ing: { quinua: 0.03, "papa-blanca": 0.08, zanahoria: 0.03, zapallo: 0.03, pollo: 0.05, queso: 0.01, cebolla: 0.02, ajo: 0.003, aceite: 0.005 } },
 
-  { id: "huancaina", tipo: "entrada", nombre: "Papa a la huancaína", emo: "🧀", aparte: ["galletas de soda", "lechuga", "aceitunas"],
+  { id: "sopa-verduras", tipo: "sopa", nombre: "Sopa de verduras", emo: "🥣|🥦", aparte: ["apio", "poro"],
+    ing: { zapallo: 0.05, zanahoria: 0.03, "papa-blanca": 0.08, fideos: 0.03, choclo: 0.12, arveja: 0.02, cebolla: 0.02, aceite: 0.005 } },
+  { id: "menestron", tipo: "sopa", nombre: "Menestrón", emo: "🍲|🧀", aparte: ["albahaca", "espinaca"],
+    ing: { frejol: 0.03, zapallo: 0.04, zanahoria: 0.03, "papa-blanca": 0.06, fideos: 0.03, choclo: 0.12, carne: 0.04, queso: 0.01, aceite: 0.005 } },
+
+  { id: "huancaina", tipo: "entrada", nombre: "Papa a la huancaína", emo: "🥔|🧀", aparte: ["galletas de soda", "lechuga", "aceitunas"],
     ing: { "papa-amarilla": 0.2, aji: 0.03, leche: 0.08, queso: 0.04, huevo: 0.03, aceite: 0.02 } },
-  { id: "causa", tipo: "entrada", nombre: "Causa rellena", emo: "🥔", aparte: ["mayonesa", "palta (opcional)"],
+  { id: "causa", tipo: "entrada", nombre: "Causa rellena", emo: "🥔|🍋", aparte: ["mayonesa", "palta (opcional)"],
     ing: { "papa-amarilla": 0.18, aji: 0.015, limon: 0.02, pollo: 0.05, huevo: 0.02, cebolla: 0.02, aceite: 0.02 } },
 
-  { id: "chicha", tipo: "refresco", nombre: "Chicha morada", emo: "🟣", aparte: ["canela", "clavo de olor"],
-    ing: { "maiz-morado": 0.03, pina: 0.04, manzana: 0.02, limon: 0.01, azucar: 0.025 } },
-  { id: "limonada", tipo: "refresco", nombre: "Limonada", emo: "🥤", ing: { limon: 0.05, azucar: 0.025 } },
-  { id: "maracuya-ref", tipo: "refresco", nombre: "Refresco de maracuyá", emo: "🧃", ing: { maracuya: 0.06, azucar: 0.025 } },
+  { id: "papa-rellena", tipo: "entrada", nombre: "Papa rellena", emo: "🥔|🥩", aparte: ["aceitunas", "pasas"],
+    ing: { "papa-blanca": 0.2, carne: 0.05, huevo: 0.02, cebolla: 0.03, aceite: 0.04 } },
 
-  { id: "mazamorra", tipo: "postre", nombre: "Mazamorra morada", emo: "🍮", aparte: ["chuño", "canela", "pasas"],
+  { id: "chicha", tipo: "refresco", nombre: "Chicha morada", emo: "🥤|🍇", aparte: ["canela", "clavo de olor"],
+    ing: { "maiz-morado": 0.03, pina: 0.04, manzana: 0.02, limon: 0.01, azucar: 0.025 } },
+  { id: "limonada", tipo: "refresco", nombre: "Limonada", emo: "🥤|🍋", ing: { limon: 0.05, azucar: 0.025 } },
+  { id: "maracuya-ref", tipo: "refresco", nombre: "Refresco de maracuyá", emo: "🥤|@maracuya", ing: { maracuya: 0.06, azucar: 0.025 } },
+
+  { id: "pina-ref", tipo: "refresco", nombre: "Refresco de piña", emo: "🥤|🍍", aparte: ["canela"], ing: { pina: 0.08, azucar: 0.02 } },
+
+  { id: "mazamorra", tipo: "postre", nombre: "Mazamorra morada", emo: "🍮|🍇", aparte: ["chuño", "canela", "pasas"],
     ing: { "maiz-morado": 0.02, pina: 0.03, manzana: 0.02, azucar: 0.03 } },
-  { id: "arroz-leche", tipo: "postre", nombre: "Arroz con leche", emo: "🍚", aparte: ["canela", "clavo de olor"],
+  { id: "arroz-leche", tipo: "postre", nombre: "Arroz con leche", emo: "🍚|🥛", aparte: ["canela", "clavo de olor"],
     ing: { arroz: 0.03, leche: 0.15, azucar: 0.03 } },
-  { id: "ensalada-frutas", tipo: "postre", nombre: "Ensalada de frutas", emo: "🍉",
+  { id: "ensalada-frutas", tipo: "postre", nombre: "Ensalada de frutas", emo: "🍌|🍓",
     ing: { papaya: 0.06, platano: 0.05, pina: 0.04, manzana: 0.03 } },
 
   { id: "f-platano", tipo: "fruta", nombre: "Plátano (1)", emo: "🍌", ing: { platano: 0.15 } },
   { id: "f-manzana", tipo: "fruta", nombre: "Manzana (1)", emo: "🍎", ing: { manzana: 0.17 } },
-  { id: "f-mandarina", tipo: "fruta", nombre: "Mandarinas (2)", emo: "🟠", ing: { mandarina: 0.2 } },
-  { id: "f-papaya", tipo: "fruta", nombre: "Papaya (1 tajada)", emo: "🍈", ing: { papaya: 0.25 } },
-  { id: "f-jugo", tipo: "fruta", nombre: "Jugo de naranja (1 vaso)", emo: "🍊", ing: { naranja: 0.6 } },
+  { id: "f-mandarina", tipo: "fruta", nombre: "Mandarinas (2)", emo: "🍊", ing: { mandarina: 0.2 } },
+  { id: "f-papaya", tipo: "fruta", nombre: "Papaya (1 tajada)", emo: "@papaya", ing: { papaya: 0.25 } },
+  { id: "f-jugo", tipo: "fruta", nombre: "Jugo de naranja (1 vaso)", emo: "🥤|🍊", ing: { naranja: 0.6 } },
 ];
+/* Íconos dibujados para productos sin un emoji parecido (se ven igual en celulares antiguos). */
+const ICONOS = {
+  arveja: '<path d="M4 21c4-9 15-15 24-13-3 9-14 16-24 13z" fill="#5a9e3a"/><circle cx="11.5" cy="17.5" r="3" fill="#a5d66f"/><circle cx="17" cy="14.5" r="3" fill="#a5d66f"/><circle cx="22.5" cy="11.8" r="2.6" fill="#a5d66f"/><path d="M28 8c1.2-1.8 1.5-3.4 1-5" stroke="#3d7a25" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  lenteja: '<g fill="#a5713f" stroke="#6b4423" stroke-width=".8"><ellipse cx="9" cy="21" rx="5" ry="3.3"/><ellipse cx="18.5" cy="23" rx="5" ry="3.3"/><ellipse cx="13.5" cy="14.5" rx="5" ry="3.3"/><ellipse cx="23" cy="15.5" rx="5" ry="3.3"/><ellipse cx="25.5" cy="24" rx="4.3" ry="2.9"/></g>',
+  frejol: '<g fill="#efc957" stroke="#b08a2a" stroke-width=".9"><path d="M5 18c0-4 4-6 7-4 3-2 7 0 6 4-1 5-12 6-13 0z"/><path d="M15 25c0-4 4-6 7-4 3-2 7 0 6 4-1 5-12 6-13 0z"/><path d="M14 10c0-4 4-6 7-4 3-2 7 0 6 4-1 5-12 6-13 0z"/></g>',
+  "maiz-morado": '<path d="M10 28c-3-7 2-21 8-24 6 3 7 17 3 24-4 2-7 2-11 0z" fill="#5b2a6e"/><g fill="#9b59b6"><circle cx="15" cy="10" r="1.6"/><circle cx="19" cy="11" r="1.6"/><circle cx="14" cy="15" r="1.6"/><circle cx="18.5" cy="16" r="1.6"/><circle cx="14" cy="20" r="1.6"/><circle cx="18" cy="21" r="1.6"/><circle cx="16" cy="25" r="1.6"/></g><path d="M10 28c-4-4-6-9-5-14 3 3 5 8 5 14zM21 28c4-4 6-9 5-14-3 3-5 8-5 14z" fill="#7cb342"/>',
+  maracuya: '<circle cx="16" cy="16" r="12.5" fill="#e9b81f" stroke="#b8890d" stroke-width="1.2"/><circle cx="16" cy="16" r="8" fill="#ffe08a"/><g fill="#3e2a14"><circle cx="13" cy="13" r="1.3"/><circle cx="18.5" cy="12.5" r="1.3"/><circle cx="16" cy="17" r="1.3"/><circle cx="12.5" cy="19" r="1.3"/><circle cx="19.5" cy="19.5" r="1.3"/></g>',
+  papaya: '<path d="M3.5 16C3.5 9 9 4 16 4s12.5 5 12.5 12S23 28 16 28 3.5 23 3.5 16z" fill="#7cb342"/><path d="M6 16c0-5.6 4.5-9.8 10-9.8S26 10.4 26 16s-4.5 9.8-10 9.8S6 21.6 6 16z" fill="#ff8a3d"/><ellipse cx="16" cy="16" rx="3.8" ry="6.3" fill="#ffc08f"/><g fill="#222"><circle cx="15" cy="12.5" r="1"/><circle cx="17.2" cy="14.5" r="1"/><circle cx="15" cy="16.5" r="1"/><circle cx="17" cy="18.8" r="1"/><circle cx="15.3" cy="20.5" r="1"/></g>',
+  azucar: '<path d="M8 9h16l2 17a3 3 0 01-3 3H9a3 3 0 01-3-3z" fill="#c8955a"/><path d="M8 9l2-4h12l2 4z" fill="#a87840"/><rect x="11" y="15" width="10" height="7" rx="1.5" fill="#fff4e0"/>',
+  aceite: '<path d="M13 4h6v4l3 4v15a2 2 0 01-2 2h-8a2 2 0 01-2-2V12l3-4z" fill="#f4c542" stroke="#c99a12" stroke-width="1"/><rect x="12.5" y="2" width="7" height="3.5" rx="1" fill="#2e7d32"/><rect x="11" y="15" width="10" height="7" rx="1.5" fill="#fff"/>',
+  leche: '<rect x="8" y="6" width="16" height="22" rx="3" fill="#cfd8dc"/><rect x="8" y="10" width="16" height="13" fill="#1565c0"/><rect x="8" y="15" width="16" height="3" fill="#e53935"/><ellipse cx="16" cy="6.5" rx="8" ry="2.2" fill="#eceff1"/>',
+  "papa-amarilla": '<path d="M5 18c0-7 6-11 12-11s10 4 10 9-5 10-12 10S5 23 5 18z" fill="#f2c94c" stroke="#c99a12" stroke-width="1"/><g fill="#a07a1c"><circle cx="11" cy="15" r="1"/><circle cx="18" cy="13" r="1"/><circle cx="20" cy="20" r="1"/><circle cx="12" cy="21" r="1"/></g>',
+  aji: '<path d="M11 8c2 9 8 16 18 19-9 3-19-4-21-15z" fill="#f9a825" stroke="#d48806" stroke-width=".8"/><path d="M11 8c-1-2-1-4 1-5.5" stroke="#2e7d32" stroke-width="2.6" fill="none" stroke-linecap="round"/>',
+  olluco: '<g stroke="#c99a12" stroke-width=".9"><ellipse cx="11" cy="19" rx="7" ry="4.6" fill="#f6d36b" transform="rotate(-20 11 19)"/><ellipse cx="21" cy="14" rx="7" ry="4.6" fill="#f3c94f" transform="rotate(15 21 14)"/></g><g fill="#e57373"><circle cx="9" cy="18" r="1"/><circle cx="13" cy="20" r="1"/><circle cx="20" cy="13" r="1"/><circle cx="24" cy="15" r="1"/></g>',
+};
+const emoP = (p) => (ICONOS[p.id] ? `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true">${ICONOS[p.id]}</svg>` : p.emo);
+const emo1 = (e) => (e.startsWith("@") ? emoP(prod(e.slice(1))) : e);
+function emoD(d) { const [a, b] = String(d.emo).split("|"); return b ? `<span class="emo2">${emo1(a)}<span class="sub">${emo1(b)}</span></span>` : emo1(a); }
+
+/* Sustitutos: [producto que lo reemplaza, cuánto se usa por cada unidad del original, para qué sirve]. */
+const SUSTITUTOS = {
+  "papa-amarilla": [["papa-blanca", 1, "En sopas, guisos y fritas. En causa y huancaína no es igual."], ["camote", 1, "Más dulce; bien sancochado."]],
+  "papa-blanca": [["camote", 1, "Sancochado o en guisos."], ["olluco", 1, "En guisos y saltados."]],
+  camote: [["papa-blanca", 1, "Sancochada, para acompañar."]],
+  limon: [["maracuya", 1.2, "Para refrescos y aliños. En ceviche no reemplaza."], ["naranja", 1.5, "Solo para refrescos."]],
+  tomate: [["zapallo", 1, "Da cuerpo a guisos y estofados."], ["zanahoria", 0.8, "Mezclada en aderezos y tallarines rojos."]],
+  aji: [["zanahoria", 0.5, "Licuada da el color amarillo; pica menos."]],
+  zapallo: [["zanahoria", 1, "En sopas y guisos."], ["camote", 1, "En locro y sopas."]],
+  zanahoria: [["zapallo", 1, "En sopas y guisos."]],
+  arveja: [["zanahoria", 1, "En arroces y estofados."], ["frejol", 0.5, "Seco rinde más; remójalo la noche antes."]],
+  choclo: [["arveja", 0.2, "En arroces y sopas: un poco de arveja por cada choclo."]],
+  olluco: [["papa-blanca", 1, "En guisos."]],
+  pollo: [["huevo", 0.7, "En chaufa, tallarines o tortilla."], ["lenteja", 0.5, "En guisos: menestra en vez de presa."]],
+  carne: [["pollo", 1, "En saltados y guisos."], ["lenteja", 0.5, "En guisos y sopas."]],
+  gallina: [["pollo", 1, "Para caldo; cocina en menos tiempo."]],
+  jurel: [["pollo", 1, "Para sudados y guisos."], ["huevo", 0.7, "Como proteína del plato."]],
+  arroz: [["fideos", 1, "Como acompañamiento."], ["quinua", 0.8, "Más nutritiva; rinde más."]],
+  fideos: [["arroz", 1, "Como acompañamiento."]],
+  quinua: [["arroz", 1, "En sopas y graneados."]],
+  lenteja: [["frejol", 1, "En guisos; remójalo antes."]],
+  frejol: [["lenteja", 1, "Cocina más rápido y sin remojo."]],
+  queso: [["huevo", 0.8, "En locro y sopas."]],
+  platano: [["mandarina", 1, ""], ["papaya", 1, ""]],
+  manzana: [["platano", 1, ""], ["mandarina", 1, ""]],
+  mandarina: [["naranja", 1, ""], ["platano", 1, ""]],
+  naranja: [["mandarina", 1, ""]],
+  papaya: [["platano", 1, ""], ["pina", 1, ""]],
+  pina: [["papaya", 1, ""]],
+  maracuya: [["limon", 0.8, "Para refresco."], ["pina", 1.5, "Para refresco."]],
+};
 const UNIDADES = ["kilo", "unidad", "litro", "lata", "atado", "ciento", "docena"];
 const POR = { kilo: "el kilo", unidad: "la unidad", litro: "el litro", lata: "la lata", atado: "el atado", ciento: "el ciento", docena: "la docena" };
 const porUnidad = (p) => POR[p.unidad] || p.unidad;
@@ -471,13 +562,13 @@ const state = {
   resto: null, restoPaso: null, menuFoto: null, menuPrevio: null, copia: null, toast: null, desde: null,
   idea: { nota: null, util: [], frecuencia: null, pago: null, texto: "", enviado: null },
 };
-const VERSION = "Prueba 0.4";
+const VERSION = "Prueba 0.5";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
-const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], distrito: MERCADOS[0].distrito, ampliadoHasta: null, puesto: null, acepto: false });
+const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], distrito: MERCADOS[0].distrito, ampliadoHasta: null, puesto: null, acepto: false });
 /* La semana empieza el lunes: al cambiar de semana se borran las marcas de "ya tengo" y "comprado", no los platos. */
 function semanaClave() { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-const semanaVacia = () => ({ personas: 4, dias: {}, frutas: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
+const semanaVacia = () => ({ personas: 4, dias: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
 const restoVacio = () => ({ menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vie", "sab"], precioMenu: 12, menu: {}, precios: {}, diaActivo: "lun", aportadoDia: null });
 
 /* Persistencia: base compartida del artefacto si está disponible; si no, solo este teléfono. */
@@ -515,7 +606,7 @@ function guardarDoc(k) {
     guardando = guardando.then(async () => { try { await state.db.doc(`data/users/${state.uid}/${k}`).set(s); } catch (e) {} });
   }, 700);
 }
-const guardarSemana = () => guardarDoc("semana"), guardarResto = () => guardarDoc("resto");
+const guardarSemana = () => { state.listaImg = null; guardarDoc("semana"); }, guardarResto = () => guardarDoc("resto");
 
 /* ---------------------------- datos de uso (solo versión web, Supabase) ----------------------------
    Anónimo: un identificador al azar por celular, sin nombre ni teléfono. La clave es la pública de Supabase:
@@ -679,6 +770,11 @@ function compraSemana() {
   const add = (d, veces) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * veces * S.personas; };
   for (const x of DIAS) for (const id of itemsDia(x.id)) { const d = plato(id); if (d) add(d, 1); }
   for (const [id, n] of Object.entries(S.frutas || {})) { const d = plato(id); if (d && n) add(d, n); }
+  for (const [pid, sid] of Object.entries(S.sust || {})) {
+    if (!tot[pid]) continue;
+    const r = ((SUSTITUTOS[pid] || []).find((x) => x[0] === sid) || [0, 1])[1];
+    tot[sid] = (tot[sid] || 0) + tot[pid] * r; delete tot[pid];
+  }
   return PRODUCTOS.filter((p) => tot[p.id]).map((p) => ({ p, q: tot[p.id], compra: redondeo(p, tot[p.id]) }));
 }
 const porComprar = () => compraSemana().filter((it) => !state.semana.tengo[it.p.id]);
@@ -696,7 +792,8 @@ const precioReal = (p, L) => { const x = state.superReal && state.superReal.cade
 const tieneReal = (L) => !!(state.superReal && state.superReal.cadenas[L.id] && Object.keys(state.superReal.cadenas[L.id].precios).length);
 function fechaCorta(iso) { try { return new Date(iso + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "short" }); } catch (e) { return iso; } }
 const lugar = (id) => merc(id) || SUPERS.find((s) => s.id === id);
-const lugares = () => [...misMercados(), ...SUPERS];
+const misSupers = () => SUPERS.filter((x) => (state.perfil.supers || []).includes(x.id));
+const lugares = () => [...misMercados(), ...misSupers()];
 const nombreLugar = (L) => (L.tipo === "super" ? L.nombre : corto(L));
 function precioLugar(p, L) {
   if (L.tipo === "super") return precioReal(p, L) ?? r10(p.base * (L.fr[p.rubro] || 1) * (1 + ruido(p.id, L.id)));
@@ -748,6 +845,22 @@ function sugerencias(L) {
     return { d, alt, ahorro, evita };
   }).filter((s) => s.ahorro >= 1).sort((a, b) => b.ahorro - a.ahorro).slice(0, 2);
 }
+/* Estado de un producto en un mercado: caro (subió 10% o más en la semana), escaso (reportan que no hay) o en riesgo por El Niño. */
+function estadoProd(p, M) {
+  const m = M && M.tipo !== "super" ? M : misMercados()[0];
+  if (!m) return { caro: false, sube: 0, escaso: false, riesgo: p.riesgo };
+  const hoyP = precioHoy(p, m).precio, antes = semanaPasada(p, m), sube = antes ? (hoyP - antes) / antes : 0;
+  return { caro: sube >= 0.1, sube, escaso: escasez(p, m) > 0, riesgo: p.riesgo };
+}
+const motivoProd = (e) => (e.escaso ? "Reportan que no hay o hay poco" : e.caro ? `Subió ${Math.round(e.sube * 100)}% esta semana` : e.riesgo ? "Puede subir por El Niño" : "");
+/* Sustitutos con su costo equivalente en un lugar (lo que cuesta reemplazar una unidad del original). */
+function sustitutos(p, L) {
+  const pp = precioLugar(p, L);
+  return (SUSTITUTOS[p.id] || []).map(([sid, r, nota]) => { const x = prod(sid), eq = r2(precioLugar(x, L) * r); return { s: x, r, nota, eq, ahorro: pp ? (pp - eq) / pp : 0 }; })
+    .sort((a, b) => b.ahorro - a.ahorro);
+}
+const unidadSola = (p) => ({ kilo: "kilo", litro: "litro", lata: "lata", unidad: "unidad" }[p.unidad] || p.unidad);
+
 /* Cantidad corta para el resumen: "1½ kg", "150 g", "4 choclos". */
 function cantCorta(p, q) {
   if (p.unidad === "kilo") {
@@ -832,6 +945,10 @@ function vBienvenida() {
       </button>`).join("")}</div>
     ${state.aviso ? `<p class="note" role="alert">${esc(state.aviso)}</p>` : ""}
     <p class="status">${p.mercados.length} de ${limiteMercados()} elegidos${p.mercados.length ? ": " + misMercados().map((m) => esc(m.nombre)).join(", ") : ""}</p>
+    <div style="display:grid;gap:8px"><h2>Supermercados cerca</h2>
+      <p class="small muted">Para comparar tu compra también con el súper. Elige hasta ${limiteMercados()}.</p>
+      <div class="chips wrap" role="group" aria-label="Supermercados">${SUPERS.map((x) => `
+        <button class="chip" data-act="super" data-v="${x.id}" aria-pressed="${(p.supers || []).includes(x.id)}">${(p.supers || []).includes(x.id) ? "✓ " : ""}${esc(x.nombre)}</button>`).join("")}</div></div>
     <p class="note">Lista de ejemplo. En la app real se muestran los mercados cerca de ti con tu ubicación.</p>
     <p class="small muted">Tus aportes se publican sin tu nombre y tu número no se comparte. Al seguir aceptas el uso de tus aportes para calcular precios (Ley 29733).</p>
     <button class="btn" data-act="empezar" ${p.mercados.length ? "" : "disabled"}>Empezar</button>`;
@@ -841,14 +958,16 @@ function filaProducto(p, m) {
   const h = precioHoy(p, m), antes = semanaPasada(p, m), d = r10(h.precio - antes);
   const est = d > 0.05 ? `<span class="pill up">▲ Subió ${soles(d)}</span>` : d < -0.05 ? `<span class="pill down">▼ Bajó ${soles(-d)}</span>` : `<span class="pill same">= Igual</span>`;
   const src = h.observado ? `${h.n} ${h.n === 1 ? "persona lo vio" : "personas lo vieron"} hoy · ${hora(h.ult)}${h.puesto ? " · incluye puesto" : ""}` : "Estimado de ejemplo";
-  const otros = misMercados().filter((o) => o.id !== m.id).map((o) => ({ o, x: precioHoy(p, o).precio })).sort((a, b) => a.x - b.x);
-  const barato = otros.length && otros[0].x <= h.precio - 0.3 ? `<span class="cheap">Más barato en ${esc(otros[0].o.nombre.replace("Mercado ", ""))}: ${soles(otros[0].x)}</span>` : "";
+  const otros = lugares().filter((o) => o.id !== m.id).map((o) => ({ o, x: precioLugar(p, o) })).sort((a, b) => a.x - b.x);
+  const barato = otros.length && otros[0].x <= h.precio - 0.3 ? `<span class="cheap">Más barato en ${esc(nombreLugar(otros[0].o))}: ${soles(otros[0].x)}</span>` : "";
+  const e = estadoProd(p, m), sub = (e.caro || e.escaso) ? sustitutos(p, m).find((x) => x.ahorro > 0.1) : null;
+  const pista = sub ? `<span class="hint">💡 Prueba ${esc(sub.s.nombre.toLowerCase())}</span>` : "";
   const falta = escasez(p, m) ? `<span class="pill up">Reportan que no hay</span>` : "";
   return `<button class="prod" data-act="producto" data-v="${p.id}">
-    <span class="emo" aria-hidden="true">${p.emo}</span>
+    <span class="emo" aria-hidden="true">${emoP(p)}</span>
     <span class="name">${p.nombre}</span>
     <span class="tag"><span class="p">${soles(h.precio)}</span><br><span class="u">${porUnidad(p)}</span></span>
-    <span class="meta">${est} ${falta} ${barato}<span class="src">${src}</span></span>
+    <span class="meta">${est} ${falta} ${barato} ${pista}<span class="src">${src}</span></span>
   </button>`;
 }
 
@@ -889,23 +1008,29 @@ function vInicio() {
 }
 
 function vProducto(pid) {
-  const p = prod(pid), ms = misMercados();
-  const filas = ms.map((m) => ({ m, h: precioHoy(p, m) })).sort((a, b) => a.h.precio - b.h.precio);
+  const p = prod(pid);
+  const filas = lugares().map((L) => ({ L, x: precioLugar(p, L), h: L.tipo === "super" ? null : precioHoy(p, L) })).sort((a, b) => a.x - b.x);
   const m = merc(state.mercadoActivo), h = precioHoy(p, m), antes = semanaPasada(p, m);
   const pts = [antes, r10((antes * 2 + h.precio) / 3), r10((antes + h.precio * 2) / 3), h.precio];
   const lo = Math.min(...pts) * 0.97, hi = Math.max(...pts) * 1.03;
   const y = (v) => 64 - ((v - lo) / (hi - lo || 1)) * 56;
   const linea = pts.map((v, i) => `${10 + i * 93},${y(v).toFixed(1)}`).join(" ");
+  const e = estadoProd(p, m), motivo = motivoProd(e), subs = sustitutos(p, filas[0] ? filas[0].L : m).slice(0, 3);
+  const fuente = (f) => f.L.tipo === "super" ? (precioReal(p, f.L) ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : "Súper · ejemplo")
+    : `Mercado · ${f.h.observado ? `${f.h.n} lo vieron hoy` : "estimado de ejemplo"}`;
   return `<button class="back" data-go="inicio">‹ Volver a precios</button>
-    <div style="display:flex;gap:14px;align-items:center"><span style="font-size:3rem" aria-hidden="true">${p.emo}</span><h1>${p.nombre}</h1></div>
-    <div class="card"><h2>En tus mercados hoy</h2>${filas.map((f, i) => `
-      <div class="mrow"><span><b>${esc(f.m.nombre)}</b><br><span class="small muted">${f.h.observado ? `${f.h.n} lo vieron hoy` : "Estimado de ejemplo"}</span>
+    <div style="display:flex;gap:14px;align-items:center"><span style="font-size:3rem" aria-hidden="true">${emoP(p)}</span><h1>${p.nombre}</h1></div>
+    <div class="card"><h2>¿Dónde está más barato hoy?</h2>${filas.map((f, i) => `
+      <div class="mrow"><span><b>${esc(nombreLugar(f.L))}</b><br><span class="small muted">${fuente(f)}${i ? ` · ${soles(f.x - filas[0].x)} más` : ""}</span>
       ${i === 0 && filas.length > 1 ? `<br><span class="cheap">Más barato</span>` : ""}</span>
-      <span class="tag"><span class="p">${soles(f.h.precio)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}
+      <span class="tag"><span class="p">${soles(f.x)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}
     </div>
-    <div class="card"><h2>En supermercados cercanos</h2>${SUPERS.map((L) => ({ L, x: precioLugar(p, L) })).sort((a, b) => a.x - b.x).map((s) => `
-      <div class="mrow"><span><b>${esc(s.L.nombre)}</b><br><span class="small muted">${precioReal(p, s.L) ? `Online, ${fechaCorta(state.superReal.fecha)}` : "Precio online de ejemplo"}${s.x < filas[0].h.precio ? " · más barato que tus mercados" : ""}</span></span>
-      <span class="tag"><span class="p">${soles(s.x)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}</div>
+    ${subs.length ? `<div class="card"><h2>${motivo ? "¿Caro o no hay? Prueba con" : "Si no encuentras, prueba con"}</h2>
+      ${motivo ? `<span class="pill up" style="justify-self:start">${esc(motivo)}</span>` : ""}
+      ${subs.map((x) => `<div class="mrow"><span><b>${emoP(x.s)} ${esc(x.s.nombre)}</b>${x.nota ? `<br><span class="small muted">${esc(x.nota)}</span>` : ""}
+        ${x.ahorro > 0.05 ? `<br><span class="pill down">${Math.round(x.ahorro * 100)}% más barato</span>` : ""}</span>
+        <span class="tag"><span class="p">${soles(x.eq)}</span><br><span class="u">por ${unidadSola(p)}</span></span></div>`).join("")}
+      <p class="small muted">Lo que cuesta reemplazar 1 ${unidadSola(p)} de ${esc(p.nombre.toLowerCase())}, en ${esc(nombreLugar(filas[0].L))}.</p></div>` : ""}
     <div class="card"><h2>En ${esc(m.nombre.replace("Mercado ", ""))}, esta semana</h2>
       <svg viewBox="0 0 300 76" role="img" aria-label="Pasó de ${soles(antes)} hace una semana a ${soles(h.precio)} hoy" style="width:100%;height:auto">
         <polyline points="${linea}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -953,7 +1078,7 @@ function vFoto() {
 
 function editorItem(it, i) {
   const p = it.producto ? prod(it.producto) : null;
-  return `<div class="item"><div class="hd"><span>${p ? p.emo + " " + p.nombre : "Nuevo: " + esc(it.libre)}</span>
+  return `<div class="item"><div class="hd"><span>${p ? emoP(p) + " " + p.nombre : "Nuevo: " + esc(it.libre)}</span>
       <button class="x" data-act="quitar-item" data-v="${i}" aria-label="Quitar ${p ? p.nombre : esc(it.libre)}">✕</button></div>
     <div class="money"><button type="button" data-act="menos" data-v="${i}" aria-label="Diez céntimos menos">−</button>
       <input class="big" inputmode="decimal" data-precio="${i}" value="${Number(it.precio || 0).toFixed(2)}" aria-label="Precio en soles">
@@ -964,7 +1089,7 @@ function editorItem(it, i) {
 function vManual() {
   const b = state.borrador || { items: [] };
   if (!b.items.length) return `<button class="back" ${b.volverFoto ? 'data-act="volver-foto"' : 'data-go="aportar"'}>‹ Atrás</button><h1>¿Qué producto?</h1>
-    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-manual" data-v="${p.id}"><span class="emo" aria-hidden="true">${p.emo}</span>${p.nombre}</button>`).join("")}</div>`;
+    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-manual" data-v="${p.id}"><span class="emo" aria-hidden="true">${emoP(p)}</span>${p.nombre}</button>`).join("")}</div>`;
   const ma = merc(state.mercadoActivo);
   return `${state.volverA === "semana" ? `<button class="back" data-go="semana">‹ Volver a mi lista</button>` : `<button class="back" data-act="ir-manual">‹ Otro producto</button>`}
     <div style="display:grid;gap:4px"><h1>¿A cuánto está?</h1>${ma ? `<p class="muted">En ${esc(ma.nombre)}</p>` : ""}</div>
@@ -975,9 +1100,9 @@ function vManual() {
 function vNoHay() {
   const b = state.borrador || {};
   if (!b.producto) return `<button class="back" data-go="aportar">‹ Atrás</button><h1>¿Qué no encontraste?</h1>
-    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-nohay" data-v="${p.id}"><span class="emo" aria-hidden="true">${p.emo}</span>${p.nombre}</button>`).join("")}</div>`;
+    <div class="grid-prod">${PRODUCTOS.map((p) => `<button class="tile" data-act="elegir-nohay" data-v="${p.id}"><span class="emo" aria-hidden="true">${emoP(p)}</span>${p.nombre}</button>`).join("")}</div>`;
   const p = prod(b.producto);
-  return `<button class="back" data-act="ir-nohay">‹ Otro producto</button><h1>${p.emo} ${p.nombre}</h1>
+  return `<button class="back" data-act="ir-nohay">‹ Otro producto</button><h1>${emoP(p)} ${p.nombre}</h1>
     <div class="list"><button class="choice" data-act="enviar-nohay" data-v="no-hay" style="grid-template-columns:1fr"><span><b>No había</b><span>Ningún puesto lo tenía</span></span></button>
     <button class="choice" data-act="enviar-nohay" data-v="poco" style="grid-template-columns:1fr"><span><b>Había poco</b><span>Solo en uno o dos puestos</span></span></button></div>`;
 }
@@ -1047,7 +1172,7 @@ function semDias() {
     <div class="dias">${DIAS.map((x) => {
       const its = itemsDia(x.id);
       return `<div class="dia${its.length ? " on" : ""}"><b class="dn">${x.n}</b>
-        <div class="dchips">${its.map((id) => { const d = plato(id); return `<span class="dchip"><span aria-hidden="true">${d.emo}</span> ${d.nombre}
+        <div class="dchips">${its.map((id) => { const d = plato(id); return `<span class="dchip"><span aria-hidden="true">${emoD(d)}</span> ${d.nombre}
           <button type="button" data-act="sem-quitar" data-v="${x.id}:${id}" aria-label="Quitar ${d.nombre} del ${x.n}">✕</button></span>`; }).join("")}
           ${its.length < 3 ? `<button type="button" class="dadd" data-act="sem-elegir" data-v="${x.id}">${its.length ? "+ Sopa, refresco u otro" : "+ Elegir plato"}</button>` : ""}</div></div>`;
     }).join("")}</div>
@@ -1068,7 +1193,7 @@ function semElegir() {
     <div class="opts">${PLATOS.filter((d) => d.tipo === tipo).map((d) => {
       const c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0], on = its.includes(d.id);
       return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}">
-        <span class="emo" aria-hidden="true">${d.emo}</span><span class="name">${d.nombre}</span>
+        <span class="emo" aria-hidden="true">${emoD(d)}</span><span class="name">${d.nombre}</span>
         <span class="meta"><span>≈ ${soles(c.t)} ${tipoDe(d.tipo).por}</span>${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}</span>
         <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
     }).join("")}</div>
@@ -1083,7 +1208,7 @@ function semFrutas() {
       <p class="muted">¿Cuántas por persona a la semana? Por ejemplo, 7 es una al día.</p></div>
     <div class="list">${PLATOS.filter((d) => d.tipo === "fruta").map((d) => {
       const v = S.frutas[d.id] || 0, c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L)).t).sort((a, b) => a - b)[0];
-      return `<div class="plato" data-on="${v > 0}"><span class="emo" aria-hidden="true">${d.emo}</span><b class="name">${d.nombre}</b>
+      return `<div class="plato" data-on="${v > 0}"><span class="emo" aria-hidden="true">${emoD(d)}</span><b class="name">${d.nombre}</b>
         <div class="fila"><span class="meta"><span>≈ ${soles(c)} cada una</span></span>
           <span class="step" role="group" aria-label="${d.nombre}: por persona a la semana">
             <button type="button" data-act="fruta-menos" data-v="${d.id}" aria-label="Una menos" ${v ? "" : "disabled"}>−</button>
@@ -1098,7 +1223,7 @@ function filaLista(it, mL) {
   const visto = mL.tipo !== "super" && precioHoy(it.p, mL).observado;
   const planear = S.modo !== "comprar", off = planear ? tengo : compre;
   return `<div class="lrow${off ? " off" : ""}">
-    <span class="emo" aria-hidden="true">${it.p.emo}</span>
+    <span class="emo" aria-hidden="true">${emoP(it.p)}</span>
     <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantTxt(it.p, it.compra)}</span><br>
       <span class="small muted">a ${soles(pr)} ${porUnidad(it.p)}${visto ? " · visto hoy" : ""}</span></span>
     <span class="pr">${planear && tengo ? "—" : soles(it.compra * pr)}</span>
@@ -1118,6 +1243,12 @@ function semLista() {
   const comboOk = combo && best.t - combo.t >= 5 && combo.asign[combo.a.id].length && combo.asign[combo.b.id].length;
   const riesgo = items.filter((it) => it.p.riesgo).map((it) => it.p.nombre.toLowerCase());
   const sug = sugerencias(best.m);
+  const subsCanasta = items.map((it) => {
+    const e = estadoProd(it.p, best.m); if (!(e.caro || e.escaso || e.riesgo)) return null;
+    const x = sustitutos(it.p, best.m)[0]; if (!x || x.ahorro <= 0.08) return null;
+    const ahorro = r2(it.compra * (precioLugar(it.p, best.m) - x.eq));
+    return ahorro >= 1 ? { p: it.p, s: x.s, nota: x.nota, ahorro, motivo: motivoProd(e) } : null;
+  }).filter(Boolean).sort((a1, b1) => b1.ahorro - a1.ahorro).slice(0, 4);
   const aparte = [...new Set(DIAS.flatMap((x) => itemsDia(x.id)).flatMap((id) => (plato(id) && plato(id).aparte) || []))];
   const falta = items.filter((it) => !S.compre[it.p.id]);
   const faltaT = r2(falta.reduce((a, it) => a + it.compra * precioLugar(it.p, mL), 0));
@@ -1137,12 +1268,35 @@ function semLista() {
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="sem-paso" data-v="platos">Cambiar platos</button>
         <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas</button></div></div>
 
-    ${items.length ? `<div class="card" style="gap:8px">
-      <span class="small muted">Lo más barato para toda tu canasta</span>
-      <span class="tag big" style="justify-self:start"><span class="p">${soles(best.t)}</span></span>
-      <p><b>en ${esc(best.m.tipo === "super" ? "el súper " + best.m.nombre : best.m.nombre)}</b><br><span class="muted">≈ ${soles(best.t / S.personas)} por persona a la semana</span></p></div>
-    <div class="card"><h2>Lo que te llevas</h2>${resumen}
-      <button class="btn quiet" data-act="sem-ver-lista">${state.semVerLista ? "Ocultar la lista" : "Ver la lista para ir a comprar"}</button></div>`
+    ${items.length ? `<div class="card" style="gap:10px"><h2>¿Dónde te sale más barato?</h2>
+      <div class="best"><span class="small muted">Lo más barato para toda tu canasta</span>
+        <span class="tag big" style="justify-self:start"><span class="p">${soles(best.t)}</span></span>
+        <p><b>en ${esc(best.m.tipo === "super" ? "el súper " + best.m.nombre : best.m.nombre)}</b><br><span class="muted">≈ ${soles(best.t / S.personas)} por persona a la semana</span></p></div>
+      ${tot.slice(1, state.semVerLugares ? tot.length : 3).map((x) => `
+      <div class="mrow"><span><b>${esc(nombreLugar(x.m))}</b><br>
+        <span class="small muted">${x.m.tipo === "super" ? (!x.reales ? "Súper · ejemplo" : x.reales === x.n ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : `Súper · online del ${fechaCorta(state.superReal.fecha)} en ${x.reales} de ${x.n} productos`) : "Mercado"}${x.vistos ? ` · ${x.vistos} precios vistos hoy` : ""} · ${soles(x.t - best.t)} más</span></span>
+        <span class="tag"><span class="p">${soles(x.t)}</span></span></div>`).join("")}
+      ${tot.length > 3 ? `<button class="btn quiet" data-act="sem-ver-lugares">${state.semVerLugares ? "Ver solo los 3 más baratos" : `Ver los ${tot.length} lugares`}</button>` : ""}
+      ${comboOk ? (() => { const rb = rubrosDe(combo); return `<p>💡 <b>Combina y ahorra ${soles(best.t - combo.t)}:</b> ${esc(rb[combo.a.id].join(", ") || "algunas cosas")} en ${esc(nombreLugar(combo.a))}
+        y ${esc(rb[combo.b.id].join(", ") || "lo demás")} en ${esc(nombreLugar(combo.b))}. Pagas ${soles(combo.t)}.</p>`; })()
+        : worst.t - best.t >= 1 ? `<p>Ahorras <b>${soles(worst.t - best.t)}</b> si compras en ${esc(nombreLugar(best.m))} y no en ${esc(nombreLugar(worst.m))}.</p>` : ""}
+      <p class="small muted">${state.superReal ? `Los súper marcados "online" usan el precio de su tienda virtual (${fechaCorta(state.superReal.fecha)}); en el local puede variar. Lo demás es de ejemplo.` : "Precios de ejemplo de tus mercados y supermercados."} <button class="link" data-act="editar-mercados" style="min-height:0">Cambiar lugares</button></p></div>` : ""}
+
+    ${subsCanasta.length || Object.keys(S.sust || {}).length ? `<div class="card"><h2>💡 Ahorra con sustitutos</h2>
+      ${subsCanasta.length ? `<p class="small muted">Productos de tu canasta que están caros, escasos o pueden subir por El Niño.</p>` : ""}
+      ${subsCanasta.map((c) => `<div class="srow"><span class="emo" aria-hidden="true">${emoP(c.p)}</span>
+        <span class="txt"><b>${esc(c.p.nombre)}</b> → <b>${esc(c.s.nombre)}</b><br><span class="small muted">${esc(c.motivo)}${c.nota ? ` · ${esc(c.nota)}` : ""}</span></span>
+        <span class="pr">−${soles(c.ahorro)}</span>
+        <span class="btnw"><button class="chip" data-act="sem-sust" data-v="${c.p.id}:${c.s.id}">Cambiar por ${esc(c.s.nombre.toLowerCase())}</button></span></div>`).join("")}
+      ${Object.keys(S.sust || {}).length ? `<p class="small">Ya cambiaste:</p><div class="chips wrap">${Object.entries(S.sust).map(([a1, b1]) => `
+        <button class="chip" data-act="sem-sust-quitar" data-v="${a1}" aria-label="Deshacer cambio de ${esc(prod(a1).nombre)}">${esc(prod(a1).nombre)} → ${esc(prod(b1).nombre)} ✕</button>`).join("")}</div>` : ""}</div>` : ""}
+
+    ${items.length ? `<div class="card"><h2>Lo que te llevas</h2>${resumen}
+      <div class="row2"><button class="btn quiet" data-act="sem-ver-lista">${state.semVerLista ? "Ocultar la lista" : "Ver la lista"}</button>
+        <button class="btn sec" data-act="sem-imagen">📥 Guardar imagen</button></div>
+      ${state.listaImg ? `<img class="preview" src="${state.listaImg.url}" alt="Imagen de tu lista de compras">
+        <p class="small muted">Si no se guardó sola, mantén presionada la imagen para guardarla o compartirla.</p>
+        ${state.downloads ? "" : `<a class="btn quiet" href="${state.listaImg.url}" download="${esc(state.listaImg.nombre)}">Descargar otra vez</a>`}` : ""}</div>`
       : `<div class="card"><h2>Ya tienes todo en casa</h2><p class="muted">No hay nada que comprar con lo que elegiste.</p></div>`}
 
     ${state.semVerLista && todos.length ? `<div class="card"><h2>Tu lista</h2>
@@ -1157,17 +1311,6 @@ function semLista() {
         return its.length ? `<div class="grp"><h3>${r.nombre}</h3>${its.map((it) => filaLista(it, mL)).join("")}</div>` : ""; }).join("")}
       ${!planear && ocultos ? `<p class="small muted">No mostramos ${ocultos} ${ocultos === 1 ? "cosa que ya tienes" : "cosas que ya tienes"} en casa.</p>` : ""}
     </div>` : ""}
-
-    ${items.length ? `<div class="card"><h2>¿Dónde te sale más barato?</h2>${tot.slice(0, state.semVerLugares ? tot.length : 3).map((x, i) => `
-      <div class="mrow"><span><b>${esc(nombreLugar(x.m))}</b><br>
-        <span class="small muted">${x.m.tipo === "super" ? (!x.reales ? "Súper · ejemplo" : x.reales === x.n ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : `Súper · online del ${fechaCorta(state.superReal.fecha)} en ${x.reales} de ${x.n} productos`) : "Mercado"}${x.vistos ? ` · ${x.vistos} precios vistos hoy` : ""}${i ? ` · ${soles(x.t - best.t)} más` : ""}</span>
-        ${i === 0 ? `<br><span class="cheap">Más barato</span>` : ""}</span>
-        <span class="tag"><span class="p">${soles(x.t)}</span></span></div>`).join("")}
-      ${tot.length > 3 ? `<button class="btn quiet" data-act="sem-ver-lugares">${state.semVerLugares ? "Ver solo los 3 más baratos" : `Ver los ${tot.length} lugares`}</button>` : ""}
-      ${comboOk ? (() => { const rb = rubrosDe(combo); return `<p>💡 <b>Combina y ahorra ${soles(best.t - combo.t)}:</b> ${esc(rb[combo.a.id].join(", ") || "algunas cosas")} en ${esc(nombreLugar(combo.a))}
-        y ${esc(rb[combo.b.id].join(", ") || "lo demás")} en ${esc(nombreLugar(combo.b))}. Pagas ${soles(combo.t)}.</p>`; })()
-        : worst.t - best.t >= 1 ? `<p>Ahorras <b>${soles(worst.t - best.t)}</b> si compras en ${esc(nombreLugar(best.m))} y no en ${esc(nombreLugar(worst.m))}.</p>` : ""}
-      <p class="small muted">${state.superReal ? `Los súper marcados "online" usan el precio de su tienda virtual (${fechaCorta(state.superReal.fecha)}); en el local puede variar. Lo demás es de ejemplo.` : "Precios de ejemplo de tus mercados y de supermercados cercanos."}${limiteMercados() === GRATIS ? ` Con tus puntos puedes comparar hasta ${AMPLIADO} mercados.` : ""}</p></div>` : ""}
 
     <div class="card"><h2>🍎 Frutas de la semana</h2>
       ${frutas.length ? `<p>${esc(frutas.join(", "))} por persona · <b>${soles(frutasT)}</b> (ya sumado)</p>
@@ -1217,7 +1360,7 @@ function restoNegocio() {
 function opcion(p, campo, on, multi) {
   const k = costoPlatoCon(p, precioResto);
   return `<button class="opt" data-act="${multi ? "resto-toggle" : "resto-unico"}" data-v="${campo}:${p.id}" aria-pressed="${on}">
-    <span class="emo" aria-hidden="true">${p.emo}</span><span class="name">${p.nombre}</span>
+    <span class="emo" aria-hidden="true">${emoD(p)}</span><span class="name">${p.nombre}</span>
     <span class="meta"><span>${soles(k.t)} por porción</span>${k.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}</span>
     <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
 }
@@ -1254,7 +1397,7 @@ function filaPedido(it) {
   const dif = mio ? (mio - ref) / ref : 0;
   const pill = !mio ? "" : dif > 0.05 ? `<span class="pill up">${Math.round(dif * 100)}% sobre la referencia</span>`
     : dif < -0.05 ? `<span class="pill down">${Math.round(-dif * 100)}% bajo la referencia</span>` : `<span class="pill same">En precio</span>`;
-  return `<div class="prow"><span class="emo" aria-hidden="true">${it.p.emo}</span>
+  return `<div class="prow"><span class="emo" aria-hidden="true">${emoP(it.p)}</span>
     <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantResto(it.p, it.compra)}</span></span>
     <span class="sub">${soles(it.compra * pu)}</span>
     <span class="inp"><label for="tp-${it.p.id}">Te cobra S/</label><input id="tp-${it.p.id}" inputmode="decimal" data-tprecio="${it.p.id}" value="${mio ? mio.toFixed(2) : ""}" placeholder="¿cuánto?"
@@ -1416,7 +1559,7 @@ function vPuesto() {
     <div class="alert" role="note"><span class="bang" aria-hidden="true">i</span><span>Cada mañana, actualiza tus precios en un minuto. Ganas ${PUNTOS.puesto} puntos y las caseras te encuentran.</span></div>
     ${state.puedeFoto ? `<button class="btn sec" data-act="ir-foto-puesto">${icono.foto} Mejor, tomo foto a mi pizarra</button>` : ""}
     <h2>Mis precios de hoy</h2>
-    <div class="list">${mios.map((p) => `<div class="item"><div class="hd"><span>${p.emo} ${p.nombre} <span class="small muted">(${p.unidad === "kilo" ? "kilo" : p.unidad})</span></span>
+    <div class="list">${mios.map((p) => `<div class="item"><div class="hd"><span>${emoP(p)} ${p.nombre} <span class="small muted">(${p.unidad === "kilo" ? "kilo" : p.unidad})</span></span>
         <button class="chip" data-act="sin-stock" data-v="${p.id}" aria-pressed="${!!sinStock[p.id]}" style="min-height:48px;font-size:0.8rem">${sinStock[p.id] ? "Hoy no tengo" : "Sí tengo"}</button></div>
       ${sinStock[p.id] ? "" : `<div class="money"><button type="button" data-act="pmenos" data-v="${p.id}" aria-label="Diez céntimos menos">−</button>
         <input class="big" inputmode="decimal" data-pprecio="${p.id}" value="${Number(precios[p.id]).toFixed(2)}" aria-label="Precio de ${p.nombre}">
@@ -1504,6 +1647,52 @@ async function leerFoto(e) {
     if (err && (err.code === "not_granted" || err.code === "sampling_disabled")) state.puedeFoto = false;
   }
   render();
+}
+
+/* ---------------------------- imagen de la lista de compras ---------------------------- */
+function dibujarLista(x, W) {
+  const S = state.semana, items = porComprar(), L = mercLista(), P = 64, F = '"Atkinson Hyperlegible", Verdana, sans-serif';
+  const wrap = (txt, font, max) => { x.font = font; const out = []; let line = "";
+    for (const w of txt.split(" ")) { const t = line ? line + " " + w : w; if (x.measureText(t).width > max && line) { out.push(line); line = w; } else line = t; }
+    if (line) out.push(line); return out; };
+  const menu = DIAS.filter((d) => itemsDia(d.id).length).map((d) => `${d.c}: ${itemsDia(d.id).map((id) => plato(id).nombre).join(", ")}`);
+  const lineas = menu.flatMap((t) => wrap(t, `30px ${F}`, W - 2 * P));
+  const total = items.reduce((a, it) => a + it.compra * precioLugar(it.p, L), 0);
+  x.fillStyle = "#ffffff"; x.fillRect(0, 0, W, 100000);
+  x.fillStyle = "#0b6b3a"; x.fillRect(0, 0, W, 200);
+  x.fillStyle = "#ffffff"; x.textAlign = "left"; x.font = `56px "Bungee", "Arial Black", sans-serif`; x.fillText("ACUÁNTO", P, 86);
+  x.font = `700 34px ${F}`; x.fillText(`Mi lista de compras · hecha el ${fechaCorta(hoy())}`, P, 140);
+  x.font = `28px ${F}`; x.fillText(`${S.personas} ${S.personas === 1 ? "persona" : "personas"} · ${diasLlenos()} días · precios de ${nombreLugar(L)}`, P, 180);
+  let y = 262;
+  if (lineas.length) {
+    x.fillStyle = "#17201a"; x.font = `700 34px ${F}`; x.fillText("Menú de la semana", P, y); y += 48;
+    x.fillStyle = "#4b5a50"; x.font = `30px ${F}`; for (const l of lineas) { x.fillText(l, P, y); y += 42; } y += 30;
+  }
+  for (const r of RUBROS) {
+    const its = items.filter((it) => it.p.rubro === r.id); if (!its.length) continue;
+    x.fillStyle = "#0b6b3a"; x.font = `700 34px ${F}`; x.fillText(r.nombre, P, y); y += 20;
+    for (const it of its) {
+      x.strokeStyle = "#17201a"; x.lineWidth = 3; x.strokeRect(P, y + 16, 34, 34);
+      x.fillStyle = "#17201a"; x.font = `700 32px ${F}`; x.fillText(it.p.nombre, P + 58, y + 44);
+      x.fillStyle = "#4b5a50"; x.font = `26px ${F}`; x.fillText(cantTxt(it.p, it.compra), P + 58, y + 80);
+      x.fillStyle = "#17201a"; x.font = `700 32px ${F}`; x.textAlign = "right"; x.fillText(soles(it.compra * precioLugar(it.p, L)), W - P, y + 44); x.textAlign = "left";
+      y += 94; x.strokeStyle = "#e3e8e1"; x.lineWidth = 2; x.beginPath(); x.moveTo(P, y); x.lineTo(W - P, y); x.stroke();
+    }
+    y += 50;
+  }
+  x.fillStyle = "#dcb77d"; x.beginPath(); if (x.roundRect) x.roundRect(P, y, W - 2 * P, 150, 18); else x.rect(P, y, W - 2 * P, 150); x.fill();
+  x.fillStyle = "#26180a"; x.font = `700 30px ${F}`; x.fillText("Total aproximado", P + 32, y + 52);
+  x.font = `700 60px ${F}`; x.fillText(soles(total), P + 32, y + 120);
+  x.font = `28px ${F}`; x.textAlign = "right"; x.fillText(`en ${nombreLugar(L)}`, W - P - 32, y + 120); x.textAlign = "left";
+  y += 200; x.fillStyle = "#4b5a50"; x.font = `24px ${F}`; x.fillText("Precios de referencia; pueden variar. Hecho con Acuánto.", P, y);
+  return y + 50;
+}
+async function imagenLista() {
+  try { await Promise.all([document.fonts.load('700 34px "Atkinson Hyperlegible"'), document.fonts.load('56px "Bungee"')]); } catch (e) {}
+  const W = 1080, medir = document.createElement("canvas"); medir.width = W; medir.height = 10;
+  const H = dibujarLista(medir.getContext("2d"), W);
+  const c = document.createElement("canvas"); c.width = W; c.height = H; dibujarLista(c.getContext("2d"), W);
+  return await new Promise((res) => c.toBlob(res, "image/png"));
 }
 
 /* ---------------------------- foto del menú (casa o restaurante) ---------------------------- */
@@ -1714,6 +1903,30 @@ async function accion(act, v) {
     }
     case "sem-ver-lista": state.semVerLista = !state.semVerLista; if (state.semVerLista) evento("ver_lista", {}); break;
     case "sem-ver-lugares": state.semVerLugares = !state.semVerLugares; break;
+    case "sem-sust": {
+      const [a1, b1] = v.split(":"); state.semana.sust = { ...(state.semana.sust || {}), [a1]: b1 };
+      evento("sustituto", { de: a1, a: b1 }); state.toast = `Listo: cambiamos ${prod(a1).nombre.toLowerCase()} por ${prod(b1).nombre.toLowerCase()}.`; guardarSemana(); break;
+    }
+    case "sem-sust-quitar": { const x = { ...(state.semana.sust || {}) }; delete x[v]; state.semana.sust = x; guardarSemana(); break; }
+    case "sem-imagen": {
+      const blob = await imagenLista(); if (!blob) break;
+      const nombre = `lista-acuanto-${hoy()}.png`;
+      if (state.listaImg) URL.revokeObjectURL(state.listaImg.url);
+      state.listaImg = { url: URL.createObjectURL(blob), nombre };
+      let via = "vista";
+      if (state.downloads) {
+        try { await state.downloads.save({ filename: nombre, data: blob }); via = "claude"; state.toast = "Lista guardada."; } catch (e2) { via = "vista"; }
+      } else {
+        const file = typeof File === "function" ? new File([blob], nombre, { type: "image/png" }) : null;
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: "Mi lista de compras", text: "Mi lista de la semana (Acuánto)" }); via = "compartir"; }
+          catch (e2) { via = e2 && e2.name === "AbortError" ? "cancelado" : "vista"; }
+        } else {
+          const a2 = document.createElement("a"); a2.href = state.listaImg.url; a2.download = nombre; document.body.append(a2); a2.click(); a2.remove(); via = "descarga";
+        }
+      }
+      evento("descargar_lista", { via, productos: porComprar().length }); break;
+    }
     case "sem-tengo": case "sem-compre": {
       const k = act === "sem-tengo" ? "tengo" : "compre", S = state.semana;
       if (S[k][v]) delete S[k][v]; else S[k][v] = true;
@@ -1744,6 +1957,12 @@ async function accion(act, v) {
       state.menuFoto = null; state.toast = "Listo, dejamos todo como estaba."; break;
     }
     case "rubro-inicio": state.rubroInicio = v; break;
+    case "super": {
+      const xs = [...(P.supers || [])], i = xs.indexOf(v);
+      if (i >= 0) xs.splice(i, 1); else if (xs.length < limiteMercados()) xs.push(v);
+      else state.aviso = `Puedes comparar hasta ${limiteMercados()} supermercados. Quita uno para cambiarlo.`;
+      P.supers = xs; guardar(); break;
+    }
 
     /* Plan Restaurante */
     case "resto-paso": leerPrecioMenu(); leerTPrecios();
@@ -1886,8 +2105,8 @@ async function cargarPreciosSuper() {
   state.perfil = perfilVacio(); state.semana = semanaVacia(); state.resto = restoVacio();
   render();
   const cl = window.claude;
-  const [db, user, sample] = cl ? await Promise.all([cl.use("db"), cl.use("user"), cl.use("sample")]) : [null, null, null];
-  state.db = db; state.sample = sample;
+  const [db, user, sample, downloads] = cl ? await Promise.all([cl.use("db"), cl.use("user"), cl.use("sample"), cl.use("downloads")]) : [null, null, null, null];
+  state.db = db; state.sample = sample; state.downloads = downloads;
   state.uid = user ? await user.id() : null;
   if (sample) { try { const lim = await sample.limits(); state.puedeFoto = !!lim.images; } catch (e) { state.puedeFoto = false; } }
   await cargar();
