@@ -474,11 +474,11 @@ const PLATOS = [
   { id: "ensalada-frutas", tipo: "postre", nombre: "Ensalada de frutas", emo: "🍌|🍓",
     ing: { papaya: 0.06, platano: 0.05, pina: 0.04, manzana: 0.03 } },
 
-  { id: "f-platano", tipo: "fruta", nombre: "Plátano (1)", emo: "🍌", ing: { platano: 0.15 } },
-  { id: "f-manzana", tipo: "fruta", nombre: "Manzana (1)", emo: "🍎", ing: { manzana: 0.17 } },
-  { id: "f-mandarina", tipo: "fruta", nombre: "Mandarinas (2)", emo: "🍊", ing: { mandarina: 0.2 } },
-  { id: "f-papaya", tipo: "fruta", nombre: "Papaya (1 tajada)", emo: "@papaya", ing: { papaya: 0.25 } },
-  { id: "f-jugo", tipo: "fruta", nombre: "Jugo de naranja (1 vaso)", emo: "🥤|🍊", ing: { naranja: 0.6 } },
+  { id: "f-platano", tipo: "fruta", nombre: "Plátano", porcion: ["plátano", "plátanos"], emo: "🍌", ing: { platano: 0.15 } },
+  { id: "f-manzana", tipo: "fruta", nombre: "Manzana", porcion: ["manzana", "manzanas"], emo: "🍎", ing: { manzana: 0.17 } },
+  { id: "f-mandarina", tipo: "fruta", nombre: "Mandarina", porcion: ["mandarina", "mandarinas"], emo: "🍊", ing: { mandarina: 0.1 } },
+  { id: "f-papaya", tipo: "fruta", nombre: "Papaya", porcion: ["tajada", "tajadas"], emo: "@papaya", ing: { papaya: 0.25 } },
+  { id: "f-jugo", tipo: "fruta", nombre: "Jugo de naranja", porcion: ["vaso", "vasos"], emo: "🥤|🍊", ing: { naranja: 0.6 } },
 ];
 /* Íconos dibujados para productos sin un emoji parecido (se ven igual en celulares antiguos). */
 const ICONOS = {
@@ -1209,7 +1209,7 @@ function semFrutas() {
     <div class="list">${PLATOS.filter((d) => d.tipo === "fruta").map((d) => {
       const v = S.frutas[d.id] || 0, c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L)).t).sort((a, b) => a - b)[0];
       return `<div class="plato" data-on="${v > 0}"><span class="emo" aria-hidden="true">${emoD(d)}</span><b class="name">${d.nombre}</b>
-        <div class="fila"><span class="meta"><span>≈ ${soles(c)} cada una</span></span>
+        <div class="fila"><span class="meta"><span>≈ ${soles(c)} ${d.porcion[0] === "tajada" ? "cada tajada" : d.porcion[0] === "vaso" ? "cada vaso" : "cada " + d.porcion[0]}</span>${v ? `<span>${v} ${v === 1 ? d.porcion[0] : d.porcion[1]} por persona</span>` : ""}</span>
           <span class="step" role="group" aria-label="${d.nombre}: por persona a la semana">
             <button type="button" data-act="fruta-menos" data-v="${d.id}" aria-label="Una menos" ${v ? "" : "disabled"}>−</button>
             <output>${v}</output>
@@ -1253,14 +1253,14 @@ function semLista() {
   const falta = items.filter((it) => !S.compre[it.p.id]);
   const faltaT = r2(falta.reduce((a, it) => a + it.compra * precioLugar(it.p, mL), 0));
   const ocultos = todos.length - items.length;
-  const frutas = Object.entries(S.frutas || {}).filter(([, n]) => n).map(([id, n]) => `${plato(id).nombre.replace(/ \(.*\)$/, "").toLowerCase()} ${n}`);
+  const frutas = Object.entries(S.frutas || {}).filter(([id, n]) => n && plato(id)).map(([id, n]) => { const d = plato(id), u = d.porcion || ["unidad", "unidades"]; return `${n} ${n === 1 ? u[0] : u[1]}${d.id === "f-papaya" ? " de papaya" : d.id === "f-jugo" ? " de jugo" : ""}`; });
   const frutasT = items.filter((it) => it.p.rubro === "frutas").reduce((a, it) => a + it.compra * precioLugar(it.p, best.m), 0);
   const resumen = RUBROS.map((r) => {
     const its = items.filter((it) => it.p.rubro === r.id); if (!its.length) return "";
     const costo = (it) => it.compra * precioLugar(it.p, best.m), sub = its.reduce((a, it) => a + costo(it), 0);
     const top = [...its].sort((a, b) => costo(b) - costo(a)).slice(0, 3).map((it) => `${it.p.nombre.replace(/ \(.*\)$/, "").toLowerCase()} ${cantCorta(it.p, it.compra)}`);
     return `<div class="lleva"><span class="emo" aria-hidden="true">${r.emo}</span>
-      <span><b>${r.corto}</b> <span class="muted">(${its.length})</span><br><span class="small muted">${esc(top.join(", "))}${its.length > 3 ? ` y ${its.length - 3} más` : ""}</span></span>
+      <span><b>${r.corto}</b><br><span class="small muted">${esc(top.join(", "))}${its.length > 3 ? ` y ${its.length - 3} más` : ""}</span></span>
       <b class="pr">${soles(sub)}</b></div>`;
   }).join("");
   return `<div style="display:grid;gap:6px"><h1>Tu canasta de la semana</h1>
@@ -1313,7 +1313,7 @@ function semLista() {
     </div>` : ""}
 
     <div class="card"><h2>🍎 Frutas de la semana</h2>
-      ${frutas.length ? `<p>${esc(frutas.join(", "))} por persona · <b>${soles(frutasT)}</b> (ya sumado)</p>
+      ${frutas.length ? `<p>${esc(frutas.join(", "))} por persona</p><p class="small muted"><b>${soles(frutasT)}</b>, ya incluido en tu canasta</p>
         <button class="btn quiet" data-act="sem-paso" data-v="frutas">Cambiar frutas</button>`
         : `<p class="muted">Van aparte para no mezclar con los platos.</p><button class="btn sec" data-act="sem-paso" data-v="frutas">Agregar frutas</button>`}</div>
 
@@ -1559,7 +1559,7 @@ function vPuesto() {
     <div class="alert" role="note"><span class="bang" aria-hidden="true">i</span><span>Cada mañana, actualiza tus precios en un minuto. Ganas ${PUNTOS.puesto} puntos y las caseras te encuentran.</span></div>
     ${state.puedeFoto ? `<button class="btn sec" data-act="ir-foto-puesto">${icono.foto} Mejor, tomo foto a mi pizarra</button>` : ""}
     <h2>Mis precios de hoy</h2>
-    <div class="list">${mios.map((p) => `<div class="item"><div class="hd"><span>${emoP(p)} ${p.nombre} <span class="small muted">(${p.unidad === "kilo" ? "kilo" : p.unidad})</span></span>
+    <div class="list">${mios.map((p) => `<div class="item"><div class="hd"><span>${emoP(p)} ${p.nombre} <span class="small muted">· por ${p.unidad}</span></span>
         <button class="chip" data-act="sin-stock" data-v="${p.id}" aria-pressed="${!!sinStock[p.id]}" style="min-height:48px;font-size:0.8rem">${sinStock[p.id] ? "Hoy no tengo" : "Sí tengo"}</button></div>
       ${sinStock[p.id] ? "" : `<div class="money"><button type="button" data-act="pmenos" data-v="${p.id}" aria-label="Diez céntimos menos">−</button>
         <input class="big" inputmode="decimal" data-pprecio="${p.id}" value="${Number(precios[p.id]).toFixed(2)}" aria-label="Precio de ${p.nombre}">
