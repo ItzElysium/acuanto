@@ -1,0 +1,60 @@
+# Publica Acuánto en GitHub Pages y, cada mañana, actualiza los precios online de supermercados.
+# Requisito (una sola vez): Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Publicar Acuánto
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 11 * * *"     # 6:30 a. m. de Lima (11:30 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write   # para guardar precios_super.json en el repositorio
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        if: github.event_name != 'push'
+        with:
+          python-version: "3.12"
+
+      # Respeta robots.txt, una búsqueda por producto con pausa. Si una tienda no responde, se publica igual.
+      - name: Precios online de supermercados
+        if: github.event_name != 'push'
+        continue-on-error: true
+        run: |
+          pip install pyyaml
+          python scripts/supermercados.py --config scripts/supermercados.yaml --salida precios_super.json --pausa 2.5
+
+      - name: Guardar precios del día
+        if: github.event_name != 'push'
+        continue-on-error: true
+        run: |
+          if [ -f precios_super.json ]; then
+            git config user.name "acuanto-bot"
+            git config user.email "acuanto-bot@users.noreply.github.com"
+            git add precios_super.json
+            git diff --cached --quiet || git commit -m "Precios de supermercados del día"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
