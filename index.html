@@ -47,6 +47,8 @@
     --alert-bg: #fff3bf;
     --alert-ink: #3d3100;
     --amber: #8a5300;
+    --viz-up: #e34948; --viz-down: #2a78d6;
+    --viz-1: #2a78d6; --viz-2: #eb6834; --viz-3: #1baf7a; --viz-4: #eda100; --viz-5: #e87ba4;
     --font-brand: "Bungee", "Arial Black", Impact, sans-serif;
     --font-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
     --radius: 14px;
@@ -57,9 +59,11 @@
       --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --red: #ff8b76; --red-soft: #3b1712;
       --same: #b3c3cd; --same-soft: #26313a; --kraft: #c9a46b; --kraft-ink: #1f1308;
       --alert-bg: #3a3205; --alert-ink: #fff0a8; --amber: #f0b45a; color-scheme: dark;
+      --viz-up: #e66767; --viz-down: #3987e5; --viz-1: #3987e5; --viz-2: #d95926; --viz-3: #199e70; --viz-4: #c98500; --viz-5: #d55181;
     }
   }
   :root[data-theme="dark"] {
+    --viz-up: #e66767; --viz-down: #3987e5; --viz-1: #3987e5; --viz-2: #d95926; --viz-3: #199e70; --viz-4: #c98500; --viz-5: #d55181;
     --bg: #0f1410; --surface: #19211b; --ink: #eef3ee; --muted: #b5c2b8; --line: #2d382f;
     --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --red: #ff8b76; --red-soft: #3b1712;
     --same: #b3c3cd; --same-soft: #26313a; --kraft: #c9a46b; --kraft-ink: #1f1308;
@@ -139,6 +143,10 @@
   .tag.big .p { font-size: 2.2rem; }
   .pill { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; padding: 2px 8px; white-space: nowrap; }
   .pill.up { background: var(--red-soft); color: var(--red); }
+  .pill.pop { background: var(--alert-bg); color: var(--alert-ink); }
+  .pill.fit { background: var(--green-soft); color: var(--green); }
+  .kcal { flex-basis: 100%; font-size: 0.82rem; color: var(--muted); }
+  .opt[disabled] { opacity: 0.5; }
   .pill.down { background: var(--green-soft); color: var(--green); }
   .pill.same { background: var(--same-soft); color: var(--same); }
   .cheap { display: inline-block; background: var(--yellow); color: var(--yellow-ink); font-weight: 700; font-size: 0.85rem; border-radius: 6px; padding: 2px 8px; }
@@ -178,13 +186,66 @@
   /* Barra inferior */
   nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 2px solid var(--line);
             padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
-  nav.bar .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr); gap: 6px; padding: 8px 10px; }
+  nav.bar .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); gap: 4px; padding: 8px 6px; }
   nav.bar button { min-height: 64px; min-width: 0; border: none; background: transparent; border-radius: 14px; display: grid; justify-items: center; align-content: center; gap: 2px;
                    font-weight: 700; font-size: 0.8rem; line-height: 1.1; text-align: center; padding: 4px 2px; color: var(--muted); }
   nav.bar button svg { width: 28px; height: 28px; }
   nav.bar button[aria-current="page"] { color: var(--green); background: var(--green-soft); }
   nav.bar button.main { background: var(--green); color: var(--green-ink); }
   nav.bar button.main[aria-current="page"] { outline: 3px solid var(--yellow); }
+  /* Registro opcional */
+  .consent { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 0.95rem; }
+  .consent input { width: 28px; height: 28px; margin: 2px 0 0; accent-color: var(--green); }
+  /* Historial: calendario */
+  .cal-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .cal-h { text-align: center; font-weight: 700; font-size: 0.8rem; color: var(--muted); }
+  .cal-d { min-height: 56px; border-radius: 10px; background: var(--bg); display: grid; justify-items: center; align-content: start; gap: 2px; padding: 4px 1px; font-size: 0.8rem; min-width: 0; }
+  .cal-d.vacio { background: transparent; }
+  .cal-d.on { background: var(--green-soft); }
+  .cal-d.hoy { box-shadow: inset 0 0 0 2px var(--green); }
+  .cal-d .n { color: var(--muted); font-weight: 700; }
+  .cal-d .e { font-size: 1.15rem; line-height: 1; }
+  .cal-d .e .emo2 { transform: scale(0.8); }
+  .cal-d .mas { font-size: 0.72rem; font-weight: 700; color: var(--green); }
+  .hrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .hrow:last-child { border-bottom: none; }
+  /* Alzas: barras divergentes (rojo sube, azul baja) y líneas por cadena. Colores validados con dataviz. */
+  .ab { display: grid; gap: 6px; }
+  .ab-row { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 8fr) 58px; gap: 8px; align-items: center; border-radius: 8px; padding: 2px 0; }
+  .ab-row:hover, .ab-row:focus-visible { background: var(--bg); }
+  .ab-n { font-size: 0.88rem; line-height: 1.2; overflow-wrap: anywhere; }
+  .ab-t { position: relative; height: 16px; }
+  .ab-t::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--line); }
+  .ab-b { position: absolute; top: 1px; height: 14px; }
+  .ab-b.up { background: var(--viz-up); border-radius: 0 4px 4px 0; }
+  .ab-b.down { background: var(--viz-down); border-radius: 4px 0 0 4px; }
+  .ab-v { font-weight: 700; font-size: 0.88rem; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .leg { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.85rem; color: var(--muted); align-items: center; }
+  .leg .k { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+  .leg .k.up { background: var(--viz-up); } .leg .k.down { background: var(--viz-down); }
+  .leg .kl { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: 3px; margin-right: 4px; }
+  .viz { width: 100%; height: auto; display: block; overflow: visible; }
+  .viz .gl { stroke: var(--line); stroke-width: 1; }
+  .viz .tk { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+  .viz .ln { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .viz .dot { stroke: var(--surface); stroke-width: 2; }
+  .viz .el { fill: var(--ink); font-size: 10px; font-weight: 700; }
+  .viz .xh { stroke: var(--muted); stroke-width: 1; }
+  .s1 { stroke: var(--viz-1); } .f1 { fill: var(--viz-1); background: var(--viz-1); }
+  .s2 { stroke: var(--viz-2); } .f2 { fill: var(--viz-2); background: var(--viz-2); }
+  .s3 { stroke: var(--viz-3); } .f3 { fill: var(--viz-3); background: var(--viz-3); }
+  .s4 { stroke: var(--viz-4); } .f4 { fill: var(--viz-4); background: var(--viz-4); }
+  .s5 { stroke: var(--viz-5); } .f5 { fill: var(--viz-5); background: var(--viz-5); }
+  .vtip { position: relative; min-height: 1.4em; font-size: 0.88rem; }
+  .vtip b { font-variant-numeric: tabular-nums; }
+  .causa { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .causa:last-child { border-bottom: none; }
+  .causa .emo { font-size: 1.5rem; text-align: center; }
+  table.tv { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  table.tv th, table.tv td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+  table.tv td:last-child, table.tv th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  details > summary { cursor: pointer; font-weight: 700; color: var(--green); min-height: 44px; display: flex; align-items: center; }
   .spin { width: 40px; height: 40px; border-radius: 50%; border: 5px solid var(--line); border-top-color: var(--green); animation: rot 0.9s linear infinite; justify-self: center; }
   @keyframes rot { to { transform: rotate(360deg); } }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -322,6 +383,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
         <span id="nav-aportar-txt">Aportar</span>
       </button>
+      <button type="button" data-go="alzas" id="nav-alzas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16"/><path d="M5 15l4-4 3 3 6-7"/><path d="M14 7h4v4"/></svg>
+        Alzas
+      </button>
       <button type="button" data-go="puntos" id="nav-puntos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
         Mis puntos
@@ -367,6 +432,7 @@ const PRODUCTOS = [
   { id: "frejol", nombre: "Frejol canario", emo: "🟡", unidad: "kilo", base: 9.0, riesgo: false, rubro: "abarrotes" },
   { id: "fideos", nombre: "Fideos", emo: "🍝", unidad: "kilo", base: 6.0, riesgo: false, rubro: "abarrotes" },
   { id: "quinua", nombre: "Quinua", emo: "🌾", unidad: "kilo", base: 12.0, riesgo: false, rubro: "abarrotes" },
+  { id: "avena", nombre: "Avena", emo: "🥣", unidad: "kilo", base: 8.0, riesgo: false, rubro: "abarrotes" },
   { id: "maiz-morado", nombre: "Maíz morado", emo: "🟣", unidad: "kilo", base: 5.0, riesgo: false, rubro: "abarrotes" },
   { id: "azucar", nombre: "Azúcar rubia", emo: "🍬", unidad: "kilo", base: 4.2, riesgo: false, rubro: "abarrotes" },
   { id: "aceite", nombre: "Aceite vegetal", emo: "🧴", unidad: "litro", base: 10.0, riesgo: false, rubro: "abarrotes" },
@@ -405,7 +471,7 @@ const ZONA_F = {
 const zonaF = (d) => ZONA_F[d] ?? 0.95;
 const TIPOS = [
   { id: "segundo", nombre: "Segundos", por: "por plato" }, { id: "sopa", nombre: "Caldos y sopas", por: "por plato" },
-  { id: "entrada", nombre: "Entradas", por: "por plato" }, { id: "refresco", nombre: "Refrescos", por: "por vaso" },
+  { id: "entrada", nombre: "Entradas", por: "por plato" }, { id: "refresco", nombre: "Bebidas", por: "por vaso" },
   { id: "postre", nombre: "Postres", por: "por porción" }, { id: "fruta", nombre: "Frutas", por: "cada una" },
 ];
 /* Recetario de ejemplo: cantidad por porción de una persona adulta (kilo, litro o unidad del producto).
@@ -487,6 +553,50 @@ const PLATOS = [
     ing: { arroz: 0.03, leche: 0.15, azucar: 0.03 } },
   { id: "ensalada-frutas", tipo: "postre", nombre: "Ensalada de frutas", emo: "🍌|🍓",
     ing: { papaya: 0.06, platano: 0.05, pina: 0.04, manzana: 0.03 } },
+
+  /* v0.7: más variedad, bebidas calientes y opciones fit */
+  { id: "seco-res", tipo: "segundo", nombre: "Seco de res con frejoles", emo: "🍛|🥩", aparte: ["culantro", "chicha de jora (opcional)"],
+    ing: { carne: 0.18, frejol: 0.06, arroz: 0.1, cebolla: 0.05, aji: 0.01, zapallo: 0.03, ajo: 0.005, aceite: 0.015 } },
+  { id: "arroz-tapado", tipo: "segundo", nombre: "Arroz tapado", emo: "🍚|🥩", aparte: ["pasas", "aceitunas"],
+    ing: { carne: 0.1, arroz: 0.12, huevo: 0.03, cebolla: 0.04, tomate: 0.04, aji: 0.005, ajo: 0.004, aceite: 0.015 } },
+  { id: "bistec-pobre", tipo: "segundo", nombre: "Bistec a lo pobre", emo: "🥩|🍳", cambio: "arroz-cubana",
+    ing: { carne: 0.18, huevo: 0.06, platano: 0.15, "papa-blanca": 0.2, arroz: 0.1, aceite: 0.05 } },
+  { id: "tallarin-saltado", tipo: "segundo", nombre: "Tallarín saltado de pollo", emo: "🍝|🥢", aparte: ["sillao", "cebolla china"],
+    ing: { fideos: 0.12, pollo: 0.15, cebolla: 0.06, tomate: 0.06, aji: 0.005, ajo: 0.004, aceite: 0.02 } },
+  { id: "pollo-horno", tipo: "segundo", nombre: "Pollo al horno con papas", emo: "🍗|🥔", aparte: ["ají panca", "comino"],
+    ing: { pollo: 0.3, "papa-blanca": 0.25, ajo: 0.005, limon: 0.01, aceite: 0.015 } },
+  { id: "picante-papa", tipo: "segundo", nombre: "Picante de papa con huevo", emo: "🥔|🌶️", aparte: ["huacatay"],
+    ing: { "papa-amarilla": 0.25, aji: 0.03, leche: 0.1, queso: 0.03, huevo: 0.06, arroz: 0.1, cebolla: 0.03, aceite: 0.01 } },
+  { id: "arroz-cubana", tipo: "segundo", nombre: "Arroz a la cubana", emo: "🍚|🍌",
+    ing: { arroz: 0.15, huevo: 0.06, platano: 0.15, tomate: 0.05, aceite: 0.03 } },
+  { id: "escabeche", tipo: "segundo", nombre: "Escabeche de pescado", emo: "🐟|🧅", aparte: ["vinagre", "aceitunas"],
+    ing: { jurel: 0.2, cebolla: 0.12, aji: 0.02, camote: 0.1, huevo: 0.03, arroz: 0.1, aceite: 0.02 } },
+  { id: "pechuga-quinua", tipo: "segundo", nombre: "Pechuga a la plancha con quinua", emo: "🍗|🌾", aparte: ["lechuga", "pepino"],
+    ing: { pollo: 0.22, quinua: 0.05, tomate: 0.05, cebolla: 0.03, limon: 0.02, aceite: 0.008 } },
+  { id: "pescado-plancha", tipo: "segundo", nombre: "Pescado a la plancha con camote", emo: "🐟|🍠", aparte: ["lechuga"],
+    ing: { jurel: 0.25, camote: 0.15, limon: 0.02, tomate: 0.05, cebolla: 0.03, aceite: 0.008 } },
+  { id: "quinua-pollo", tipo: "segundo", nombre: "Quinua saltada con pollo", emo: "🌾|🍗", aparte: ["sillao"],
+    ing: { quinua: 0.07, pollo: 0.18, cebolla: 0.04, tomate: 0.05, aji: 0.01, aceite: 0.01 } },
+  { id: "tortilla-ensalada", tipo: "segundo", nombre: "Tortilla de 3 huevos con ensalada", emo: "🍳|🥗", aparte: ["lechuga"],
+    ing: { huevo: 0.18, tomate: 0.08, cebolla: 0.03, camote: 0.1, aceite: 0.008 } },
+  { id: "dieta-pollo", tipo: "sopa", nombre: "Dieta de pollo", emo: "🥣|🍗", aparte: ["apio", "kion"],
+    ing: { pollo: 0.12, fideos: 0.03, "papa-blanca": 0.08, zanahoria: 0.03 } },
+  { id: "chupe", tipo: "sopa", nombre: "Chupe de pescado", emo: "🥣|🐟", aparte: ["huacatay", "orégano"],
+    ing: { jurel: 0.12, "papa-amarilla": 0.08, leche: 0.1, huevo: 0.06, choclo: 0.12, arroz: 0.02, queso: 0.01, aji: 0.005, cebolla: 0.02, aceite: 0.005 } },
+  { id: "solterito", tipo: "entrada", nombre: "Solterito de queso", emo: "🧀|🌽", aparte: ["habas", "aceitunas", "rocoto"],
+    ing: { queso: 0.05, choclo: 0.25, tomate: 0.05, cebolla: 0.03, limon: 0.01, aceite: 0.01 } },
+  { id: "ocopa", tipo: "entrada", nombre: "Ocopa", emo: "🥔|🌿", aparte: ["huacatay", "maní", "galletas de soda"],
+    ing: { "papa-amarilla": 0.2, queso: 0.03, leche: 0.06, aji: 0.02, huevo: 0.03, aceite: 0.02 } },
+  { id: "huevos-rusa", tipo: "entrada", nombre: "Huevos a la rusa", emo: "🥚|🥕", aparte: ["mayonesa"],
+    ing: { huevo: 0.06, "papa-blanca": 0.1, zanahoria: 0.03, arveja: 0.02 } },
+  { id: "emoliente", tipo: "refresco", nombre: "Emoliente", emo: "☕|🌿", aparte: ["linaza", "cola de caballo", "alfalfa"], ing: { limon: 0.01, azucar: 0.02 } },
+  { id: "quinua-manzana", tipo: "refresco", nombre: "Quinua con manzana", emo: "🥤|🍎", aparte: ["canela", "clavo de olor"], ing: { quinua: 0.02, manzana: 0.04, azucar: 0.02 } },
+  { id: "avena-leche", tipo: "refresco", nombre: "Avena con leche", emo: "☕|🥛", aparte: ["canela"], ing: { avena: 0.03, leche: 0.12, azucar: 0.015 } },
+  { id: "batido", tipo: "refresco", nombre: "Batido de avena y plátano", emo: "🥤|🍌", fit: true, ing: { avena: 0.04, platano: 0.15, leche: 0.25 } },
+  { id: "jugo-papaya", tipo: "refresco", nombre: "Jugo de papaya", emo: "🥤|@papaya", ing: { papaya: 0.2, azucar: 0.01 } },
+  { id: "te-anis", tipo: "refresco", nombre: "Té o anís", emo: "🍵", aparte: ["té o anís en sobre"], ing: { azucar: 0.01 } },
+  { id: "mazamorra-zapallo", tipo: "postre", nombre: "Mazamorra de zapallo", emo: "🍮|🎃", aparte: ["canela", "chuño"],
+    ing: { zapallo: 0.1, azucar: 0.03, leche: 0.05 } },
 
   { id: "f-platano", tipo: "fruta", nombre: "Plátano", porcion: ["plátano", "plátanos"], emo: "🍌", ing: { platano: 0.15 } },
   { id: "f-manzana", tipo: "fruta", nombre: "Manzana", porcion: ["manzana", "manzanas"], emo: "🍎", ing: { manzana: 0.17 } },
@@ -699,8 +809,9 @@ const state = {
   resto: null, restoPaso: null, menuFoto: null, menuPrevio: null, copia: null, toast: null, desde: null,
   idea: { nota: null, util: [], frecuencia: null, pago: null, texto: "", enviado: null },
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
+  historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.6";
+const VERSION = "Prueba 0.7";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
@@ -714,16 +825,19 @@ const restoVacio = () => ({ menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vi
 const LS = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
              set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
 async function cargar() {
-  let perfil = null, puntos = null, semana = null, resto = null;
+  let perfil = null, puntos = null, semana = null, resto = null, historial = null;
   if (state.db && state.uid) {
     try {
-      const [a, b, c, d] = await Promise.all(["perfil", "puntos", "semana", "resto"].map((k) => state.db.doc(`data/users/${state.uid}/${k}`).get()));
+      const [a, b, c, d, h] = await Promise.all(["perfil", "puntos", "semana", "resto", "historial"].map((k) => state.db.doc(`data/users/${state.uid}/${k}`).get()));
       if (a.exists) perfil = a.data();
       if (b.exists) puntos = b.data();
       if (c.exists) semana = c.data();
       if (d.exists) resto = d.data();
+      if (h.exists) historial = h.data();
     } catch (e) {}
   }
+  historial = historial || LS.get("acuanto.historial");
+  state.historial = { items: historial && Array.isArray(historial.items) ? historial.items.slice(0, 52) : [] };
   perfil = perfil || LS.get("acuanto.perfil");
   puntos = puntos || LS.get("acuanto.puntos");
   semana = semana || LS.get("acuanto.semana");
@@ -745,7 +859,7 @@ function guardarDoc(k) {
     guardando = guardando.then(async () => { try { await state.db.doc(`data/users/${state.uid}/${k}`).set(s); } catch (e) {} });
   }, 700);
 }
-const guardarSemana = () => { state.listaImg = null; guardarDoc("semana"); }, guardarResto = () => guardarDoc("resto");
+const guardarSemana = () => { state.listaImg = null; state.histGuardado = false; guardarDoc("semana"); }, guardarResto = () => guardarDoc("resto");
 
 /* ---------------------------- datos de uso (solo versión web, Supabase) ----------------------------
    Anónimo: un identificador al azar por celular, sin nombre ni teléfono. La clave es la pública de Supabase:
@@ -813,6 +927,46 @@ function costoPlatoCon(d, precio) {
 }
 const costoPlato = (d, m) => costoPlatoCon(d, (p) => precioHoy(p, m).precio);
 const tipoDe = (id) => TIPOS.find((t) => t.id === id) || TIPOS[0];
+
+/* Kcal y proteína (g) por unidad del producto (kilo, litro, lata o unidad) TAL COMO SE COMPRA, con merma aproximada
+   (hueso, cáscara, espinas). Base: Tablas Peruanas de Composición de Alimentos (INS-CENAN). Referencial. */
+const NUTR = {
+  limon: [150, 3], tomate: [180, 9], cebolla: [380, 11], "papa-amarilla": [850, 17], "papa-blanca": [680, 17], aji: [400, 10],
+  zapallo: [210, 8], choclo: [165, 6], camote: [950, 13], zanahoria: [370, 8], arveja: [600, 40], ajo: [1340, 57], olluco: [560, 10],
+  platano: [580, 7], manzana: [470, 3], mandarina: [370, 6], naranja: [330, 6], papaya: [300, 3], pina: [275, 3], maracuya: [440, 10],
+  pollo: [1460, 126], gallina: [1620, 117], carne: [1430, 210], huevo: [1260, 110], jurel: [690, 110],
+  arroz: [3600, 70], lenteja: [3400, 240], frejol: [3400, 210], fideos: [3600, 120], quinua: [3700, 135], avena: [3800, 130],
+  "maiz-morado": [0, 0], azucar: [3870, 0], aceite: [7400, 0], leche: [536, 27], queso: [2640, 175],
+};
+function nutri(d) {
+  let kcal = 0, prot = 0;
+  for (const [pid, q] of Object.entries(d.ing)) { const n = NUTR[pid]; if (n) { kcal += q * n[0]; prot += q * n[1]; } }
+  return { kcal: Math.round(kcal / 10) * 10, prot: Math.round(prot) };
+}
+/* Fit: alto en proteína y moderado en calorías (o marcado a mano, como el batido). */
+const esFit = (d) => { if (d.fit) return true; const n = nutri(d); return n.prot >= 20 && n.kcal <= 650 && (n.prot * 4) / Math.max(n.kcal, 1) >= 0.2; };
+/* Popularidad: puntaje base de cocina casera limeña (0–100) + lo que la gente elige y descarga (Supabase, solo totales). */
+const POP = {
+  "arroz-pollo": 98, lomo: 96, "aji-gallina": 93, chaufa: 92, tallarines: 90, ceviche: 88, lentejas: 86, "seco-pollo": 85, estofado: 84,
+  "pollo-saltado": 83, "pollo-horno": 82, "seco-res": 80, "arroz-tapado": 78, "tallarin-saltado": 78, sudado: 76, "pescado-frito": 75,
+  "bistec-pobre": 74, "tacu-tacu": 72, "pollo-plancha": 72, "arroz-cubana": 70, locro: 68, olluquito: 66, "picante-papa": 62, tortilla: 62,
+  escabeche: 58, "quinua-pollo": 55, "pechuga-quinua": 54, "pescado-plancha": 54, "tortilla-ensalada": 50,
+  "caldo-gallina": 95, "sopa-casa": 85, aguadito: 84, "sopa-criolla": 80, menestron: 76, chilcano: 72, "sopa-quinua": 70, "dieta-pollo": 68, chupe: 66, "sopa-verduras": 64,
+  huancaina: 95, causa: 92, "papa-rellena": 85, ocopa: 75, solterito: 70, "huevos-rusa": 60,
+  chicha: 98, limonada: 92, "maracuya-ref": 85, emoliente: 82, "quinua-manzana": 75, "avena-leche": 74, "pina-ref": 70, "jugo-papaya": 68, batido: 60, "te-anis": 55,
+  mazamorra: 92, "arroz-leche": 90, "ensalada-frutas": 80, "mazamorra-zapallo": 55,
+};
+function puntaje(d) {
+  const v = state.popReal || {}, delTipo = PLATOS.filter((x) => x.tipo === d.tipo), max = Math.max(0, ...delTipo.map((x) => v[x.id] || 0));
+  const total = delTipo.reduce((a, x) => a + (v[x.id] || 0), 0);
+  return (POP[d.id] ?? 50) + (total >= 10 && max ? 40 * (v[d.id] || 0) / max : 0);
+}
+function populares(tipo) {   // los 3 primeros del tipo y si ya vienen de elecciones reales
+  const xs = PLATOS.filter((x) => x.tipo === tipo).sort((a, b) => puntaje(b) - puntaje(a)).slice(0, 3).map((x) => x.id);
+  const v = state.popReal || {}, real = PLATOS.filter((x) => x.tipo === tipo).reduce((a, x) => a + (v[x.id] || 0), 0) >= 10;
+  return { ids: xs, real };
+}
+const MAX_DIA = 6;
 
 /* ---------------------------- plan restaurante: cálculo ---------------------------- */
 const DIAS = [{ id: "lun", c: "Lun", n: "lunes" }, { id: "mar", c: "Mar", n: "martes" }, { id: "mie", c: "Mié", n: "miércoles" },
@@ -1059,7 +1213,8 @@ function vBienvenida() {
         <span class="prem" style="margin-top:6px">PREMIUM · GRATIS EN LA PRUEBA</span></span>
     </button>
     <p class="note">Versión de prueba con precios de ejemplo. Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>
-    ${supaOn() ? `<p class="small muted">Para mejorar la app registramos de forma anónima qué pantallas, platos y productos usas. Sin tu nombre ni tu número.</p>` : ""}`;
+    ${supaOn() ? `<p class="small muted">Para mejorar la app registramos de forma anónima qué pantallas, platos y productos usas. Tu nombre y celular, solo si tú decides dejarlos.</p>` : ""}`;
+  if (state.paso === 4) return vRegistro();
   if (state.paso === 2) return `
     <button class="back" data-act="paso" data-v="1">‹ Atrás</button>
     <h1>¿Cómo lees mejor?</h1>
@@ -1322,7 +1477,7 @@ function vSemana() {
   if (!misMercados().length) return `<h1>Tu compra de la semana</h1><p class="muted">Primero elige tus mercados.</p>
     <button class="btn" data-act="editar-mercados">Elegir mercados</button>`;
   const paso = state.semPaso || (nPlatos() ? "lista" : "personas");
-  return paso === "personas" ? semPersonas() : paso === "platos" ? semDias() : paso === "elegir" ? semElegir() : paso === "frutas" ? semFrutas() : semLista();
+  return paso === "personas" ? semPersonas() : paso === "platos" ? semDias() : paso === "elegir" ? semElegir() : paso === "frutas" ? semFrutas() : paso === "historial" ? semHistorial() : semLista();
 }
 
 const numFs = (n) => (String(n).length >= 3 ? ' style="font-size:2.3rem"' : "");
@@ -1365,7 +1520,8 @@ function semDias() {
   const S = state.semana, llenos = diasLlenos();
   return `<button class="back" data-act="sem-paso" data-v="personas">‹ ${S.personas} ${S.personas === 1 ? "persona" : "personas"}</button>
     <div style="display:grid;gap:6px"><h1>¿Qué cocinarás cada día?</h1>
-      <p class="muted">Elige el plato de cada día. Puedes dejar días vacíos.</p></div>
+      <p class="muted">Elige el plato de cada día. Puedes dejar días vacíos.</p>
+      ${(state.historial.items || []).length ? `<button class="link" data-act="sem-paso" data-v="historial" style="justify-self:start">📅 Mi historial</button>` : ""}</div>
     ${bloqueFotoMenu(botonFotoMenu("Foto de tu menú de la semana", "Si lo tienes escrito en un papel o pizarra, la app llena los días por ti."))}
     ${state.aviso ? `<p class="note" role="status">${esc(state.aviso)}</p>` : ""}
     <div class="dias">${DIAS.map((x) => {
@@ -1373,7 +1529,7 @@ function semDias() {
       return `<div class="dia${its.length ? " on" : ""}"><b class="dn">${x.n}</b>
         <div class="dchips">${its.map((id) => { const d = plato(id); return `<span class="dchip"><span aria-hidden="true">${emoD(d)}</span> ${d.nombre}
           <button type="button" data-act="sem-quitar" data-v="${x.id}:${id}" aria-label="Quitar ${d.nombre} del ${x.n}">✕</button></span>`; }).join("")}
-          ${its.length < 3 ? `<button type="button" class="dadd" data-act="sem-elegir" data-v="${x.id}">${its.length ? "+ Sopa, refresco u otro" : "+ Elegir plato"}</button>` : ""}</div></div>`;
+          ${its.length < MAX_DIA ? `<button type="button" class="dadd" data-act="sem-elegir" data-v="${x.id}">${its.length ? "+ Agregar plato, bebida o postre" : "+ Elegir plato"}</button>` : ""}</div></div>`;
     }).join("")}</div>
     ${llenos < 7 ? `<button class="btn sec" data-act="sem-economica">💡 Llenar los días vacíos con platos económicos</button>` : ""}
     ${llenos ? `<div class="stick"><button class="btn" data-act="sem-paso" data-v="lista">Ver mi canasta · ${llenos} de 7 días</button></div>`
@@ -1383,20 +1539,28 @@ function semDias() {
 /* Elegir un plato para un día: una sola decisión por pantalla. */
 function semElegir() {
   const id = state.semDia, x = dia(id), its = itemsDia(id), tipo = state.semTipo || "segundo", ls = lugares();
-  const tipos = TIPOS.filter((t) => t.id !== "fruta");
+  const tipos = [...TIPOS.filter((t) => t.id !== "fruta"), { id: "fit", nombre: "💪 Fit", por: "por plato" }];
+  const fit = tipo === "fit";
+  const lista = (fit ? PLATOS.filter((d) => d.tipo !== "fruta" && esFit(d)).sort((a, b) => nutri(b).prot - nutri(a).prot)
+    : PLATOS.filter((d) => d.tipo === tipo).sort((a, b) => puntaje(b) - puntaje(a)));
+  const pop = fit ? { ids: [], real: false } : populares(tipo);
+  const lleno = its.length >= MAX_DIA;
   return `<button class="back" data-act="sem-paso" data-v="platos">‹ Volver a la semana</button>
     <div style="display:grid;gap:6px"><h1 style="text-transform:none">${x.n[0].toUpperCase() + x.n.slice(1)}: ¿qué vas a cocinar?</h1>
-      <p class="muted">Toca un plato y vuelves a tu semana.</p></div>
+      <p class="muted">${lleno ? `Ya tienes ${MAX_DIA} cosas este día. Quita una para cambiarla.` : "Toca un plato y vuelves a tu semana. Puedes sumar hasta " + MAX_DIA + " por día."}</p></div>
     <div class="chips wrap" role="group" aria-label="Tipo de plato">${tipos.map((t) => `
       <button class="chip" data-act="sem-tipo" data-v="${t.id}" aria-pressed="${tipo === t.id}">${t.nombre}</button>`).join("")}</div>
-    <div class="opts">${PLATOS.filter((d) => d.tipo === tipo).map((d) => {
-      const c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0], on = its.includes(d.id);
-      return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}">
+    ${fit ? `<p class="small muted">Altos en proteína y moderados en calorías. Valores referenciales por porción; no reemplazan a un nutricionista.</p>` : ""}
+    <div class="opts">${lista.map((d) => {
+      const c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0], on = its.includes(d.id), n = nutri(d);
+      const badge = pop.ids.includes(d.id) ? `<span class="pill pop">🔥 ${pop.real ? "Más elegido" : "Popular"}</span>` : "";
+      return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}" ${lleno && !on ? "disabled" : ""}>
         <span class="emo" aria-hidden="true">${emoD(d)}</span><span class="name">${d.nombre}</span>
-        <span class="meta"><span>≈ ${soles(c.t)} ${tipoDe(d.tipo).por}</span>${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}</span>
+        <span class="meta"><span>≈ ${soles(c.t)} ${tipoDe(d.tipo).por}</span>${badge}${esFit(d) && !fit ? `<span class="pill fit">💪 Fit</span>` : ""}${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}
+          ${n.kcal ? `<span class="kcal">≈ ${n.kcal} kcal · ${n.prot} g proteína</span>` : ""}</span>
         <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
     }).join("")}</div>
-    <p class="small muted">Precio por persona en el lugar más barato hoy (ejemplo).</p>`;
+    <p class="small muted">Precio por persona en el lugar más barato hoy (ejemplo). Calorías y proteína: referenciales, según la receta casera.</p>`;
 }
 
 /* Frutas: sección aparte para no mezclar con los platos. */
@@ -1465,7 +1629,8 @@ function semLista() {
   return `<div style="display:grid;gap:6px"><h1>Tu canasta de la semana</h1>
       <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"} · ${llenos} de 7 días con plato</p>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="sem-paso" data-v="platos">Cambiar platos</button>
-        <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas</button></div></div>
+        <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas</button>
+        ${(state.historial.items || []).length ? `<button class="link" data-act="sem-paso" data-v="historial">📅 Mi historial</button>` : ""}</div></div>
 
     ${items.length ? `<div class="card" style="gap:10px"><h2>¿Dónde te sale más barato?</h2>
       <div class="best"><span class="small muted">Lo más barato para toda tu canasta</span>
@@ -1495,6 +1660,7 @@ function semLista() {
         <button class="btn sec" data-act="sem-imagen">📥 Guardar imagen</button></div>
       ${state.listaImg ? `<img class="preview" src="${state.listaImg.url}" alt="Imagen de tu lista de compras">
         <p class="small muted">Si no se guardó sola, mantén presionada la imagen para guardarla o compartirla.</p>
+        ${state.histGuardado ? `<p class="small">✓ También quedó en tu historial. <button class="link" data-act="sem-paso" data-v="historial" style="min-height:0">Ver mi historial</button></p>` : ""}
         ${state.downloads ? "" : `<a class="btn quiet" href="${state.listaImg.url}" download="${esc(state.listaImg.nombre)}">Descargar otra vez</a>`}` : ""}</div>`
       : `<div class="card"><h2>Ya tienes todo en casa</h2><p class="muted">No hay nada que comprar con lo que elegiste.</p></div>`}
 
@@ -1730,6 +1896,9 @@ function vPuntos() {
       <p class="muted">Tope de ${PUNTOS.topeDia} puntos al día.</p></div>
     ${pt.historial && pt.historial.length ? `<h2>Últimos movimientos</h2><div class="card hist">${pt.historial.slice(0, 8).map((h) => `
       <div><span>${esc(h.motivo)}</span><b>${h.n >= 0 ? "+" : ""}${h.n}${h.confirmado ? "" : " (revisión)"}</b></div>`).join("")}</div>` : ""}
+    ${supaOn() ? `<h2>Tus datos</h2><div class="card">${state.perfil.registro
+      ? `<p>Registrado como <b>${esc(state.perfil.registro.nombre)}</b> · celular que termina en ${esc(state.perfil.registro.fin)}</p><button class="btn quiet" data-act="reg-abrir">Actualizar mis datos</button>`
+      : `<p class="muted">Opcional: déjanos tu nombre y celular para avisarte de premios y novedades de la prueba.</p><button class="btn sec" data-act="reg-abrir">Dejar mis datos</button>`}</div>` : ""}
     <h2>Ajustes</h2>
     <div class="card"><button class="btn quiet" data-act="editar-mercados">Cambiar mis mercados</button>
       <button class="btn quiet" data-act="cambiar-rol">Cambiar cómo uso la app</button>
@@ -1775,7 +1944,7 @@ function render() {
   const html = v === "bienvenida" ? vBienvenida() : v === "inicio" ? vInicio() : v === "producto" ? vProducto(state.productoActivo)
     : v === "aportar" ? vAportar() : v === "foto" ? vFoto() : v === "manual" ? vManual() : v === "nohay" ? vNoHay()
     : v === "gracias" ? vGracias() : v === "puntos" ? vPuntos() : v === "puesto" ? vPuesto() : v === "semana" ? vSemana()
-    : v === "ideas" ? vIdeas() : vInicio();
+    : v === "ideas" ? vIdeas() : v === "alzas" ? vAlzas() : vInicio();
   $("#main").innerHTML = html;
   state.aviso = null; state.ubicError = null;
   const enApp = v !== "bienvenida" && !(v === "ideas" && state.desde === "bienvenida");
@@ -1786,15 +1955,16 @@ function render() {
   $("#nav-semana-txt").textContent = state.perfil.rol === "resto" ? "Mi menú" : "Mi semana";
   const im = $("#in-menu"); if (im) im.addEventListener("change", (e) => leerMenu(e, state.perfil.rol === "resto" ? "resto" : "casa"));
   if (state.toast) { toast(state.toast); state.toast = null; }
-  let tab = { inicio: "inicio", producto: "inicio", aportar: "aportar", foto: "aportar", manual: "aportar", nohay: "aportar", gracias: "aportar", puesto: "aportar", puntos: "puntos", semana: "semana" }[v];
+  let tab = { inicio: "inicio", producto: "inicio", aportar: "aportar", foto: "aportar", manual: "aportar", nohay: "aportar", gracias: "aportar", puesto: "aportar", puntos: "puntos", semana: "semana", alzas: "alzas" }[v];
   if (state.volverA === "semana" && (v === "manual" || v === "gracias")) tab = "semana";
-  ["inicio", "semana", "aportar", "puntos"].forEach((t) => { const b = $("#nav-" + t); if (t === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  ["inicio", "semana", "aportar", "alzas", "puntos"].forEach((t) => { const b = $("#nav-" + t); if (t === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   const foto = $("#in-foto"); if (foto) foto.addEventListener("change", leerFoto);
+  const lc = $("#lc"); if (lc) conectarLineas(lc);
   const sd = $("#sel-distrito"); if (sd) sd.addEventListener("change", (e) => { state.perfil.distrito = e.target.value; state.perfil.zona = null; state.verDistrito = true; state.verMas = 0; autoSupers(puntoLista()); guardar(); render(); });
 }
 function ir(view) {
   if (view === "aportar" && state.perfil.rol === "puesto") view = "puesto";
-  if (["aportar", "puesto", "inicio", "puntos", "semana"].includes(view)) { state.borrador = null; state.volverA = null; }
+  if (["aportar", "puesto", "inicio", "puntos", "semana", "alzas"].includes(view)) { state.borrador = null; state.volverA = null; }
   if (view === "semana") { state.semPaso = nPlatos() ? "lista" : "personas"; state.restoPaso = null; state.menuFoto = null; state.copia = null; }
   state.view = view; render(); window.scrollTo(0, 0); enfocarTitulo();
   evento("vista", { v: view });
@@ -1995,7 +2165,38 @@ async function accion(act, v) {
       else state.aviso = `Puedes seguir hasta ${limiteMercados()} mercados. Quita uno para cambiarlo, o canjea puntos para ver más.`;
       guardar(); break;
     }
-    case "empezar": evento("empezar", { rol: P.rol, mercados: P.mercados, distrito: P.distrito }); P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar(); return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
+    case "empezar":
+      if (supaOn() && !P.registro && !P.registroOmitido) { state.paso = 4; state.regDesde = null; window.scrollTo(0, 0); break; }
+      return empezarApp();
+    case "reg-ok": {
+      const nombre = (($("#rg-nombre") || {}).value || "").replace(/\s+/g, " ").trim().slice(0, 60);
+      const telTxt = ($("#rg-tel") || {}).value || "", tel = telTxt.replace(/\D/g, "").replace(/^51(?=9\d{8}$)/, "");
+      const ok = !!($("#rg-ok") || {}).checked;
+      state.regBorrador = { nombre, tel: telTxt, ok };
+      if (nombre.length < 2) { state.regError = "Escribe tu nombre."; break; }
+      if (!/^9\d{8}$/.test(tel)) { state.regError = "El celular debe tener 9 dígitos y empezar con 9."; break; }
+      if (!ok) { state.regError = "Para guardar tus datos, marca la casilla de permiso."; break; }
+      state.regError = null; state.regEnviando = true; render();
+      const listo = await supaPost("personas", [{ sesion: sesionId(), nombre, telefono: tel, consentimiento: true, version: VERSION }]);
+      state.regEnviando = false; state.regBorrador = null;
+      if (listo) { P.registro = { nombre, fin: tel.slice(-3), ts: Date.now() }; P.registroOmitido = false; state.toast = `Gracias, ${nombre.split(" ")[0]}.`; }
+      else state.toast = "No pudimos guardar tus datos ahora. Puedes intentarlo después desde Mis puntos.";
+      evento("registro", { ok: !!listo }); guardar();
+      return terminarRegistro();
+    }
+    case "reg-no": P.registroOmitido = true; state.regError = null; state.regBorrador = null; evento("registro", { ok: false, omitio: true }); guardar(); return terminarRegistro();
+    case "reg-abrir": state.regDesde = "puntos"; state.regError = null; state.view = "bienvenida"; state.paso = 4; window.scrollTo(0, 0); break;
+    case "reg-volver": state.regDesde = null; state.regError = null; return ir("puntos");
+    case "hist-mes": state.histMes = Math.min(1, (state.histMes || 0) + Number(v)); break;
+    case "hist-usar": {
+      const h = (state.historial.items || []).find((x) => x.clave === v); if (!h) break;
+      const S = state.semana;
+      S.dias = structuredClone(h.dias || {}); S.frutas = structuredClone(h.frutas || {}); S.personas = h.personas || S.personas; S.tengo = {}; S.compre = {}; S.sust = {};
+      guardarSemana(); state.semPaso = "lista"; state.toast = `Listo: cargamos tu semana del ${fechaCorta(h.clave)}.`;
+      evento("historial_usar", { semana: h.clave }); window.scrollTo(0, 0); break;
+    }
+    case "alza-mes": state.alzaMes = v; evento("alza_mes", { mes: v }); break;
+    case "alza-prod": state.alzaProd = v; evento("alza_producto", { producto: v }); break;
     case "activo": state.mercadoActivo = v; break;
     case "editar-mercados": state.paso = 3; state.view = "bienvenida"; state.qMerc = ""; state.nuevoMerc = null; state.verMas = 0; window.scrollTo(0, 0); break;
     case "ubicar": return ubicar();
@@ -2102,7 +2303,7 @@ async function accion(act, v) {
     case "sem-tipo": state.semTipo = v; break;
     case "sem-poner": {
       const [d, id] = v.split(":"), S = state.semana, its = [...itemsDia(d)], i = its.indexOf(id);
-      if (i >= 0) its.splice(i, 1); else if (its.length < 3) { its.push(id); evento("plato_dia", { dia: d, plato: id, tipo: plato(id).tipo, personas: S.personas }); }
+      if (i >= 0) its.splice(i, 1); else if (its.length < MAX_DIA) { its.push(id); evento("plato_dia", { dia: d, plato: id, tipo: plato(id).tipo, personas: S.personas }); }
       S.dias = { ...S.dias, [d]: its }; guardarSemana();
       state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo();
       avisarSR(`${dia(d).n}: ${its.map((x) => plato(x).nombre).join(", ") || "sin plato"}`); return;
@@ -2137,6 +2338,8 @@ async function accion(act, v) {
     case "sem-imagen": {
       const blob = await imagenLista(); if (!blob) break;
       const nombre = `lista-acuanto-${hoy()}.png`;
+      const Lh = mercLista(), itsH = porComprar(), totH = itsH.reduce((a, it) => a + it.compra * precioLugar(it.p, Lh), 0);
+      guardarHistorial(Lh, totH);
       if (state.listaImg) URL.revokeObjectURL(state.listaImg.url);
       state.listaImg = { url: URL.createObjectURL(blob), nombre };
       let via = "vista";
@@ -2151,7 +2354,9 @@ async function accion(act, v) {
           const a2 = document.createElement("a"); a2.href = state.listaImg.url; a2.download = nombre; document.body.append(a2); a2.click(); a2.remove(); via = "descarga";
         }
       }
-      evento("descargar_lista", { via, productos: porComprar().length }); break;
+      evento("descargar_lista", { via, productos: itsH.length, semana: state.semana.clave, personas: state.semana.personas, dias: diasLlenos(),
+        platos: [...new Set(DIAS.flatMap((x) => itemsDia(x.id)))], total: r2(totH), lugar: Lh.id, tipo_lugar: Lh.tipo === "super" ? "super" : "mercado" });
+      state.histGuardado = true; break;
     }
     case "sem-tengo": case "sem-compre": {
       const k = act === "sem-tengo" ? "tengo" : "compre", S = state.semana;
@@ -2325,6 +2530,261 @@ $("#btn-letra").addEventListener("click", () => {
 });
 
 /* ---------------------------- arranque ---------------------------- */
+/* ---------------------------- registro opcional (solo versión web) ---------------------------- */
+function vRegistro() {
+  const b = state.regBorrador || {}, ya = state.perfil.registro;
+  return `<button class="back" data-act="${state.regDesde === "puntos" ? "reg-volver" : "paso"}" data-v="3">‹ Atrás</button>
+    <div style="display:grid;gap:6px"><h1>¿Te podemos conocer?</h1>
+      <p class="muted">Es opcional. Con tu nombre y celular sabemos quién nos ayuda en la prueba y te avisamos de premios y novedades. No hace falta para usar la app.</p></div>
+    <div><label class="lbl" for="rg-nombre">Tu nombre</label>
+      <input class="big" id="rg-nombre" autocomplete="given-name" maxlength="60" value="${esc(b.nombre ?? (ya ? ya.nombre : ""))}"></div>
+    <div><label class="lbl" for="rg-tel">Tu celular</label>
+      <input class="big" id="rg-tel" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="15" placeholder="9XX XXX XXX" value="${esc(b.tel || "")}"></div>
+    <label class="consent"><input type="checkbox" id="rg-ok" ${b.ok ? "checked" : ""}>
+      <span>Acepto que Acuánto guarde mi nombre y celular para contactarme sobre esta prueba. No se publican ni se venden. Puedo pedir que los borren desde el botón 💬 Opinar.</span></label>
+    ${state.regError ? `<p class="note" role="alert">${esc(state.regError)}</p>` : ""}
+    <button class="btn" data-act="reg-ok" ${state.regEnviando ? "disabled" : ""}>${state.regEnviando ? "Guardando…" : "Guardar y seguir"}</button>
+    <button class="btn quiet" data-act="reg-no">Ahora no</button>`;
+}
+function empezarApp() {
+  const P = state.perfil;
+  evento("empezar", { rol: P.rol, mercados: P.mercados, distrito: P.distrito });
+  P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar();
+  return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
+}
+function terminarRegistro() {
+  if (state.regDesde === "puntos" || state.perfil.acepto) { state.regDesde = null; return ir("puntos"); }
+  return empezarApp();
+}
+
+/* ---------------------------- historial de listas guardadas ---------------------------- */
+const dos = (n) => String(n).padStart(2, "0");
+const isoDia = (x) => x.getFullYear() + "-" + dos(x.getMonth() + 1) + "-" + dos(x.getDate());
+const lunesDe = (f) => { const x = new Date(f); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return isoDia(x); };
+function guardarHistorial(L, total) {
+  const S = state.semana;
+  const snap = { clave: S.clave, fecha: hoy(), personas: S.personas, dias: structuredClone(S.dias || {}), frutas: structuredClone(S.frutas || {}),
+    total: r2(total), lugar: nombreLugar(L), productos: porComprar().map((it) => [it.p.id, r2(it.compra)]) };
+  state.historial = { items: [snap, ...(state.historial.items || []).filter((h) => h.clave !== S.clave)].slice(0, 52) };
+  guardarDoc("historial");
+}
+function semHistorial() {
+  const H = state.historial.items || [], off = state.histMes || 0;
+  const base = new Date(); base.setHours(12, 0, 0, 0); base.setDate(1); base.setMonth(base.getMonth() + off);
+  const mesTxt = ((m) => m[0].toUpperCase() + m.slice(1))(base.toLocaleDateString("es-PE", { month: "long", year: "numeric" }));
+  const primero = (base.getDay() + 6) % 7, diasMes = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+  const porClave = Object.fromEntries(H.map((h) => [h.clave, h]));
+  const celdas = [];
+  for (let i = 0; i < primero; i++) celdas.push(`<span class="cal-d vacio" aria-hidden="true"></span>`);
+  for (let d = 1; d <= diasMes; d++) {
+    const f = new Date(base.getFullYear(), base.getMonth(), d, 12), h = porClave[lunesDe(f)], dia = DIAS[(f.getDay() + 6) % 7].id;
+    const ids = h ? (h.dias[dia] || []).filter((id) => plato(id)) : [];
+    celdas.push(`<span class="cal-d${ids.length ? " on" : ""}${isoDia(f) === hoy() ? " hoy" : ""}" role="gridcell" aria-label="${d}${ids.length ? ": " + esc(ids.map((id) => plato(id).nombre).join(", ")) : ""}">
+      <span class="n" aria-hidden="true">${d}</span>${ids.length ? `<span class="e" aria-hidden="true">${emoD(plato(ids[0]))}</span>${ids.length > 1 ? `<span class="mas" aria-hidden="true">+${ids.length - 1}</span>` : ""}` : ""}</span>`);
+  }
+  const cuenta = {};
+  for (const h of H) for (const [pid] of h.productos || []) cuenta[pid] = (cuenta[pid] || 0) + 1;
+  const top = Object.entries(cuenta).filter(([pid]) => prod(pid)).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  return `<button class="back" data-act="sem-paso" data-v="lista">‹ Volver a mi canasta</button>
+    <div style="display:grid;gap:6px"><h1>📅 Mi historial</h1>
+      <p class="muted">Cada vez que guardas la imagen de tu lista, esa semana queda aquí.</p></div>
+    ${H.length ? `<div class="card" style="gap:10px">
+      <div class="cal-top"><button class="chip" data-act="hist-mes" data-v="-1" aria-label="Mes anterior">‹</button><b>${esc(mesTxt)}</b>
+        <button class="chip" data-act="hist-mes" data-v="1" aria-label="Mes siguiente" ${off >= 1 ? "disabled" : ""}>›</button></div>
+      <div class="cal" role="grid" aria-label="Platos de cada día">${["L", "M", "M", "J", "V", "S", "D"].map((x) => `<span class="cal-h" aria-hidden="true">${x}</span>`).join("")}${celdas.join("")}</div></div>
+    ${top.length ? `<div class="card"><h2>Lo que más compras</h2>${top.map(([pid, n]) => `<div class="lleva"><span class="emo" aria-hidden="true">${emoP(prod(pid))}</span>
+      <span><b>${esc(prod(pid).nombre)}</b><br><span class="small muted">en ${n} de ${H.length} ${H.length === 1 ? "semana" : "semanas"}</span></span><span></span></div>`).join("")}</div>` : ""}
+    <div class="card"><h2>Tus semanas</h2>${H.map((h) => { const n = DIAS.filter((x) => (h.dias[x.id] || []).length).length; return `<div class="hrow">
+      <span><b>Semana del ${esc(fechaCorta(h.clave))}</b><br><span class="small muted">${n} ${n === 1 ? "día" : "días"} · ${h.personas} ${h.personas === 1 ? "persona" : "personas"} · ${soles(h.total)} en ${esc(h.lugar)}</span></span>
+      <span><button class="chip" data-act="hist-usar" data-v="${esc(h.clave)}">Usar esta semana otra vez</button></span></div>`; }).join("")}</div>`
+    : `<div class="card"><p>Todavía no guardas ninguna lista.</p><p class="small muted">Arma tu semana y toca <b>📥 Guardar imagen</b>: la semana se guarda aquí.</p>
+      <button class="btn" data-act="sem-paso" data-v="lista">Ir a mi canasta</button></div>`}`;
+}
+
+/* ---------------------------- alzas: qué está subiendo y por qué ----------------------------
+   INEI, IPC de Lima Metropolitana: alimentos con mayor y menor variación de precio del mes. Se actualiza a mano cada mes
+   (el INEI publica el día 1). Tercer valor: producto de la app, si existe (uno por producto y mes). */
+const ALZAS = [
+  { mes: "2026-09", nombre: "setiembre", ipc: 0.12, fuente: "INEI, vía Finanzas Digital, 1 oct 2026", url: "https://finanzasdigital.com/inflacion-peru-septiembre-2026/",
+    datos: [["Maracuyá", 34.83, "maracuya"], ["Tomate", 28.9, "tomate"], ["Arveja verde", 18.5, "arveja"], ["Choclo", 16.8, "choclo"], ["Poro", 16.4],
+      ["Azúcar rubia", 16.2, "azucar"], ["Ají pimiento", 16.0], ["Pepinillo", 15.0], ["Azúcar blanca", 10.4],
+      ["Limón", -4.4, "limon"], ["Pollo eviscerado", -4.6, "pollo"], ["Jurel", -8.0, "jurel"], ["Lechuga", -11.82], ["Caballa", -11.9],
+      ["Ají rocoto molido", -13.03], ["Bonito", -15.6], ["Perico", -15.7], ["Ají amarillo escabeche", -16.26, "aji"], ["Ají amarillo molido", -16.47], ["Mango", -19.0]] },
+  { mes: "2026-08", nombre: "agosto", ipc: 0.07, fuente: "INEI, Informe Técnico N.° 09, set 2026", url: "https://www.inei.gob.pe/media/MenuRecursivo/boletines/boletin-precios-agosto2026_1.pdf",
+    datos: [["Ají amarillo molido", 28.57], ["Cebolla china", 13.87], ["Bonito", 13.67], ["Maracuyá", 13.13, "maracuya"], ["Ají amarillo escabeche", 12.15, "aji"],
+      ["Ají pimiento", 10.9], ["Choclo", 9.2, "choclo"], ["Cebolla de cabeza", 2.6, "cebolla"], ["Tomate", 1.7, "tomate"],
+      ["Pepino", -7.36], ["Pollo eviscerado", -8.37, "pollo"], ["Papaya", -8.49, "papaya"], ["Lechuga", -8.78], ["Mango", -10.31], ["Arándanos", -20.29]] },
+  { mes: "2026-07", nombre: "julio", ipc: 0.29, fuente: "INEI, Informe de precios, julio 2026", url: "https://www.inei.gob.pe/media/MenuRecursivo/boletines/informe-de-precios-jul2026.pdf",
+    datos: [["Ají amarillo escabeche", 47.04, "aji"], ["Pollo eviscerado", 13.32, "pollo"], ["Tomate", 10.25, "tomate"], ["Alas de pollo", 8.55], ["Pechuga de pollo", 7.9],
+      ["Vainita", 6.98], ["Merluza", 6.7], ["Jurel", 6.4, "jurel"], ["Caballa", 5.8],
+      ["Papa color", -5.61], ["Cebolla de cabeza", -6.67, "cebolla"], ["Espinaca", -6.96], ["Poro", -8.41], ["Pepino", -8.8], ["Bonito", -11.34], ["Papaya", -13.0, "papaya"], ["Arándanos", -16.23]] },
+  { mes: "2026-06", nombre: "junio", ipc: 0.23, fuente: "INEI, Boletín estadístico, junio 2026", url: "https://www.inei.gob.pe/media/MenuRecursivo/boletines/boletin_estadistico_17_2026.pdf",
+    datos: [["Bonito", 48.69], ["Mango", 27.22], ["Manzana israel", 22.79, "manzana"], ["Jurel", 18.09, "jurel"], ["Choclo", 14.44, "choclo"], ["Papaya", 14.04, "papaya"],
+      ["Lechuga", 14.01], ["Pepino", 13.53], ["Manzana corriente", 12.7], ["Plátano de seda", 7.8, "platano"],
+      ["Papa color", -6.19], ["Papa blanca", -7.14, "papa-blanca"], ["Cebolla china", -8.65], ["Arándanos", -16.46], ["Arveja verde", -21.3, "arveja"]] },
+];
+const CAUSAS = [
+  { emo: "🌊", titulo: "El Niño costero sigue en alerta", fecha: "21 oct 2026", fuente: "Infobae, con datos del ENFEN",
+    url: "https://www.infobae.com/peru/2026/10/21/enfen-emite-alerta-ante-el-calentamiento-del-mar-hasta-cuando-se-prolongarian-los-efectos-de-el-nino-en-peru/",
+    texto: "El ENFEN prevé una magnitud extraordinaria hasta enero de 2027 y fuerte hasta el otoño. El mar caliente mueve a los peces y el calor altera algunos cultivos." },
+  { emo: "⛽", titulo: "Combustibles más caros", fecha: "1 oct 2026", fuente: "INEI, vía Finanzas Digital", url: "https://finanzasdigital.com/inflacion-peru-septiembre-2026/",
+    texto: "En setiembre el gasohol subió 5.8% y el diésel 3.9% en Lima. Traer alimentos desde provincias cuesta más." },
+  { emo: "🚛", titulo: "Transportistas en alerta", fecha: "oct 2026", fuente: "RPP y Gestión", url: "https://rpp.pe/noticias/paro-de-transportistas",
+    texto: "Gremios de transporte evalúan un paro nacional por las extorsiones. En el paro de marzo, la papa yungay subió 30% en un día en el mercado mayorista." },
+];
+const SLOT_CADENA = { plazavea: 1, metro: 2, wong: 3, tottus: 4, mass: 5 };   // el color sigue a la cadena, no a su orden
+const fmtPct = (v) => (v > 0 ? "+" : "−") + String(Math.round(Math.abs(v) * 10) / 10) + "%";
+function vAlzas() {
+  const M = ALZAS.find((m) => m.mes === state.alzaMes) || ALZAS[0];
+  const filas = [...M.datos].sort((a, b) => b[1] - a[1]), max = Math.max(...filas.map((f) => Math.abs(f[1])));
+  const mios = new Set(porComprar().map((it) => it.p.id));
+  const barras = filas.map(([n, v, pid]) => {
+    const w = (Math.abs(v) / max) * 50, sube = v > 0, en = pid && mios.has(pid), txt = `${n}: ${sube ? "subió" : "bajó"} ${fmtPct(v)}${en ? ", está en tu canasta" : ""}`;
+    return `<div class="ab-row" tabindex="0" title="${esc(txt)}" aria-label="${esc(txt)}">
+      <span class="ab-n">${en ? "🛒 " : ""}${esc(n)}</span>
+      <span class="ab-t" aria-hidden="true"><span class="ab-b ${sube ? "up" : "down"}" style="${sube ? "left" : "right"}:50%;width:${w.toFixed(1)}%"></span></span>
+      <span class="ab-v" aria-hidden="true">${fmtPct(v)}</span></div>`;
+  }).join("");
+  // Tus productos: el mes más reciente (de los dos últimos) en que aparecen
+  const tuyos = [...mios].map((pid) => { for (const m of ALZAS.slice(0, 2)) { const f = m.datos.find((x) => x[2] === pid); if (f) return { p: prod(pid), v: f[1], m }; } return null; })
+    .filter(Boolean).sort((a, b) => b.v - a.v);
+  return `<div style="display:grid;gap:6px"><h1>¿Qué está subiendo?</h1>
+      <p class="muted">Alimentos que más subieron y bajaron de precio en Lima, según el INEI.</p></div>
+    <div class="chips" role="group" aria-label="Mes">${ALZAS.map((m) => `
+      <button class="chip" data-act="alza-mes" data-v="${m.mes}" aria-pressed="${m === M}">${m.nombre[0].toUpperCase() + m.nombre.slice(1)}</button>`).join("")}</div>
+    <div class="card" style="gap:10px"><h2>Lo que más cambió en ${M.nombre}</h2>
+      <p class="small muted">Precios en Lima ${M.ipc >= 0 ? "subieron" : "bajaron"} ${Math.abs(M.ipc).toFixed(2)}% en promedio ese mes. 🛒 = está en tu canasta.</p>
+      <div class="leg"><span><span class="k up"></span>Subió</span><span><span class="k down"></span>Bajó</span></div>
+      <div class="ab" role="list" aria-label="Variación de precios en ${M.nombre}">${barras}</div>
+      <details><summary>Ver como tabla</summary><table class="tv"><thead><tr><th>Producto</th><th>Variación</th></tr></thead>
+        <tbody>${filas.map(([n, v]) => `<tr><td>${esc(n)}</td><td>${fmtPct(v)}</td></tr>`).join("")}</tbody></table></details>
+      <p class="small muted">Fuente: <a href="${M.url}" target="_blank" rel="noopener">${esc(M.fuente)}</a>. Variación del precio promedio frente al mes anterior.</p></div>
+
+    <div class="card" style="gap:10px"><h2>En tu canasta</h2>${!mios.size
+      ? `<p class="muted">Arma tu semana para ver si tus productos están subiendo.</p><button class="btn sec" data-go="semana">Armar mi semana</button>`
+      : tuyos.length ? tuyos.map((x) => `<div class="srow"><span class="emo" aria-hidden="true">${emoP(x.p)}</span>
+          <span class="txt"><b>${esc(x.p.nombre)}</b><br><span class="small muted">en ${x.m.nombre}</span></span>
+          <span class="pr"><span class="pill ${x.v > 0 ? "up" : "down"}">${x.v > 0 ? "▲" : "▼"} ${fmtPct(x.v)}</span></span>
+          ${x.v > 0 ? `<span class="btnw"><button class="chip" data-act="producto" data-v="${x.p.id}">Ver dónde está más barato y qué usar en su lugar</button></span>` : ""}</div>`).join("")
+      : `<p class="muted">Ninguno de tus productos está entre los que más cambiaron. 👍</p>`}</div>
+
+    <div class="card"><h2>¿Por qué suben?</h2>${CAUSAS.map((c) => `<div class="causa"><span class="emo" aria-hidden="true">${c.emo}</span>
+      <span><b>${esc(c.titulo)}</b><br>${esc(c.texto)}<br><span class="small muted">${esc(c.fecha)} · <a href="${c.url}" target="_blank" rel="noopener">${esc(c.fuente)}</a></span></span></div>`).join("")}</div>
+
+    ${cardOnline()}`;
+}
+function cardOnline() {
+  const H = state.hist;
+  const titulo = `<h2>Precio online día a día</h2>`;
+  if (!H || !Array.isArray(H.fechas) || !H.fechas.length || !H.cadenas)
+    return `<div class="card">${titulo}<p class="muted">${window.claude ? "Disponible en la versión web de la app." : "Todavía no hay precios guardados."}</p></div>`;
+  const cads = Object.keys(H.cadenas).filter((c) => SLOT_CADENA[c]);
+  const tiene = (pid) => cads.some((c) => (H.cadenas[c][pid] || []).some((x) => x > 0));
+  const cand = [...new Set([...porComprar().map((it) => it.p.id), "tomate", "limon", "pollo", "papa-amarilla", "cebolla", "arroz", "azucar", "huevo", "aceite"])]
+    .filter((pid) => prod(pid) && tiene(pid)).slice(0, 10);
+  const pid = cand.includes(state.alzaProd) ? state.alzaProd : cand[0];
+  if (!pid) return `<div class="card">${titulo}<p class="muted">Todavía no hay precios guardados.</p></div>`;
+  const p = prod(pid), series = cads.map((c) => ({ c, n: (SUPERS.find((s) => s.id === c) || {}).nombre || c, slot: SLOT_CADENA[c], vals: (H.cadenas[c][pid] || []).map((x) => (x > 0 ? x : null)) }))
+    .filter((s) => s.vals.some((x) => x));
+  const chips = `<div class="chips" role="group" aria-label="Producto">${cand.map((x) => `<button class="chip" data-act="alza-prod" data-v="${x}" aria-pressed="${x === pid}">${emoP(prod(x))} ${esc(prod(x).nombre)}</button>`).join("")}</div>`;
+  const ult = (s) => { for (let i = s.vals.length - 1; i >= 0; i--) if (s.vals[i]) return s.vals[i]; return null; };
+  const tabla = `<table class="tv"><thead><tr><th>Supermercado</th><th>${porUnidad(p)}</th></tr></thead><tbody>${series.map((s) => `<tr><td>${esc(s.n)}</td><td>${soles(ult(s))}</td></tr>`).join("")}</tbody></table>`;
+  const dias = H.fechas.length;
+  if (dias < 3) return `<div class="card" style="gap:10px">${titulo}${chips}
+    <p class="muted">Estamos juntando precios desde el ${esc(fechaCorta(H.fechas[0]))}: la curva aparece cuando haya 3 días. Hoy:</p>${tabla}
+    <p class="small muted">Precio de la tienda online de cada cadena; en el local puede variar.</p></div>`;
+  state.lcData = { fechas: H.fechas, series, unidad: porUnidad(p) };
+  return `<div class="card" style="gap:10px">${titulo}${chips}
+    <p class="small muted">${esc(p.nombre)}, ${porUnidad(p)}, últimos ${dias} días.</p>
+    ${series.length > 1 ? `<div class="leg">${series.map((s) => `<span><span class="kl f${s.slot}"></span>${esc(s.n)}</span>`).join("")}</div>` : `<p class="small">${esc(series[0].n)}</p>`}
+    ${graficoLineas(H.fechas, series)}
+    <div class="vtip" id="lc-tip" aria-live="polite"></div>
+    <details><summary>Ver como tabla</summary>${tablaLineas(H.fechas, series)}</details>
+    <p class="small muted">Precio de la tienda online de cada cadena, guardado cada mañana; en el local puede variar.</p></div>`;
+}
+function escalaLineas(fechas, series) {
+  const W = 320, Hh = 170, pl = 44, pr = 50, pt = 10, pb = 22;
+  const vals = series.flatMap((s) => s.vals.filter((x) => x));
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi - lo < 0.4) { lo -= 0.2; hi += 0.2; }
+  const pad = (hi - lo) * 0.12; lo = Math.max(0, lo - pad); hi += pad;
+  const x = (i) => pl + (fechas.length === 1 ? (W - pl - pr) / 2 : (i * (W - pl - pr)) / (fechas.length - 1));
+  const y = (v) => pt + (1 - (v - lo) / (hi - lo)) * (Hh - pt - pb);
+  return { W, Hh, pl, pr, pt, pb, lo, hi, x, y };
+}
+function graficoLineas(fechas, series) {
+  const E = escalaLineas(fechas, series), { W, Hh, pl, pr, pb, lo, hi, x, y } = E;
+  const ticks = [lo, (lo + hi) / 2, hi];
+  const grid = ticks.map((t) => `<line class="gl" x1="${pl}" x2="${W - pr}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"/><text class="tk" x="${pl - 6}" y="${(y(t) + 3).toFixed(1)}" text-anchor="end">${t.toFixed(2)}</text>`).join("");
+  const xl = `<text class="tk" x="${x(0)}" y="${Hh - 6}" text-anchor="start">${esc(fechaCorta(fechas[0]))}</text><text class="tk" x="${x(fechas.length - 1)}" y="${Hh - 6}" text-anchor="end">${esc(fechaCorta(fechas[fechas.length - 1]))}</text>`;
+  const finales = series.map((s) => { let i = s.vals.length - 1; while (i >= 0 && !s.vals[i]) i--; return { s, i, v: s.vals[i] }; }).filter((f) => f.i >= 0);
+  const ys = finales.map((f) => y(f.v)).sort((a, b) => a - b), separadas = ys.every((v, k) => !k || v - ys[k - 1] >= 12);
+  const lineas = series.map((s) => {
+    let d = "", pen = false;
+    s.vals.forEach((v, i) => { if (v) { d += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`; pen = true; } else pen = false; });
+    return `<path class="ln s${s.slot}" d="${d}"/>`;
+  }).join("");
+  const puntos = finales.map((f) => `<circle class="dot f${f.s.slot}" r="4" cx="${x(f.i).toFixed(1)}" cy="${y(f.v).toFixed(1)}"/>${separadas ? `<text class="el" x="${(x(f.i) + 7).toFixed(1)}" y="${(y(f.v) + 3).toFixed(1)}">${f.v.toFixed(2)}</text>` : ""}`).join("");
+  return `<svg class="viz" id="lc" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Precio por día en cada supermercado; usa la tabla para ver cada valor">
+    ${grid}${xl}${lineas}${puntos}<line class="xh" id="lc-x" x1="0" x2="0" y1="${E.pt}" y2="${Hh - pb}" visibility="hidden"/>
+    <rect id="lc-hit" x="${pl}" y="0" width="${W - pl - pr}" height="${Hh}" fill="transparent"/></svg>`;
+}
+function tablaLineas(fechas, series) {
+  return `<table class="tv"><thead><tr><th>Día</th>${series.map((s) => `<th>${esc(s.n)}</th>`).join("")}</tr></thead><tbody>${fechas.map((f, i) => `<tr><td>${esc(fechaCorta(f))}</td>${series.map((s) => `<td>${s.vals[i] ? s.vals[i].toFixed(2) : "—"}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+/* Cruz que sigue al dedo: muestra el precio de cada cadena en el día más cercano. */
+function conectarLineas(svg) {
+  const D = state.lcData, tip = $("#lc-tip"), xh = $("#lc-x"), hit = $("#lc-hit");
+  if (!D || !tip || !xh || !hit) return;
+  const E = escalaLineas(D.fechas, D.series);
+  const mostrar = (i) => {
+    xh.setAttribute("x1", E.x(i)); xh.setAttribute("x2", E.x(i)); xh.setAttribute("visibility", "visible");
+    tip.textContent = "";
+    const dia = document.createElement("span"); dia.textContent = fechaCorta(D.fechas[i]) + ": "; tip.append(dia);
+    D.series.forEach((s, k) => {
+      const b = document.createElement("b"); b.textContent = s.vals[i] ? "S/ " + s.vals[i].toFixed(2) : "—";
+      const n = document.createElement("span"); n.textContent = " " + s.n + (k < D.series.length - 1 ? " · " : "");
+      tip.append(b, n);
+    });
+  };
+  const mover = (ev) => {
+    const r = svg.getBoundingClientRect(), px = ((ev.clientX - r.left) / r.width) * E.W;
+    let best = 0; D.fechas.forEach((_, i) => { if (Math.abs(E.x(i) - px) < Math.abs(E.x(best) - px)) best = i; });
+    mostrar(best);
+  };
+  hit.addEventListener("pointermove", mover); hit.addEventListener("pointerdown", mover);
+  svg.setAttribute("tabindex", "0");
+  let k = D.fechas.length - 1;
+  svg.addEventListener("keydown", (ev) => { if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") { k = Math.max(0, Math.min(D.fechas.length - 1, k + (ev.key === "ArrowRight" ? 1 : -1))); mostrar(k); ev.preventDefault(); } });
+  svg.addEventListener("focus", () => mostrar(k));
+}
+/* Datos de la versión web: historial de precios online (lo arma la tarea diaria) y platos más elegidos (Supabase, solo totales). */
+async function cargarHist() {
+  if (window.claude || !/^https?:$/.test(location.protocol)) return;
+  try {
+    const ctl4 = new AbortController(), t = setTimeout(() => ctl4.abort(), 5000);
+    const r = await fetch("precios_hist.json", { cache: "no-cache", signal: ctl4.signal }); clearTimeout(t);
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && Array.isArray(d.fechas) && d.cadenas && typeof d.cadenas === "object") state.hist = d;
+  } catch (e) {}
+}
+async function cargarPopulares() {
+  const c = LS.get("acuanto.pop");
+  if (c && c.v && Date.now() - (c.ts || 0) < 6 * 3600e3) { state.popReal = c.v; return; }
+  if (!supaOn()) return;
+  try {
+    const h = { apikey: SUPA.key, "Content-Type": "application/json" };
+    if (SUPA.key.startsWith("eyJ")) h.Authorization = "Bearer " + SUPA.key;
+    const ctl5 = new AbortController(), t = setTimeout(() => ctl5.abort(), 5000);
+    const r = await fetch(SUPA.url.replace(/\/$/, "") + "/rest/v1/rpc/acuanto_platos_top", { method: "POST", headers: h, body: JSON.stringify({ dias: 60 }), signal: ctl5.signal });
+    clearTimeout(t);
+    if (!r.ok) return;
+    const v = await r.json();
+    if (v && typeof v === "object" && !Array.isArray(v)) { state.popReal = v; LS.set("acuanto.pop", { ts: Date.now(), v }); }
+  } catch (e) {}
+}
+
 async function cargarPreciosSuper() {
   if (window.claude || !/^https?:$/.test(location.protocol)) return;  // dentro de Claude no hay archivo de precios
   try {
@@ -2360,7 +2820,7 @@ async function cargarLugaresWeb() {
   state.perfil.mercados = (state.perfil.mercados || []).filter((id) => merc(id));   // quita mercados que ya no existen
   const u = LS.get("acuanto.ubic");
   if (u && Number.isFinite(u.la) && Number.isFinite(u.lo) && dentroDeLima(u.la, u.lo) && Date.now() - (u.ts || 0) < 90 * 864e5) state.ubic = u;
-  await Promise.all([cargarPreciosSuper(), cargarLugaresWeb()]);
+  await Promise.all([cargarPreciosSuper(), cargarLugaresWeb(), cargarHist(), cargarPopulares()]);
   evento("abrir", { distrito: state.perfil.distrito || null, mercados: (state.perfil.mercados || []).length, nuevo: !state.perfil.acepto,
     precios_super: !!state.superReal, ubicacion: !!state.ubic, lugares: LUG.fecha, instalada: matchMedia("(display-mode: standalone)").matches });
   if (state.perfil.acepto && state.perfil.mercados.length) {
