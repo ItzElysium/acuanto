@@ -337,6 +337,18 @@
   .dacc .link { min-height: 40px; padding: 0 2px; }
   .dlab { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
   .dconf { display: grid; gap: 8px; padding: 10px; border-radius: 12px; background: var(--bg); }
+  .bal { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; padding: 4px 0; }
+  .bal .ic { font-size: 1.1rem; line-height: 1.4; }
+  details.ficha { border-bottom: 1px solid var(--line); padding: 4px 0; }
+  details.ficha > summary { justify-content: space-between; gap: 8px; color: var(--ink); font-weight: 700; }
+  details.ficha > summary > span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+  details.ficha .emo2 { transform: scale(0.75); }
+  .ing { display: grid; gap: 4px; padding: 10px; border-radius: 12px; background: var(--bg); }
+  .ing.estrella { box-shadow: inset 4px 0 0 var(--green); } .ing.caballo { box-shadow: inset 4px 0 0 var(--amber); }
+  .ing.puzzle { box-shadow: inset 4px 0 0 var(--viz-1); } .ing.perro { box-shadow: inset 4px 0 0 var(--red); }
+  .ingrow { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 40px; }
+  .ingrow .emo2 { transform: scale(0.75); }
+  input.mini { width: 88px; min-height: 44px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); padding: 6px 10px; font: inherit; color: inherit; text-align: right; }
   .dchips { display: flex; flex-wrap: wrap; gap: 8px; }
   .dchip { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 4px 4px 4px 12px; border-radius: 999px; background: var(--green-soft);
            border: 2px solid var(--green); font-weight: 700; font-size: 0.95rem; max-width: 100%; }
@@ -431,6 +443,8 @@ const PRODUCTOS = [
   { id: "gallina", nombre: "Gallina", emo: "🐔", unidad: "kilo", base: 12.0, riesgo: false, rubro: "carnes" },
   { id: "carne", nombre: "Carne de res", emo: "🥩", unidad: "kilo", base: 30.0, riesgo: false, rubro: "carnes" },
   { id: "huevo", nombre: "Huevo", emo: "🥚", unidad: "kilo", base: 8.5, riesgo: false, rubro: "carnes", pieza: [0.06, "huevo", "huevos"] },
+  { id: "sangrecita", nombre: "Sangrecita de pollo", emo: "🩸", unidad: "kilo", base: 6.0, riesgo: false, rubro: "carnes" },
+  { id: "higado", nombre: "Hígado de res", emo: "🥩", unidad: "kilo", base: 14.0, riesgo: false, rubro: "carnes" },
   { id: "jurel", nombre: "Jurel", emo: "🐟", unidad: "kilo", base: 8.0, riesgo: true, rubro: "pescado" },
   { id: "arroz", nombre: "Arroz", emo: "🍚", unidad: "kilo", base: 4.2, riesgo: false, rubro: "abarrotes" },
   { id: "lenteja", nombre: "Lenteja", emo: "🟤", unidad: "kilo", base: 7.5, riesgo: false, rubro: "abarrotes" },
@@ -592,6 +606,8 @@ const PLATOS = [
     ing: { queso: 0.05, choclo: 0.25, tomate: 0.05, cebolla: 0.03, limon: 0.01, aceite: 0.01 } },
   { id: "ocopa", tipo: "entrada", nombre: "Ocopa", emo: "🥔|🌿", aparte: ["huacatay", "maní", "galletas de soda"],
     ing: { "papa-amarilla": 0.2, queso: 0.03, leche: 0.06, aji: 0.02, huevo: 0.03, aceite: 0.02 } },
+  { id: "ensalada-criolla", tipo: "entrada", nombre: "Ensalada criolla de tomate y cebolla", emo: "🥗|🍅", aparte: ["culantro"],
+    ing: { tomate: 0.08, cebolla: 0.06, zanahoria: 0.03, limon: 0.015, aji: 0.005, aceite: 0.005 } },
   { id: "huevos-rusa", tipo: "entrada", nombre: "Huevos a la rusa", emo: "🥚|🥕", aparte: ["mayonesa"],
     ing: { huevo: 0.06, "papa-blanca": 0.1, zanahoria: 0.03, arveja: 0.02 } },
   { id: "emoliente", tipo: "refresco", nombre: "Emoliente", emo: "☕|🌿", aparte: ["linaza", "cola de caballo", "alfalfa"], ing: { limon: 0.01, azucar: 0.02 } },
@@ -600,6 +616,10 @@ const PLATOS = [
   { id: "batido", tipo: "refresco", nombre: "Batido de avena y plátano", emo: "🥤|🍌", fit: true, ing: { avena: 0.04, platano: 0.15, leche: 0.25 } },
   { id: "jugo-papaya", tipo: "refresco", nombre: "Jugo de papaya", emo: "🥤|@papaya", ing: { papaya: 0.2, azucar: 0.01 } },
   { id: "te-anis", tipo: "refresco", nombre: "Té o anís", emo: "🍵", aparte: ["té o anís en sobre"], ing: { azucar: 0.01 } },
+  { id: "sangrecita", tipo: "segundo", nombre: "Sangrecita con arroz y camote", emo: "🍲|🍠", aparte: ["hierbabuena", "ají limo"],
+    ing: { sangrecita: 0.12, cebolla: 0.05, aji: 0.01, ajo: 0.005, arroz: 0.1, camote: 0.1, aceite: 0.01 } },
+  { id: "higado-encebollado", tipo: "segundo", nombre: "Hígado encebollado con arroz", emo: "🥩|🧅", aparte: ["vinagre", "comino"],
+    ing: { higado: 0.15, cebolla: 0.12, tomate: 0.05, aji: 0.005, ajo: 0.005, arroz: 0.1, aceite: 0.015 } },
   { id: "mazamorra-zapallo", tipo: "postre", nombre: "Mazamorra de zapallo", emo: "🍮|🎃", aparte: ["canela", "chuño"],
     ing: { zapallo: 0.1, azucar: 0.03, leche: 0.05 } },
 
@@ -816,15 +836,15 @@ const state = {
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
   historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.7.2";
+const VERSION = "Prueba 0.8";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
   distrito: MERCADOS[0].distrito, ampliadoHasta: null, puesto: null, acepto: false });
 /* La semana empieza el lunes: al cambiar de semana se borran las marcas de "ya tengo" y "comprado", no los platos. */
 function semanaClave() { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-const semanaVacia = () => ({ personas: 4, conCena: false, dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
-const restoVacio = () => ({ menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vie", "sab"], precioMenu: 12, menu: {}, precios: {}, diaActivo: "lun", aportadoDia: null });
+const semanaVacia = () => ({ personas: 4, conCena: false, taper: 0, compras: 1, despensa: {}, dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
+const restoVacio = () => ({ despensa: {}, ventas: {}, menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vie", "sab"], precioMenu: 12, menu: {}, precios: {}, diaActivo: "lun", aportadoDia: null });
 
 /* Persistencia: base compartida del artefacto si está disponible; si no, solo este teléfono. */
 const LS = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
@@ -941,6 +961,7 @@ const NUTR = {
   platano: [580, 7], manzana: [470, 3], mandarina: [370, 6], naranja: [330, 6], papaya: [300, 3], pina: [275, 3], maracuya: [440, 10],
   pollo: [1460, 126], gallina: [1620, 117], carne: [1430, 210], huevo: [1260, 110], jurel: [690, 110],
   arroz: [3600, 70], lenteja: [3400, 240], frejol: [3400, 210], fideos: [3600, 120], quinua: [3700, 135], avena: [3800, 130],
+  sangrecita: [850, 180], higado: [1350, 200],
   "maiz-morado": [0, 0], azucar: [3870, 0], aceite: [7400, 0], leche: [536, 27], queso: [2640, 175],
 };
 function nutri(d) {
@@ -955,9 +976,9 @@ const POP = {
   "arroz-pollo": 98, lomo: 96, "aji-gallina": 93, chaufa: 92, tallarines: 90, ceviche: 88, lentejas: 86, "seco-pollo": 85, estofado: 84,
   "pollo-saltado": 83, "pollo-horno": 82, "seco-res": 80, "arroz-tapado": 78, "tallarin-saltado": 78, sudado: 76, "pescado-frito": 75,
   "bistec-pobre": 74, "tacu-tacu": 72, "pollo-plancha": 72, "arroz-cubana": 70, locro: 68, olluquito: 66, "picante-papa": 62, tortilla: 62,
-  escabeche: 58, "quinua-pollo": 55, "pechuga-quinua": 54, "pescado-plancha": 54, "tortilla-ensalada": 50,
+  escabeche: 58, "higado-encebollado": 50, sangrecita: 48, "quinua-pollo": 55, "pechuga-quinua": 54, "pescado-plancha": 54, "tortilla-ensalada": 50,
   "caldo-gallina": 95, "sopa-casa": 85, aguadito: 84, "sopa-criolla": 80, menestron: 76, chilcano: 72, "sopa-quinua": 70, "dieta-pollo": 68, chupe: 66, "sopa-verduras": 64,
-  huancaina: 95, causa: 92, "papa-rellena": 85, ocopa: 75, solterito: 70, "huevos-rusa": 60,
+  huancaina: 95, causa: 92, "papa-rellena": 85, ocopa: 75, solterito: 70, "ensalada-criolla": 65, "huevos-rusa": 60,
   chicha: 98, limonada: 92, "maracuya-ref": 85, emoliente: 82, "quinua-manzana": 75, "avena-leche": 74, "pina-ref": 70, "jugo-papaya": 68, batido: 60, "te-anis": 55,
   mazamorra: 92, "arroz-leche": 90, "ensalada-frutas": 80, "mazamorra-zapallo": 55,
 };
@@ -1018,8 +1039,8 @@ function redondeoResto(p, q) {
 function cantResto(p, q) {
   let t = p.unidad === "kilo" ? (q < 1 ? `${Math.round(q * 1000)} g` : `${String(q).replace(/\.0+$/, "")} kg`)
     : p.unidad === "litro" ? `${q} L` : `${q} ${q === 1 ? (p.cuenta || ["unidad"])[0] : (p.cuenta || [0, "unidades"])[1]}`;
-  if (p.id === "huevo") { const n = Math.round(q / p.pieza[0]); t += ` (≈ ${n} huevos, ${Math.ceil(n / 30)} ${Math.ceil(n / 30) === 1 ? "jaba" : "jabas"})`; }
-  else if (p.pieza && p.pieza[0] < 0.5) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` (≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]})`; }
+  if (p.id === "huevo") { const n = Math.round(q / p.pieza[0]); t += ` · ≈ ${n} huevos, ${Math.ceil(n / 30)} ${Math.ceil(n / 30) === 1 ? "jaba" : "jabas"}`; }
+  else if (p.pieza && p.pieza[0] < 0.5) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` · ≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]}`; }
   return t;
 }
 function compraResto() {
@@ -1057,7 +1078,7 @@ function cantTxt(p, q) {
   if (p.unidad === "kilo") t = q < 0.25 ? `${Math.round(q * 1000)} gramos` : fraccion(q, "kilo", "kilos");
   else if (p.unidad === "litro") t = fraccion(q, "litro", "litros");
   else { const [a, b] = p.cuenta || ["unidad", "unidades"]; t = `${q} ${q === 1 ? a : b}`; }
-  if (p.pieza) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` (≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]})`; }
+  if (p.pieza) { const n = Math.round(q / p.pieza[0]); if (n > 0) t += ` · ≈ ${n} ${n === 1 ? p.pieza[1] : p.pieza[2]}`; }
   return t;
 }
 /* La semana del hogar: un plan por día (hasta 3 cosas por día) + frutas aparte, para N personas. */
@@ -1069,8 +1090,9 @@ const diasLlenos = () => DIAS.filter((d) => itemsTodo(d.id).length).length;
 function compraSemana() {
   const S = state.semana, tot = {};
   const add = (d, veces) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * veces * S.personas; };
-  for (const x of DIAS) for (const id of itemsTodo(x.id)) { const d = plato(id); if (d) add(d, 1); }
+  for (const x of DIAS) for (const [pid, q] of Object.entries(necesidadDia(x.id))) tot[pid] = (tot[pid] || 0) + q;   // almuerzo (+ táper) y cena
   for (const [id, n] of Object.entries(S.frutas || {})) { const d = plato(id); if (d && n) add(d, n); }
+  for (const [pid, q] of Object.entries(ajusteReusos())) { tot[pid] = (tot[pid] || 0) + q; if (tot[pid] <= 0.001) delete tot[pid]; }   // aprovechamiento
   for (const [pid, sid] of Object.entries(S.sust || {})) {
     if (!tot[pid]) continue;
     const r = ((SUSTITUTOS[pid] || []).find((x) => x[0] === sid) || [0, 1])[1];
@@ -1139,7 +1161,12 @@ const veces = (id) => DIAS.reduce((a, x) => a + itemsTodo(x.id).filter((y) => y 
 /* Solo se sugiere un cambio si hoy ahorra al menos S/ 1 en la semana. */
 function sugerencias(L) {
   const S = state.semana, usados = [...new Set(DIAS.flatMap((x) => itemsTodo(x.id)))];
-  return usados.map(plato).filter((d) => d && d.cambio).map((d) => {
+  /* No sugerir cambios que rompan el aprovechamiento de sobras ni el balance (pescado, menestras, hierro). */
+  const enReuso = new Set(reusosActivos().map((u) => u.aId));
+  const todos = DIAS.flatMap((x) => itemsTodo(x.id)).map(plato).filter(Boolean);
+  const n = (pids) => todos.filter((d) => pids.some((p) => (d.ing[p] || 0) >= 0.05)).length;
+  const protege = (d) => [["jurel"], ["lenteja", "frejol"], ["sangrecita", "higado"]].some((pids) => pids.some((p) => (d.ing[p] || 0) >= 0.05) && n(pids) <= 2);
+  return usados.map(plato).filter((d) => d && d.cambio && !enReuso.has(d.id) && !protege(d)).map((d) => {
     const alt = plato(d.cambio), precio = (p) => precioLugar(p, L);
     const ahorro = r2((costoPlatoCon(d, precio).t - costoPlatoCon(alt, precio).t) * veces(d.id) * S.personas);
     const evita = Object.keys(d.ing).filter((pid) => prod(pid).riesgo && !(pid in alt.ing)).map((pid) => prod(pid).nombre.toLowerCase());
@@ -1504,6 +1531,10 @@ function semPersonas() {
       <button class="chip" data-act="sem-per-fijo" data-v="${n}" aria-pressed="${S.personas === n}" style="min-width:52px">${n}</button>`).join("")}
       <button class="chip" data-act="sem-per-fijo" data-v="50" aria-pressed="${S.personas === 50}">Olla común: 50</button></div>
     <p class="note">Contamos la porción de una persona adulta. Dos niños pequeños cuentan como una persona.</p>
+    <div style="display:grid;gap:8px"><h2>🥡 ¿Alguien lleva táper?</h2>
+      <p class="small muted">Cocinamos porciones extra del segundo del almuerzo para el trabajo o el colegio del día siguiente.</p>
+      <div class="chips wrap" role="group" aria-label="Táper">${[0, 1, 2, 3].map((n) => `
+        <button class="chip" data-act="sem-taper" data-v="${n}" aria-pressed="${(S.taper || 0) === n}" style="min-width:52px">${n === 0 ? "Nadie" : n}</button>`).join("")}</div></div>
     <div style="display:grid;gap:8px"><h2>¿Qué comidas planificas?</h2>
       <div class="seg" role="group" aria-label="Comidas">
         <button type="button" data-act="sem-comidas" data-v="0" aria-pressed="${!S.conCena}">Solo almuerzo</button>
@@ -1535,6 +1566,7 @@ function semDias() {
       <p class="muted">Elige el ${S.conCena ? "almuerzo y la cena" : "almuerzo"} de cada día. Puedes dejar días vacíos.</p>
       ${(state.historial.items || []).length ? `<button class="link" data-act="sem-paso" data-v="historial" style="justify-self:start">📅 Mi historial</button>` : ""}</div>
     ${bloqueFotoMenu(botonFotoMenu("Foto de tu menú de la semana", "Si lo tienes escrito en un papel o pizarra, la app llena los días por ti."))}
+    ${tarjetaMes()}
     ${state.aviso ? `<p class="note" role="status">${esc(state.aviso)}</p>` : ""}
     ${state.deshacer ? `<div class="note" role="status">${esc(state.deshacer.txt)} <button class="link" data-act="sem-deshacer" style="min-height:0">Deshacer</button></div>` : ""}
     <div class="dias">${DIAS.map((x) => {
@@ -1553,6 +1585,7 @@ function semDias() {
     }).join("")}</div>
     ${DIAS.some((x) => !itemsDia(x.id).length || (S.conCena && !itemsDe(x.id, "cena").length)) ? (state.llenar ? `<div class="card" style="gap:10px"><h2>💡 ¿Qué llenamos en los días vacíos?</h2>
         <p class="small muted">Con los platos más económicos de tus lugares, sin los que suben por El Niño.${S.conCena ? " La cena se llena con un plato de fondo." : ""}</p>
+        <button class="btn" data-act="sem-economica" data-v="inteligente">🧠 Semana inteligente: barata, variada y balanceada</button>
         <button class="btn sec" data-act="sem-economica" data-v="segundo">Solo el segundo</button>
         <button class="btn sec" data-act="sem-economica" data-v="menu">Menú completo: entrada o sopa + segundo + bebida</button>
         <button class="btn quiet" data-act="sem-llenar-no">Cancelar</button></div>`
@@ -1568,11 +1601,12 @@ function semDias() {
 function semElegir() {
   const id = state.semDia, comida = state.semComida || "almuerzo", x = dia(id), its = itemsDe(id, comida), tipo = state.semTipo || "segundo", ls = lugares();
   const S = state.semana, nP = S.personas;
-  const tipos = [...TIPOS.filter((t) => t.id !== "fruta"), { id: "fit", nombre: "💪 Fit", por: "por plato" }];
-  const fit = tipo === "fit";
+  const tipos = [...TIPOS.filter((t) => t.id !== "fruta"), { id: "fit", nombre: "💪 Fit", por: "por plato" }, { id: "rapido", nombre: "⏱ Rápidos", por: "por plato" }];
+  const fit = tipo === "fit", rapido = tipo === "rapido";
   const lista = (fit ? PLATOS.filter((d) => d.tipo !== "fruta" && esFit(d)).sort((a, b) => nutri(b).prot - nutri(a).prot)
+    : rapido ? PLATOS.filter((d) => ["segundo", "sopa", "entrada"].includes(d.tipo) && (TIEMPO[d.id] || 99) <= 30).sort((a, b) => puntaje(b) - puntaje(a))
     : PLATOS.filter((d) => d.tipo === tipo).sort((a, b) => puntaje(b) - puntaje(a)));
-  const pop = fit ? { ids: [], real: false } : populares(tipo);
+  const pop = fit || rapido ? { ids: [], real: false } : populares(tipo);
   const lleno = its.length >= MAX_DIA;
   return `<button class="back" data-act="sem-paso" data-v="platos">‹ Volver a la semana</button>
     <div style="display:grid;gap:6px"><h1 style="text-transform:none">${x.n[0].toUpperCase() + x.n.slice(1)}${S.conCena ? (comida === "cena" ? ", cena" : ", almuerzo") : ""}: ¿qué vas a cocinar?</h1>
@@ -1580,14 +1614,17 @@ function semElegir() {
     <div class="chips wrap" role="group" aria-label="Tipo de plato">${tipos.map((t) => `
       <button class="chip" data-act="sem-tipo" data-v="${t.id}" aria-pressed="${tipo === t.id}">${t.nombre}</button>`).join("")}</div>
     ${fit ? `<p class="small muted">Altos en proteína y moderados en calorías. Valores referenciales por porción; no reemplazan a un nutricionista.</p>` : ""}
+    ${rapido ? `<p class="small muted">Listos en 30 minutos o menos, de principio a fin.</p>` : ""}
     <div class="opts">${lista.map((d) => {
       const c = ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0], on = its.includes(d.id), n = nutri(d);
       const badge = pop.ids.includes(d.id) ? `<span class="pill pop">🔥 ${pop.real ? "Más elegido" : "Popular"}</span>` : "";
+      const mm = marcaMes(d), marca = mm ? `<span class="pill ${mm.tipo === "sube" ? "up" : "down"}">${mm.tipo === "sube" ? "▲" : "▼"} ${esc(mm.txt)}</span>` : "";
+      const fe = hierroDe(d) >= 4 && d.tipo !== "refresco" ? `<span class="pill fit">🩸 Hierro</span>` : "";
       const unidad = d.tipo === "refresco" ? "el vaso" : "por persona";
       return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}" ${lleno && !on ? "disabled" : ""}>
         <span class="emo" aria-hidden="true">${emoD(d)}</span><span class="name">${d.nombre}</span>
-        <span class="meta"><span>≈ ${soles(c.t)} ${unidad}${nP > 1 ? ` · ${soles(c.t * nP)} para ${nP}` : ""}</span>${badge}${esFit(d) && !fit ? `<span class="pill fit">💪 Fit</span>` : ""}${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}
-          ${n.kcal ? `<span class="kcal">≈ ${n.kcal} kcal · ${n.prot} g proteína por porción</span>` : ""}</span>
+        <span class="meta"><span>≈ ${soles(c.t)} ${unidad}${nP > 1 ? ` · ${soles(c.t * nP)} para ${nP}` : ""}</span>${badge}${marca}${fe}${esFit(d) && !fit ? `<span class="pill fit">💪 Fit</span>` : ""}${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}
+          ${n.kcal ? `<span class="kcal">${TIEMPO[d.id] ? `⏱ ${TIEMPO[d.id]} min · ` : ""}≈ ${n.kcal} kcal · ${n.prot} g proteína por porción</span>` : ""}</span>
         <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
     }).join("")}</div>
     <p class="small muted">Precio de una porción en el lugar más barato hoy (ejemplo); al lado, lo que cuesta para las ${nP} ${nP === 1 ? "persona" : "personas"} de tu casa. Calorías y proteína: referenciales, según la receta casera.</p>`;
@@ -1617,7 +1654,7 @@ function filaLista(it, mL) {
   const planear = S.modo !== "comprar", off = planear ? tengo : compre;
   return `<div class="lrow${off ? " off" : ""}">
     <span class="emo" aria-hidden="true">${emoP(it.p)}</span>
-    <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantTxt(it.p, it.compra)}</span><br>
+    <span class="nm"><b>${it.p.nombre}</b><br><span class="small">${cantTxt(it.p, it.compra)}</span>${rindeTxt(it.p, it.compra) ? `<br><span class="small muted">${rindeTxt(it.p, it.compra)}</span>` : ""}<br>
       <span class="small muted">a ${soles(pr)} ${porUnidad(it.p)}${visto ? " · visto hoy" : ""}</span></span>
     <span class="pr">${planear && tengo ? "—" : soles(it.compra * pr)}</span>
     <span class="act">${planear
@@ -1657,7 +1694,7 @@ function semLista() {
       <b class="pr">${soles(sub)}</b></div>`;
   }).join("");
   return `<div style="display:grid;gap:6px"><h1>Tu canasta de la semana</h1>
-      <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"} · ${llenos} de 7 días con plato</p>
+      <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"}${S.taper ? ` + ${S.taper} ${S.taper === 1 ? "táper" : "tápers"}` : ""}${S.conCena ? " · almuerzo y cena" : ""} · ${llenos} de 7 días con plato</p>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="sem-paso" data-v="platos">Cambiar platos</button>
         <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas o comidas</button>
         ${(state.historial.items || []).length ? `<button class="link" data-act="sem-paso" data-v="historial">📅 Mi historial</button>` : ""}</div></div>
@@ -1685,6 +1722,7 @@ function semLista() {
       ${Object.keys(S.sust || {}).length ? `<p class="small">Ya cambiaste:</p><div class="chips wrap">${Object.entries(S.sust).map(([a1, b1]) => `
         <button class="chip" data-act="sem-sust-quitar" data-v="${a1}" aria-label="Deshacer cambio de ${esc(prod(a1).nombre)}">${esc(prod(a1).nombre)} → ${esc(prod(b1).nombre)} ✕</button>`).join("")}</div>` : ""}</div>` : ""}
 
+    ${tarjetaReuso()}
     ${items.length ? `<div class="card"><h2>Lo que te llevas</h2>${resumen}
       <div class="row2"><button class="btn quiet" data-act="sem-ver-lista">${state.semVerLista ? "Ocultar la lista" : "Ver la lista"}</button>
         <button class="btn sec" data-act="sem-imagen">📥 Guardar imagen</button></div>
@@ -1707,6 +1745,7 @@ function semLista() {
       ${!planear && ocultos ? `<p class="small muted">No mostramos ${ocultos} ${ocultos === 1 ? "cosa que ya tienes" : "cosas que ya tienes"} en casa.</p>` : ""}
     </div>` : ""}
 
+    ${items.length ? tarjetaFrescura() : ""}
     <div class="card"><h2>🍎 Frutas de la semana</h2>
       ${frutas.length ? `<p>${esc(frutas.join(", "))} por persona</p><p class="small muted"><b>${soles(frutasT)}</b>, ya incluido en tu canasta</p>
         <button class="btn quiet" data-act="sem-paso" data-v="frutas">Cambiar frutas</button>`
@@ -1719,8 +1758,10 @@ function semLista() {
       ahorras cerca de <b>${soles(s.ahorro)}</b> en la semana${s.evita.length ? ` y no dependes de ${esc(s.evita.join(" ni "))}` : ""}.</p>
       <button class="btn sec" data-act="sem-cambiar" data-v="${s.d.id}">Cambiar</button></div>`).join("")}
 
-    <p class="note">No incluye: ${esc([...aparte, "sal y condimentos"].join(", "))}. Porciones caseras aproximadas, redondeadas a como se vende
-      (cuarto, medio kilo). Precios de mercados y supermercados de ejemplo.</p>
+    ${tarjetaBalance()}
+    ${tarjetaAderezo()}
+    ${tarjetaDespensa([...aparte, "sal", "pimienta y comino"], "hogar")}
+    <p class="note">Porciones caseras aproximadas, redondeadas a como se vende (cuarto, medio kilo). Precios de mercados y supermercados de ejemplo.</p>
     <button class="btn quiet" data-act="sem-limpiar">Empezar otra semana desde cero</button>
     <button class="btn sec" data-act="ir-ideas">💬 ¿Te sirvió? Danos tu opinión</button>`;
 }
@@ -1863,8 +1904,10 @@ function restoCostos() {
         <button class="btn sec" data-act="resto-aportar" ${R.aportadoDia === hoy() ? "disabled" : ""}>${R.aportadoDia === hoy() ? "Ya aportaste hoy ✓" : "Aportar mis precios (anónimo) · +10 puntos"}</button>
         <p class="small muted">Se publican sin tu nombre ni el de tu proveedor. Ayudan a que otros restaurantes negocien mejor.</p>`
       : `<p class="muted">Escribe en el pedido lo que te cobra tu proveedor y aquí verás si estás pagando de más.</p>`}</div>
-    <p class="note">No incluye: ${esc([...aparte, "sal, condimentos y gas"].join(", "))}. Porciones de menú aproximadas; la referencia mayorista es de ejemplo
-      (en la app real sale del boletín diario de precios mayoristas de Lima).</p>
+    ${tarjetaIngenieria()}
+    ${tarjetaFichas()}
+    ${tarjetaDespensa([...aparte, "sal", "condimentos", "gas"], "resto")}
+    <p class="note">Porciones de menú aproximadas; la referencia mayorista es de ejemplo (en la app real sale del boletín diario de precios mayoristas de Lima).</p>
     <button class="btn sec" data-act="ir-ideas">💬 ¿Te sirvió? Danos tu opinión</button>`;
 }
 
@@ -2062,7 +2105,7 @@ function dibujarLista(x, W) {
   x.fillStyle = "#0b6b3a"; x.fillRect(0, 0, W, 200);
   x.fillStyle = "#ffffff"; x.textAlign = "left"; x.font = `56px "Bungee", "Arial Black", sans-serif`; x.fillText("ACUÁNTO", P, 86);
   x.font = `700 34px ${F}`; x.fillText(`Mi lista de compras · hecha el ${fechaCorta(hoy())}`, P, 140);
-  x.font = `28px ${F}`; x.fillText(`${S.personas} ${S.personas === 1 ? "persona" : "personas"} · ${diasLlenos()} días · precios de ${nombreLugar(L)}`, P, 180);
+  x.font = `28px ${F}`; x.fillText(`${S.personas} ${S.personas === 1 ? "persona" : "personas"}${S.taper ? ` + ${S.taper} táper` : ""} · ${diasLlenos()} días · precios de ${nombreLugar(L)}`, P, 180);
   let y = 262;
   if (lineas.length) {
     x.fillStyle = "#17201a"; x.font = `700 34px ${F}`; x.fillText("Menú de la semana", P, y); y += 48;
@@ -2364,6 +2407,33 @@ async function accion(act, v) {
       S.dias = u.dias; S.cenas = u.cenas; state.deshacer = null; guardarSemana(); avisarSR("Listo, lo dejamos como estaba."); break;
     }
     case "sem-llenar": state.llenar = true; break;
+    case "sem-ensalada": {
+      const S = state.semana; let n = 0; S.dias = { ...S.dias };
+      for (const x of DIAS) {
+        const its = itemsTodo(x.id); if (!its.length) continue;
+        const v = its.map(plato).reduce((a, d) => a + VERDURAS.reduce((b, pid) => b + (d.ing[pid] || 0), 0), 0);
+        if (v < 0.1 && itemsDia(x.id).length < MAX_DIA && !itemsDia(x.id).includes("ensalada-criolla")) { S.dias[x.id] = ["ensalada-criolla", ...itemsDia(x.id)]; n++; }
+      }
+      evento("ensalada", { dias: n }); state.toast = n ? `Listo: ensalada criolla en ${n} ${n === 1 ? "día" : "días"}.` : "Ya tienes verduras todos los días."; guardarSemana(); break;
+    }
+    case "sem-taper": state.semana.taper = Math.max(0, Math.min(6, Number(v) || 0)); evento("taper", { n: state.semana.taper }); guardarSemana(); break;
+    case "sem-compras": state.semana.compras = v === "2" ? 2 : 1; evento("compras", { n: state.semana.compras }); guardarDoc("semana"); break;
+    case "sem-reuso": {
+      const [d, aId, quita] = v.split(":"), S = state.semana; if (!dia(d) || !plato(aId)) break;
+      let its = [...itemsDia(d)]; if (quita) its = its.filter((x) => x !== quita);
+      if (!its.includes(aId) && its.length < MAX_DIA) its.push(aId);
+      S.dias = { ...S.dias, [d]: its }; evento("reuso", { a: aId }); state.toast = `Listo: ${plato(aId).nombre.toLowerCase()} el ${dia(d).n}.`; guardarSemana(); break;
+    }
+    case "despensa": {
+      const [k, ...r] = v.split(":"), item = r.join(":"), obj = k === "resto" ? state.resto : state.semana;
+      obj.despensa = { ...(obj.despensa || {}) }; if (obj.despensa[item]) delete obj.despensa[item]; else obj.despensa[item] = true;
+      if (k === "resto") guardarResto(); else guardarDoc("semana"); break;
+    }
+    case "resto-ventas": {
+      const R = state.resto; R.ventas = { ...(R.ventas || {}) };
+      document.querySelectorAll("[data-venta]").forEach((el) => { const n = Math.max(0, Math.round(Number(el.value) || 0)); if (n) R.ventas[el.dataset.venta] = n; else delete R.ventas[el.dataset.venta]; });
+      evento("resto_ventas", { platos: Object.keys(R.ventas).length }); guardarResto(); state.toast = "Listo: usamos tus ventas."; break;
+    }
     case "sem-llenar-no": state.llenar = false; break;
     case "sem-tipo": state.semTipo = v; break;
     case "sem-poner": {
@@ -2387,13 +2457,19 @@ async function accion(act, v) {
       guardarSemana(); avisarSR(`${plato(v).nombre}: ${x} por persona`); break;
     }
     case "sem-economica": {
-      const ls = lugares(), S = state.semana, modo = v === "menu" ? "menu" : "segundo";
+      const ls = lugares(), S = state.semana, modo = v === "menu" ? "menu" : v === "inteligente" ? "inteligente" : "segundo";
       const baratos = (tipos) => PLATOS.filter((d) => tipos.includes(d.tipo)).map((d) => ({ d, c: ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L))).sort((a, b) => a.t - b.t)[0] }))
         .filter((x) => x.c.riesgo < 0.35).sort((a, b) => a.c.t - b.c.t).map((x) => x.d.id);
       const seg = baratos(["segundo"]), ent = baratos(["entrada", "sopa"]).slice(0, 6), beb = baratos(["refresco"]).filter((id) => id !== "te-anis").slice(0, 4);
       state.deshacer = { txt: "", dias: structuredClone(S.dias || {}), cenas: structuredClone(S.cenas || {}) };
       const vacAlm = DIAS.filter((x) => !itemsDia(x.id).length), vacCena = S.conCena ? DIAS.filter((x) => !itemsDe(x.id, "cena").length) : [];
       let k = 0; S.dias = { ...S.dias }; S.cenas = { ...(S.cenas || {}) };
+      if (modo === "inteligente") {
+        semanaInteligente(vacAlm, vacCena);
+        const n = vacAlm.length + vacCena.length, re = reusosActivos().length;
+        state.deshacer.txt = n ? `Armamos ${vacAlm.length} ${vacAlm.length === 1 ? "almuerzo" : "almuerzos"}${vacCena.length ? ` y ${vacCena.length} ${vacCena.length === 1 ? "cena" : "cenas"}` : ""}: lo más barato y variado, con pescado, menestras y hierro, evitando lo que subió este mes${re ? ` y aprovechando sobras en ${re} ${re === 1 ? "día" : "días"}` : ""}.` : "No había días vacíos.";
+        state.llenar = false; evento("semana_economica", { dias: n, modo }); guardarSemana(); avisarSR(state.deshacer.txt); break;
+      }
       for (const x of vacAlm) { const i = k++; S.dias[x.id] = modo === "menu" ? [ent[i % ent.length], seg[i % seg.length], beb[i % beb.length]] : [seg[i % seg.length]]; }
       for (const x of vacCena) { const i = k++; S.cenas[x.id] = [seg[(i + 3) % seg.length]]; }
       const n = vacAlm.length + vacCena.length;
@@ -2636,7 +2712,7 @@ const isoDia = (x) => x.getFullYear() + "-" + dos(x.getMonth() + 1) + "-" + dos(
 const lunesDe = (f) => { const x = new Date(f); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return isoDia(x); };
 function guardarHistorial(L, total) {
   const S = state.semana;
-  const snap = { clave: S.clave, fecha: hoy(), personas: S.personas, dias: structuredClone(S.dias || {}), conCena: !!S.conCena, cenas: structuredClone(S.conCena ? S.cenas || {} : {}), frutas: structuredClone(S.frutas || {}),
+  const snap = { clave: S.clave, fecha: hoy(), personas: S.personas, taper: S.taper || 0, dias: structuredClone(S.dias || {}), conCena: !!S.conCena, cenas: structuredClone(S.conCena ? S.cenas || {} : {}), frutas: structuredClone(S.frutas || {}),
     total: r2(total), lugar: nombreLugar(L), productos: porComprar().map((it) => [it.p.id, r2(it.compra)]) };
   state.historial = { items: [snap, ...(state.historial.items || []).filter((h) => h.clave !== S.clave)].slice(0, 52) };
   guardarDoc("historial");
@@ -2856,6 +2932,334 @@ async function cargarPopulares() {
     const v = await r.json();
     if (v && typeof v === "object" && !Array.isArray(v)) { state.popReal = v; LS.set("acuanto.pop", { ts: Date.now(), v }); }
   } catch (e) {}
+}
+
+/* ============================ v0.8: mirada de chef ============================ */
+/* Vida útil aproximada en días (refrigerado si corresponde). Sirve para ordenar la semana y dividir la compra. */
+const VIDA = {
+  jurel: 1, sangrecita: 1, higado: 1, pollo: 2, gallina: 2, carne: 3, arveja: 3, choclo: 4, papaya: 4, platano: 4, tomate: 5, pina: 5,
+  aji: 7, olluco: 7, zapallo: 7, queso: 7, mandarina: 7, maracuya: 7, limon: 10, naranja: 10, "papa-amarilla": 10,
+  "papa-blanca": 14, camote: 14, zanahoria: 14, manzana: 14, huevo: 21, cebolla: 21, ajo: 30,
+};
+const vida = (pid) => VIDA[pid] ?? 90;   // abarrotes y latas: no apuran
+/* Rendimiento: cuánto aprovechas de lo que compras (sin hueso, cáscara, espinas o semillas). */
+const REND = {
+  pollo: [0.68, "de carne"], gallina: [0.65, "de carne"], jurel: [0.55, "de pescado limpio"], "papa-amarilla": [0.85, "pelada"], "papa-blanca": [0.85, "pelada"],
+  camote: [0.85, "pelado"], olluco: [0.9, "limpio"], zapallo: [0.75, "sin cáscara"], cebolla: [0.9, "limpia"], zanahoria: [0.9, "pelada"], aji: [0.8, "sin venas"],
+  choclo: [0.5, "en grano"], limon: [0.45, "de jugo"], naranja: [0.45, "de jugo"], mandarina: [0.7, "de gajos"], papaya: [0.7, "de pulpa"], pina: [0.55, "de pulpa"],
+  maracuya: [0.45, "de pulpa"], platano: [0.65, "sin cáscara"], ajo: [0.85, "pelado"],
+};
+function rindeTxt(p, q) {
+  const r = REND[p.id]; if (!r || r[0] >= 0.9 || p.unidad !== "kilo") return "";
+  const x = q * r[0];
+  return `rinde ≈ ${x < 1 ? Math.max(50, Math.round(x * 20) * 50) + " g" : (Math.round(x * 4) / 4).toString().replace(".25", " ¼").replace(".5", " ½").replace(".75", " ¾") + " kg"} ${r[1]}`;
+}
+/* Minutos aproximados de preparación + cocción en casa. */
+const TIEMPO = {
+  "arroz-pollo": 75, lomo: 30, "pollo-saltado": 30, "aji-gallina": 60, ceviche: 25, sudado: 35, tallarines: 45, lentejas: 60, estofado: 60, locro: 45,
+  chaufa: 25, "seco-pollo": 75, "pescado-frito": 30, tortilla: 25, "tacu-tacu": 30, "pollo-plancha": 25, olluquito: 45, "caldo-gallina": 120,
+  "sopa-casa": 60, "sopa-criolla": 35, aguadito: 60, chilcano: 30, "sopa-quinua": 45, "sopa-verduras": 40, menestron: 90, huancaina: 30, causa: 45,
+  "papa-rellena": 60, chicha: 60, limonada: 5, "maracuya-ref": 10, "pina-ref": 30, mazamorra: 45, "arroz-leche": 45, "ensalada-frutas": 10,
+  "seco-res": 120, "arroz-tapado": 45, "bistec-pobre": 35, "tallarin-saltado": 30, "pollo-horno": 75, "picante-papa": 45, "arroz-cubana": 25,
+  escabeche: 50, "pechuga-quinua": 30, "pescado-plancha": 25, "quinua-pollo": 30, "tortilla-ensalada": 15, "dieta-pollo": 50, chupe: 50,
+  solterito: 20, ocopa: 30, "huevos-rusa": 25, "ensalada-criolla": 10, emoliente: 30, "quinua-manzana": 40, "avena-leche": 15, batido: 5, "jugo-papaya": 5, "te-anis": 5,
+  "mazamorra-zapallo": 40, sangrecita: 25, "higado-encebollado": 25,
+};
+/* Hierro (mg) por unidad del producto tal como se compra. Referencial. */
+const HIERRO = { sangrecita: 295, higado: 65, lenteja: 70, frejol: 60, quinua: 45, avena: 45, carne: 28, huevo: 18, gallina: 10, pollo: 7, jurel: 12, arveja: 15 };
+const hierroDe = (d) => Object.entries(d.ing).reduce((a, [pid, q]) => a + q * (HIERRO[pid] || 0), 0);
+const VERDURAS = ["tomate", "cebolla", "zapallo", "zanahoria", "arveja", "choclo", "olluco", "aji"];
+const ANIMAL = ["pollo", "gallina", "carne", "huevo", "jurel", "queso", "higado", "sangrecita", "leche"];
+
+/* ---------- precios del mes: qué conviene y qué evitar ---------- */
+function senalesMes() {
+  const M = ALZAS[0], sube = {}, baja = {};
+  for (const [n, v, pid] of M.datos) if (pid) { if (v >= 10) sube[pid] = v; else if (v <= -4) baja[pid] = v; }
+  return { M, sube, baja };
+}
+/* Lo que pesa cada producto en el costo del plato (0 a 1). */
+function pesoEnPlato(d, pid) {
+  const L = lugares()[0]; if (!L || !(pid in d.ing)) return 0;
+  const c = costoPlatoCon(d, (p) => precioLugar(p, L)).t; return c ? (d.ing[pid] * precioLugar(prod(pid), L)) / c : 0;
+}
+function marcaMes(d) {
+  const { sube, baja } = senalesMes();
+  const s = Object.keys(sube).map((pid) => ({ pid, v: sube[pid], w: pesoEnPlato(d, pid) })).filter((x) => x.w >= 0.15).sort((a, b) => b.w - a.w)[0];
+  if (s) return { tipo: "sube", txt: `${prod(s.pid).nombre} ${fmtPct(s.v)}` };
+  const b = Object.keys(baja).map((pid) => ({ pid, v: baja[pid], w: pesoEnPlato(d, pid) })).filter((x) => x.w >= 0.3).sort((a, b) => b.w - a.w)[0];
+  if (b) return { tipo: "baja", txt: `${prod(b.pid).nombre} ${fmtPct(b.v)}` };
+  return null;
+}
+function tarjetaMes() {
+  const { M } = senalesMes(), segs = PLATOS.filter((d) => d.tipo === "segundo");
+  const conv = segs.filter((d) => (marcaMes(d) || {}).tipo === "baja").sort((a, b) => puntaje(b) - puntaje(a)).slice(0, 4);
+  const evit = segs.filter((d) => (marcaMes(d) || {}).tipo === "sube").sort((a, b) => puntaje(b) - puntaje(a)).slice(0, 4);
+  if (!conv.length && !evit.length) return "";
+  return `<div class="card" style="gap:8px"><h2>📈 Con los precios de ${M.nombre}</h2>
+    ${conv.length ? `<p><b>Conviene:</b> ${conv.map((d) => `${esc(d.nombre)} <span class="pill down">▼ ${esc(marcaMes(d).txt)}</span>`).join(" · ")}</p>` : ""}
+    ${evit.length ? `<p><b>Mejor otra semana:</b> ${evit.map((d) => `${esc(d.nombre)} <span class="pill up">▲ ${esc(marcaMes(d).txt)}</span>`).join(" · ")}</p>` : ""}
+    <p class="small muted">Según el INEI. Un chef cocina con lo que está bueno y barato.</p></div>`;
+}
+
+/* ---------- aprovechamiento: lo que sobra hoy es parte del plato de mañana ---------- */
+const conArroz = (id) => { const d = plato(id); return d && d.tipo !== "postre" && (d.ing.arroz || 0) >= 0.1 && !["chaufa", "tacu-tacu", "arroz-cubana"].includes(id); };
+const REUSO = [
+  { id: "gallina", de: (id) => id === "caldo-gallina", a: ["aji-gallina"], ajuste: { gallina: 0.12, pollo: -0.2 },
+    txt: (de, a) => `Cocina una gallina entera el ${de}: el caldo para ese día y la carne deshilachada para el ají de gallina del ${a}.` },
+  { id: "espinas", de: (id) => ["sudado", "pescado-frito", "escabeche", "pescado-plancha", "ceviche"].includes(id), a: ["chilcano"], ajuste: { jurel: -0.1 },
+    txt: (de, a) => `Guarda las cabezas y espinas del jurel del ${de}: son la base del chilcano del ${a}.` },
+  { id: "caldo-pollo", de: (id) => id === "arroz-pollo", a: ["aguadito"], ajuste: { pollo: -0.04 },
+    txt: (de, a) => `El caldo del arroz con pollo del ${de} es la base del aguadito del ${a}.` },
+  { id: "frejoles", de: (id) => ["seco-pollo", "seco-res"].includes(id), a: ["tacu-tacu"], ajuste: {}, min: 60,
+    txt: (de, a) => `Cocina frejoles de más el ${de}: con ellos haces el tacu tacu del ${a} y te ahorras una hora de olla.` },
+  { id: "arroz", de: conArroz, a: ["chaufa", "tacu-tacu", "arroz-cubana"], ajuste: {}, min: 20,
+    txt: (de, a, n) => `Cocina arroz de más el ${de}: el ${n.toLowerCase()} del ${a} sale mejor con arroz del día anterior.` },
+  { id: "pollo-horno", de: (id) => id === "pollo-horno", a: ["causa", "chaufa"], ajuste: {}, min: 15,
+    txt: (de, a, n) => `Separa una pieza del pollo al horno del ${de} para la ${n.toLowerCase()} del ${a}.` },
+];
+/* Pares de la semana: plato "de" un día (o el almuerzo) y plato "a" al día siguiente (o en la cena del mismo día). */
+function reusosActivos() {
+  const S = state.semana, out = [], usados = new Set();
+  DIAS.forEach((x, i) => {
+    const sig = DIAS[i + 1], manana = sig ? itemsTodo(sig.id).map((id) => ({ id, dia: sig, cena: false })) : [];
+    const origenes = [...itemsDia(x.id).map((id) => ({ id, destinos: [...itemsCena(x.id).map((y) => ({ id: y, dia: x, cena: true })), ...manana] })),
+      ...itemsCena(x.id).map((id) => ({ id, destinos: manana }))];
+    for (const { id: deId, destinos } of origenes) {
+      for (const r of REUSO) {
+        if (!r.de(deId)) continue;
+        const dst = destinos.find((t) => r.a.includes(t.id) && t.id !== deId && !usados.has(t.dia.id + t.id + t.cena));
+        if (!dst) continue;
+        usados.add(dst.dia.id + dst.id + dst.cena);
+        out.push({ r, deId, deDia: x, aId: dst.id, aDia: dst.dia, cena: dst.cena });
+      }
+    }
+  });
+  return out;
+}
+function ajusteReusos() {
+  const S = state.semana, tot = {};
+  for (const u of reusosActivos()) for (const [pid, q] of Object.entries(u.r.ajuste)) tot[pid] = (tot[pid] || 0) + q * S.personas;
+  return tot;
+}
+function ahorroReuso(u) {
+  const L = mercLista() || lugares()[0]; if (!L) return 0;
+  return r2(-Object.entries(u.r.ajuste).reduce((a, [pid, q]) => a + q * precioLugar(prod(pid), L), 0) * state.semana.personas);
+}
+/* Sugerencias: hay un plato "de" pero al día siguiente no está su pareja. */
+function sugReusos() {
+  const act = reusosActivos(), out = [];
+  DIAS.forEach((x, i) => {
+    const sig = DIAS[i + 1]; if (!sig) return;
+    for (const deId of itemsDia(x.id)) for (const r of REUSO) {
+      if (!r.de(deId) || act.some((u) => u.r === r && u.deDia.id === x.id)) continue;
+      const aId = r.a.find((id) => !itemsTodo(sig.id).includes(id)); if (!aId) continue;
+      if (out.some((s) => s.aDia.id === sig.id)) continue;
+      const ahorro = r2(-Object.entries(r.ajuste).reduce((a, [pid, q]) => a + q * precioLugar(prod(pid), mercLista() || lugares()[0]), 0) * state.semana.personas);
+      if (ahorro < 1 && !r.min) continue;
+      out.push({ r, deId, deDia: x, aId, aDia: sig, ahorro, reemplaza: itemsDia(sig.id).find((id) => plato(id).tipo === "segundo") || null });
+    }
+  });
+  return out.sort((a, b) => b.ahorro - a.ahorro || (b.r.min || 0) - (a.r.min || 0)).slice(0, 2);
+}
+function tarjetaReuso() {
+  const act = reusosActivos(), sug = sugReusos();
+  if (!act.length && !sug.length) return "";
+  const nombre = (id) => plato(id).nombre;
+  const linea = (u) => u.r.txt(u.deDia.n, u.cena ? u.aDia.n + " en la cena" : u.aDia.n, nombre(u.aId));
+  const ahorro = act.reduce((a, u) => a + ahorroReuso(u), 0), min = act.reduce((a, u) => a + (u.r.min || 0), 0);
+  return `<div class="card" style="gap:10px"><h2>♻️ Aprovecha tu semana</h2>
+    ${act.length ? `${act.map((u) => `<p>✓ ${esc(linea(u))}</p>`).join("")}
+      <p class="status">${ahorro >= 0.5 ? `Ahorras ≈ ${soles(ahorro)}${min ? ` y ${min} minutos de cocina` : ""}. Ya está descontado de tu canasta.` : `Ahorras ≈ ${min} minutos de cocina y gas.`}</p>` : ""}
+    ${sug.map((s) => `<div class="srow"><span class="emo" aria-hidden="true">${emoD(plato(s.aId))}</span>
+      <span class="txt"><b>Idea para el ${esc(s.aDia.n)}:</b> ${esc(nombre(s.aId))}<br><span class="small muted">${esc(s.r.txt(s.deDia.n, s.aDia.n, nombre(s.aId)))}</span></span>
+      <span class="pr">${s.ahorro >= 1 ? "−" + soles(s.ahorro) : "⏱ " + s.r.min + " min"}</span>
+      <span class="btnw"><button class="chip" data-act="sem-reuso" data-v="${s.aDia.id}:${s.aId}:${s.reemplaza || ""}">${s.reemplaza ? `Cambiar ${esc(nombre(s.reemplaza).toLowerCase())} por ${esc(nombre(s.aId).toLowerCase())}` : `Poner ${esc(nombre(s.aId).toLowerCase())}`}</button></span></div>`).join("")}</div>`;
+}
+
+/* ---------- semana inteligente: barata, variada, balanceada y con aprovechamiento ---------- */
+function semanaInteligente(diasAlm, diasCena) {
+  const ls = lugares(), { sube, baja } = senalesMes();
+  const costo = (d) => ls.map((L) => costoPlatoCon(d, (p) => precioLugar(p, L)).t).sort((a, b) => a - b)[0];
+  const usados = new Set(DIAS.flatMap((x) => itemsTodo(x.id)));
+  const cuenta = (pids) => DIAS.reduce((a, x) => a + itemsTodo(x.id).filter((id) => pids.some((p) => (plato(id).ing[p] || 0) >= 0.05)).length, 0);
+  const metas = [
+    { pids: ["jurel"], n: 2 }, { pids: ["lenteja", "frejol"], n: 2 }, { pids: ["sangrecita", "higado"], n: 1 },
+  ].map((m) => ({ ...m, falta: Math.max(0, m.n - cuenta(m.pids)) }));
+  const cumple = (d, m) => m.pids.some((p) => (d.ing[p] || 0) >= 0.05);
+  const segs = PLATOS.filter((d) => d.tipo === "segundo").map((d) => ({ d, c: costo(d) }));
+  const S0 = state.semana, cerca = S0.compras === 2 ? ["lun", "mar", "jue", "vie"] : ["lun", "mar"];
+  const perecible = (d) => Object.keys(d.ing).some((pid) => vida(pid) <= 2 && d.ing[pid] >= 0.05);
+  const puntajeIA = (x, prev, dId) => {
+    let s = x.c;
+    if (perecible(x.d)) s *= cerca.includes(dId) ? 0.9 : 1.35;   // pescado y pollo cerca del día de compra
+    if (Object.keys(sube).some((pid) => pesoEnPlato(x.d, pid) >= 0.15)) s *= 1.25;
+    if (Object.keys(baja).some((pid) => pesoEnPlato(x.d, pid) >= 0.3)) s *= 0.92;
+    if (costoPlatoCon(x.d, (p) => precioLugar(p, ls[0])).riesgo >= 0.35) s *= 1.15;
+    if (prev.some((p) => REUSO.some((r) => r.de(p) && r.a.includes(x.d.id)))) s *= 0.8;
+    return s;
+  };
+  const S = state.semana, puestos = [];
+  /* Cada meta pendiente se asigna a un día: pescado y sangrecita/hígado lo más cerca posible de la compra; menestras, al final (duran). */
+  const dist = (dId) => { const i = DIAS.findIndex((d) => d.id === dId); return S0.compras === 2 ? (i < 3 ? i : i - 3) : i; };
+  const libres = [...diasAlm], tarea = {};
+  const tomar = (m, cercanos) => {
+    for (let n = 0; n < m.falta && libres.length; n++) {
+      libres.sort((a, b) => (cercanos ? dist(a.id) - dist(b.id) : dist(b.id) - dist(a.id)) || DIAS.indexOf(a) - DIAS.indexOf(b));
+      tarea[libres.shift().id] = m;
+    }
+  };
+  tomar(metas[0], true); tomar(metas[2], true); tomar(metas[1], false);
+  diasAlm.forEach((x, k) => {
+    const i = DIAS.indexOf(x), prev = i > 0 ? itemsTodo(DIAS[i - 1].id) : [];
+    let cand = segs.filter((y) => !usados.has(y.d.id));
+    const m = tarea[x.id];
+    if (m && m.falta > 0) { const c2 = cand.filter((y) => cumple(y.d, m)); if (c2.length) cand = c2; }
+    else { const c3 = cand.filter((y) => !metas.some((mm) => mm.pids.includes("jurel") && cumple(y.d, mm)) || !perecible(y.d) || dist(x.id) <= 1); if (c3.length) cand = c3; }
+    if (!cand.length) cand = segs;
+    const elegido = cand.sort((a, b) => puntajeIA(a, prev, x.id) - puntajeIA(b, prev, x.id))[0].d;
+    const verdura = VERDURAS.reduce((a, pid) => a + (elegido.ing[pid] || 0), 0);
+    S.dias[x.id] = verdura >= 0.1 ? [elegido.id] : ["ensalada-criolla", elegido.id];   // verduras todos los días
+    usados.add(elegido.id); puestos.push(elegido.id);
+    for (const m of metas) if (cumple(elegido, m)) m.falta = Math.max(0, m.falta - 1);
+  });
+  const ligeras = ["dieta-pollo", "sopa-verduras", "tortilla-ensalada", "sopa-quinua", "aguadito", "menestron", "huevos-rusa"].map(plato).filter(Boolean)
+    .map((d) => ({ d, c: costo(d) })).sort((a, b) => a.c - b.c);
+  diasCena.forEach((x, k) => { S.cenas[x.id] = [ligeras[k % ligeras.length].d.id]; });
+  return puestos;
+}
+
+/* ---------- frescura: en qué orden cocinar y cuándo comprar ---------- */
+const PRIMERA = ["lun", "mar", "mie"];   // compra del lunes cubre lunes a miércoles; la del jueves, de jueves a domingo
+function necesidadDia(dId) {
+  const S = state.semana, tot = {};
+  const add = (d, gente) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * gente; };
+  for (const id of itemsDia(dId)) { const d = plato(id); if (d) add(d, S.personas + (d.tipo === "segundo" ? S.taper || 0 : 0)); }
+  for (const id of itemsCena(dId)) { const d = plato(id); if (d) add(d, S.personas); }
+  return tot;
+}
+function dosCompras() {
+  const S = state.semana, c1 = {}, c2 = {};
+  for (const x of DIAS) for (const [pid, q] of Object.entries(necesidadDia(x.id))) {
+    if (vida(pid) > 4) continue;
+    const t = PRIMERA.includes(x.id) ? c1 : c2; t[pid] = (t[pid] || 0) + q;
+  }
+  const lista = (t) => PRODUCTOS.filter((p) => t[p.id] && !S.tengo[p.id]).map((p) => ({ p, compra: redondeo(p, t[p.id]) }));
+  return { lunes: lista(c1), jueves: lista(c2) };
+}
+function avisosFrescura() {
+  const out = [];
+  DIAS.forEach((x, i) => {
+    if (i < 2) return;
+    for (const id of itemsTodo(x.id)) {
+      const d = plato(id), corto = Object.keys(d.ing).filter((pid) => vida(pid) <= 2 && d.ing[pid] >= 0.05);
+      if (corto.length && (state.semana.compras !== 2 || i >= 5)) out.push({ d, x, p: prod(corto[0]) });
+    }
+  });
+  return out.slice(0, 3);
+}
+function tarjetaFrescura() {
+  const S = state.semana, dos = S.compras === 2, av = avisosFrescura();
+  const dc = dos ? dosCompras() : null;
+  const fila = (its) => its.length ? its.map((it) => `${emoP(it.p)} ${esc(it.p.nombre)} <span class="muted">${esc(cantCorta(it.p, it.compra))}</span>`).join(" · ") : `<span class="muted">Nada fresco</span>`;
+  return `<div class="card" style="gap:10px"><h2>🧊 ¿Cuántas veces vas al mercado?</h2>
+    <div class="seg" role="group" aria-label="Veces que compras">
+      <button type="button" data-act="sem-compras" data-v="1" aria-pressed="${!dos}">Una vez</button>
+      <button type="button" data-act="sem-compras" data-v="2" aria-pressed="${dos}">Dos: lunes y jueves</button></div>
+    ${dos ? `<p><b>Lunes:</b> todo lo de la lista, pero de lo fresco solo lo de lunes a miércoles: ${fila(dc.lunes)}</p>
+      <p><b>Jueves:</b> ${fila(dc.jueves)}</p>` : `<p class="small muted">Pollo, pescado y carne duran 1 a 3 días en la refri. Si compras una sola vez, cocínalos al inicio de la semana.</p>`}
+    ${av.map((a) => `<p class="note">⚠️ El ${esc(a.d.nombre.toLowerCase())} del ${esc(a.x.n)} lleva ${esc(a.p.nombre.toLowerCase())}: ${dos ? "cómpralo el mismo día o cámbialo al jueves o viernes" : "cómpralo ese día, pásalo a inicio de semana o elige dos compras"}.</p>`).join("")}
+    <p class="small muted">Con el calor de El Niño la comida se malogra más rápido: guarda pollo y pescado en la parte más fría de la refri y no dejes comida cocida fuera más de 2 horas.</p></div>`;
+}
+
+/* ---------- aderezo de la semana y tiempos ---------- */
+function tarjetaAderezo() {
+  const S = state.semana, gente = S.personas;
+  const conAd = DIAS.flatMap((x) => itemsTodo(x.id)).map(plato).filter((d) => d && ["segundo", "sopa"].includes(d.tipo) && d.ing.cebolla && d.ing.ajo);
+  if (conAd.length < 3) return "";
+  const g = (pid) => Math.round(conAd.reduce((a, d) => a + (d.ing[pid] || 0), 0) * gente * 1000);
+  return `<div class="card" style="gap:6px"><h2>👩‍🍳 Truco de chef: aderezo de la semana</h2>
+    <p>${conAd.length} de tus platos parten del mismo aderezo. El domingo sofríe de una vez <b>${g("cebolla")} g de cebolla, ${g("ajo")} g de ajo${g("aji") ? ` y ${g("aji")} g de ají amarillo` : ""}</b>, guárdalo en un frasco en la refri y úsalo hasta el jueves.</p>
+    <p class="small muted">Te ahorras unos ${conAd.length * 10} minutos de picar y freír en la semana.</p></div>`;
+}
+
+/* ---------- balance de la semana (Guías alimentarias para la población peruana, MINSA 2019) ---------- */
+function tarjetaBalance() {
+  const S = state.semana, dias = DIAS.filter((x) => itemsTodo(x.id).length);
+  if (!dias.length) return "";
+  const platos = dias.flatMap((x) => itemsTodo(x.id)).map(plato).filter(Boolean);
+  const tiene = (d, pids, min = 0.05) => pids.some((p) => (d.ing[p] || 0) >= min);
+  const diasVerdura = dias.filter((x) => itemsTodo(x.id).map(plato).reduce((a, d) => a + VERDURAS.reduce((b, p) => b + (d.ing[p] || 0), 0), 0) >= 0.1).length;
+  const diasAnimal = dias.filter((x) => itemsTodo(x.id).map(plato).some((d) => tiene(d, ANIMAL, 0.03))).length;
+  const menestras = platos.filter((d) => tiene(d, ["lenteja", "frejol"], 0.03)).length;
+  const pescado = platos.filter((d) => tiene(d, ["jurel"])).length;
+  const hierro = platos.filter((d) => hierroDe(d) >= 4).length;
+  const azucar = Math.round(platos.reduce((a, d) => a + (d.ing.azucar || 0), 0) * 1000 / Math.max(1, dias.length));
+  const fila = (ok, txt, ayuda) => `<div class="bal"><span class="ic" aria-hidden="true">${ok ? "✅" : "➕"}</span><span>${txt}${!ok && ayuda ? `<br><span class="small muted">${ayuda}</span>` : ""}</span></div>`;
+  return `<div class="card" style="gap:6px"><h2>🥗 Balance de tu semana</h2>
+    ${fila(diasVerdura >= dias.length, `Verduras ${diasVerdura} de ${dias.length} días`, "Las guías del MINSA piden verduras todos los días.")}
+    ${diasVerdura < dias.length ? `<button class="chip" data-act="sem-ensalada" style="justify-self:start;white-space:normal;text-align:left;max-width:100%">🥗 Agregar ensalada criolla a los ${dias.length - diasVerdura} días sin verduras</button>` : ""}
+    ${fila(diasAnimal >= dias.length, `Un alimento de origen animal ${diasAnimal} de ${dias.length} días`, "Huevo, pescado, pollo, carne o vísceras: uno al día.")}
+    ${fila(menestras >= 2, `Menestras: ${menestras} ${menestras === 1 ? "vez" : "veces"}`, "Te sugerimos al menos 2: lentejas, seco con frejoles o tacu tacu.")}
+    ${fila(pescado >= 2, `Pescado: ${pescado} ${pescado === 1 ? "vez" : "veces"}`, "Te sugerimos 2: el jurel es barato y nutritivo; prueba sudado o pescado a la plancha.")}
+    ${fila(hierro >= 2, `Platos ricos en hierro: ${hierro}`, "Contra la anemia: sangrecita, hígado o menestras. Acompáñalos con limón o naranja para absorber mejor el hierro.")}
+    ${azucar >= 25 ? `<p class="small">🍬 Tus bebidas y postres suman ≈ ${azucar} g de azúcar por persona al día. Las guías piden reducirla: prueba con menos azúcar o refrescos de fruta sin endulzar.</p>` : ""}
+    <p class="small muted">Referencial, según las Guías alimentarias para la población peruana. No reemplaza a un nutricionista.</p></div>`;
+}
+
+/* ---------- despensa: lo que no se cotiza pero hay que tener ---------- */
+function tarjetaDespensa(items, k) {
+  const marcados = (k === "resto" ? state.resto.despensa : state.semana.despensa) || {};
+  if (!items.length) return "";
+  const faltan = items.filter((x) => !marcados[x]).length;
+  return `<div class="card" style="gap:8px"><h2>🧂 Revisa tu despensa</h2>
+    <p class="small muted">Esto no lo sumamos al precio. Marca lo que ya tienes${faltan ? `: te faltan ${faltan}` : ": ¡tienes todo!"}.</p>
+    <div class="chips wrap" role="group" aria-label="Despensa">${items.map((x) => `<button class="chip" data-act="despensa" data-v="${k}:${esc(x)}" aria-pressed="${!!marcados[x]}">${marcados[x] ? "✓ " : ""}${esc(x)}</button>`).join("")}</div></div>`;
+}
+
+/* ---------- restaurante: fichas técnicas e ingeniería de menú ---------- */
+const gramos = (p, q) => (p.unidad === "kilo" ? `${Math.round(q * 1000)} g` : p.unidad === "litro" ? `${Math.round(q * 1000)} ml` : `${Math.round(q * 100) / 100} ${p.unidad === "lata" ? "lata" : (p.cuenta || ["unidad"])[0]}`);
+function tarjetaFichas() {
+  const ids = Object.keys(porcionesSemana()); if (!ids.length) return "";
+  return `<div class="card" style="gap:8px"><h2>📋 Fichas técnicas</h2>
+    <p class="small muted">Por porción, con tus precios o la referencia mayorista y 5% de merma. Precio sugerido a la carta con 30% y 35% de costo de insumos.</p>
+    ${ids.map(plato).sort((a, b) => TIPOS.findIndex((t) => t.id === a.tipo) - TIPOS.findIndex((t) => t.id === b.tipo)).map((d) => {
+      const c = costoPlatoCon(d, precioResto).t * (1 + MERMA), n = nutri(d);
+      return `<details class="ficha"><summary><span>${emoD(d)} ${esc(d.nombre)}</span><b>${soles(c)}</b></summary>
+        <table class="tv"><thead><tr><th>Insumo</th><th>Por porción</th><th>Costo</th></tr></thead><tbody>${Object.entries(d.ing).map(([pid, q]) => {
+          const p = prod(pid), r = REND[pid]; return `<tr><td>${esc(p.nombre)}${r && r[0] < 0.9 ? `<br><span class="small muted">aprovechas ${Math.round(r[0] * 100)}%</span>` : ""}</td><td>${gramos(p, q)}</td><td>${soles(q * precioResto(p))}</td></tr>`; }).join("")}</tbody></table>
+        <p class="small">${TIEMPO[d.id] ? `⏱ ${TIEMPO[d.id]} min · ` : ""}≈ ${n.kcal} kcal · ${n.prot} g proteína${d.aparte && d.aparte.length ? ` · Aparte: ${esc(d.aparte.join(", "))}` : ""}</p>
+        ${["segundo", "entrada", "sopa"].includes(d.tipo) ? `<p class="small">Precio sugerido a la carta: <b>${soles(Math.ceil(c / 0.3 * 2) / 2)}</b> con 30% · ${soles(Math.ceil(c / 0.35 * 2) / 2)} con 35%</p>` : ""}</details>`;
+    }).join("")}</div>`;
+}
+function tarjetaIngenieria() {
+  const R = state.resto, por = porcionesSemana();
+  const segs = Object.keys(por).map(plato).filter((d) => d.tipo === "segundo");
+  if (segs.length < 2) return `<div class="card"><h2>🧭 Ingeniería de menú</h2><p class="muted">Marca al menos 2 segundos distintos en la semana para comparar cuáles te convienen.</p></div>`;
+  const resto = (ds) => ds.reduce((a, d) => { const x = diaMenu(d); const prom = (ids) => (ids.length ? ids.reduce((s, i) => s + costoPlatoCon(plato(i), precioResto).t, 0) / ids.length : 0);
+    return a + prom(x.entrada) + (x.refresco ? costoPlatoCon(plato(x.refresco), precioResto).t : 0) + (x.postre ? costoPlatoCon(plato(x.postre), precioResto).t : 0); }, 0) / Math.max(1, ds.length);
+  const acomp = resto(diasConMenu());
+  const ventas = R.ventas || {}, conVentas = segs.some((d) => Number(ventas[d.id]) > 0);
+  const filas = segs.map((d) => {
+    const costo = (costoPlatoCon(d, precioResto).t + acomp) * (1 + MERMA), margen = R.precioMenu - costo;
+    const pop = conVentas ? Number(ventas[d.id]) || 0 : puntaje(d);
+    return { d, costo, margen, pop };
+  });
+  const mMar = filas.reduce((a, f) => a + f.margen, 0) / filas.length, mPop = filas.reduce((a, f) => a + f.pop, 0) / filas.length;
+  const grupo = (f) => (f.pop >= mPop ? (f.margen >= mMar ? "estrella" : "caballo") : f.margen >= mMar ? "puzzle" : "perro");
+  const G = {
+    estrella: ["⭐ Estrellas", "Se venden y dejan buen margen. Mantenlos y cuida que la porción no crezca."],
+    caballo: ["🐴 Caballos de batalla", "Se venden mucho pero dejan poco. Revisa el gramaje o cambia un insumo caro."],
+    puzzle: ["🧩 Por impulsar", "Dejan buen margen pero salen poco. Ponlos primeros en la pizarra o recomiéndalos."],
+    perro: ["🐶 Para revisar", "Salen poco y dejan poco. Cámbialos por otro plato."],
+  };
+  return `<div class="card" style="gap:10px"><h2>🧭 Ingeniería de menú</h2>
+    <p class="small muted">Cruza lo que se vende con lo que te deja cada segundo (precio del menú menos insumos, con la entrada, el refresco y el postre promedio).
+      ${conVentas ? "Popularidad: tus ventas de la semana." : "Popularidad: lo que eligen las familias en Acuánto. Escribe tus ventas para usar las tuyas."}</p>
+    ${Object.keys(G).map((k) => { const xs = filas.filter((f) => grupo(f) === k); return xs.length ? `<div class="ing ${k}"><b>${G[k][0]}</b><span class="small muted">${G[k][1]}</span>
+      ${xs.map((f) => `<div class="ingrow"><span>${emoD(f.d)} ${esc(f.d.nombre)}</span><span class="small">te deja ${soles(f.margen)}</span></div>`).join("")}</div>` : ""; }).join("")}
+    <details><summary>Escribir mis ventas de la semana</summary>
+      ${filas.map((f) => `<div class="ingrow"><label for="vt-${f.d.id}">${esc(f.d.nombre)}</label><input class="mini" id="vt-${f.d.id}" inputmode="numeric" data-venta="${f.d.id}" value="${Number(ventas[f.d.id]) || ""}" placeholder="0"></div>`).join("")}
+      <button class="btn sec" data-act="resto-ventas">Usar mis ventas</button></details></div>`;
 }
 
 async function cargarPreciosSuper() {
