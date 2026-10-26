@@ -80,6 +80,45 @@ create policy app_inserta_opiniones on public.opiniones for insert to anon with 
 revoke select, update, delete on public.eventos, public.aportes, public.opiniones, public.precios_super_hist from anon;
 grant insert on public.eventos, public.aportes, public.opiniones to anon;
 
+-- 5) Registro opcional (v0.7): nombre y celular con consentimiento explícito. Solo INSERT para la app; nadie lee desde afuera.
+--    Antes de abrir la app al público: inscribir este banco de datos ante la ANPD y publicar la política de privacidad (Ley 29733).
+create table if not exists public.personas (
+  id             bigint generated always as identity primary key,
+  ts             timestamptz not null default now(),
+  sesion         text not null check (char_length(sesion) between 8 and 64),
+  nombre         text not null check (char_length(nombre) between 2 and 60),
+  telefono       text not null check (telefono ~ '^9[0-9]{8}$'),
+  consentimiento boolean not null check (consentimiento),
+  version        text check (char_length(version) <= 20)
+);
+create index if not exists personas_sesion on public.personas (sesion);
+alter table public.personas enable row level security;
+drop policy if exists app_inserta_personas on public.personas;
+create policy app_inserta_personas on public.personas for insert to anon with check (ts > now() - interval '5 minutes' and consentimiento);
+revoke select, update, delete on public.personas from anon;
+grant insert on public.personas to anon;
+
+-- 6) Platos más elegidos (solo totales, sin datos personales): elegir un plato pesa 1; descargar la lista pesa 2 por plato.
+create or replace function public.acuanto_platos_top(dias int default 60)
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  with e as (
+    select evento, datos from eventos
+    where ts > now() - make_interval(days => least(greatest(dias, 1), 365)) and evento in ('plato_dia', 'descargar_lista')),
+  p as (
+    select datos->>'plato' as plato, 1 as peso from e where evento = 'plato_dia' and datos ? 'plato'
+    union all
+    select jsonb_array_elements_text(datos->'platos'), 2 from e where evento = 'descargar_lista' and jsonb_typeof(datos->'platos') = 'array')
+  select coalesce(jsonb_object_agg(plato, n), '{}'::jsonb) from (
+    select plato, sum(peso) as n from p where plato ~ '^[a-z0-9-]{2,40}$' group by plato order by n desc limit 200) t;
+$$;
+revoke all on function public.acuanto_platos_top(int) from public;
+grant execute on function public.acuanto_platos_top(int) to anon, authenticated;
+
 -- Resumen agregado (sin filas sueltas ni textos) para el tablero
 create or replace function public.acuanto_resumen(dias int default 30)
 returns jsonb

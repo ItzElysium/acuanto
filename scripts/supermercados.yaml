@@ -51,6 +51,7 @@ canasta:
   frejol:        { buscar: "frejol",         unidad: kilo,   categoria: [menestra, abarrote], incluir: "^frejol (canario|panamito|bayo)?", excluir: "lata|cocido|harina|sopa", rango: [4, 25] }
   fideos:        { buscar: "tallarin", unidad: kilo,   categoria: [fideo, pasta, abarrote], incluir: "^(fideos?|tallarin)", excluir: "instantaneo|ramen|sopa", rango: [3, 20] }
   quinua:        { buscar: "quinua",         unidad: kilo,   categoria: [cereal, menestra, abarrote, grano], incluir: "^quinua", excluir: "hojuela|harina|galleta|barra|pop|bebida|avena|mezcla|instantane", rango: [6, 45] }
+  avena:         { buscar: "avena",          unidad: kilo,   categoria: [cereal, abarrote, desayuno, avena], incluir: "^avena", excluir: "galleta|barra|bebida|liquida|con leche|granola|sachet|polvo|chocolate", rango: [4, 30] }
   maiz-morado:   { buscar: "morado",    unidad: kilo,   categoria: [abarrote, cereal, grano, fruta, verdura], incluir: "^maiz morado", excluir: "chicha|refresco|mazamorra|bebida", rango: [3, 25] }
   azucar:        { buscar: "azucar",   unidad: kilo,   categoria: [azucar, endulzante, abarrote], incluir: "^azucar rubia", excluir: "impalpable|light|stevia", rango: [2.5, 10] }
   aceite:        { buscar: "aceite", unidad: litro,  categoria: [aceite, abarrote], incluir: "^aceite (vegetal|de soya|de girasol)", excluir: "oliva|sesamo|coco|spray|motor", rango: [5, 25] }
