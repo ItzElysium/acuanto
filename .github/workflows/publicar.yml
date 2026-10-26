@@ -1,4 +1,4 @@
-# Publica Acuánto en GitHub Pages y, cada mañana, actualiza los precios online de supermercados.
+# Publica Acuánto en GitHub Pages; cada mañana actualiza los precios online de supermercados y cada lunes los mercados cercanos (OpenStreetMap).
 # Requisito (una sola vez): Settings → Pages → Build and deployment → Source: "GitHub Actions".
 name: Publicar Acuánto
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' || hashFiles('lugares.json') == ''
         with:
           python-version: "3.12"
 
@@ -40,17 +40,27 @@ jobs:
           pip install pyyaml
           python scripts/supermercados.py --config scripts/supermercados.yaml --salida precios_super.json --pausa 2.5
 
-      - name: Guardar precios del día
-        if: github.event_name != 'push'
+      # Mercados y supermercados de Lima y Callao desde OpenStreetMap: los lunes (el extracto de BBBike es semanal),
+      # al correrlo a mano, o si falta el archivo. Una sola descarga de ~30 MB.
+      - name: Mercados y supermercados cercanos (OpenStreetMap)
+        if: github.event_name != 'push' || hashFiles('lugares.json') == ''
         continue-on-error: true
         run: |
-          if [ -f precios_super.json ]; then
-            git config user.name "acuanto-bot"
-            git config user.email "acuanto-bot@users.noreply.github.com"
-            git add precios_super.json
-            git diff --cached --quiet || git commit -m "Precios de supermercados del día"
-            git push
+          if [ ! -f lugares.json ] || [ "$(date -u +%u)" = "1" ] || [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            pip install osmium shapely
+            python scripts/lugares.py --salida lugares.json
+            rm -f Lima.osm.pbf
           fi
+
+      - name: Guardar precios y lugares
+        if: github.event_name != 'push' || hashFiles('lugares.json') == ''
+        continue-on-error: true
+        run: |
+          git config user.name "acuanto-bot"
+          git config user.email "acuanto-bot@users.noreply.github.com"
+          for f in precios_super.json lugares.json; do [ -f "$f" ] && git add "$f"; done
+          git diff --cached --quiet || git commit -m "Precios del día y lugares"
+          git push
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
