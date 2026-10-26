@@ -816,7 +816,7 @@ const state = {
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
   historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.7.1";
+const VERSION = "Prueba 0.7.2";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
@@ -1544,7 +1544,7 @@ function semDias() {
           ${its.length < MAX_DIA ? `<button type="button" class="dadd" data-act="sem-elegir" data-v="${x.id}:${comida}">${its.length ? "+ Agregar plato, bebida o postre" : comida === "cena" ? "+ Elegir cena" : "+ Elegir plato"}</button>` : ""}</div>`; };
       return `<div class="dia${todo.length ? " on" : ""}"><div class="dhead"><b class="dn">${x.n}</b>
           ${todo.length ? `<span class="dacc"><button type="button" class="link" data-act="sem-repetir" data-v="${x.id}">⟳ Repetir</button>
-            <button type="button" class="link" data-act="sem-limpiar" data-v="${x.id}" aria-label="Limpiar el ${x.n}">🗑 Limpiar</button></span>` : ""}</div>
+            <button type="button" class="link" data-act="sem-limpiar-dia" data-v="${x.id}" aria-label="Limpiar el ${x.n}">🗑 Limpiar</button></span>` : ""}</div>
         ${S.conCena ? `<span class="dlab">Almuerzo</span>${fila("almuerzo")}<span class="dlab">Cena</span>${fila("cena")}` : fila("almuerzo")}
         ${state.repetir === x.id ? `<div class="dconf" role="group" aria-label="Repetir el ${x.n}"><b>¿A qué días copias el ${x.n}?</b>
           <div class="chips wrap"><button class="chip" data-act="sem-repetir-ok" data-v="${x.id}:vacios">Solo a los días vacíos</button>
@@ -2346,8 +2346,8 @@ async function accion(act, v) {
       state.deshacer.txt = n ? `Copiamos el ${dia(d).n} a ${n} ${n === 1 ? "día" : "días"}.` : "No había días vacíos para copiar.";
       state.repetir = null; evento("repetir_dia", { modo, dias: n }); guardarSemana(); avisarSR(state.deshacer.txt); break;
     }
-    case "sem-limpiar": {
-      const S = state.semana;
+    case "sem-limpiar-dia": {
+      const S = state.semana; if (!dia(v)) break;
       state.deshacer = { txt: `Limpiamos el ${dia(v).n}.`, dias: structuredClone(S.dias || {}), cenas: structuredClone(S.cenas || {}) };
       S.dias = { ...S.dias, [v]: [] }; S.cenas = { ...(S.cenas || {}), [v]: [] }; state.repetir = null;
       evento("limpiar_dia", {}); guardarSemana(); avisarSR(state.deshacer.txt); break;
@@ -2444,7 +2444,7 @@ async function accion(act, v) {
       state.toast = `Listo: cambiamos ${d.nombre.toLowerCase()} por ${alt.nombre.toLowerCase()}.`;
       evento("cambiar_plato", { de: d.id, a: alt.id }); guardarSemana(); break;
     }
-    case "sem-limpiar": Object.assign(state.semana, { dias: {}, frutas: {}, tengo: {}, compre: {}, modo: "planear" }); guardarSemana(); state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "sem-limpiar": Object.assign(state.semana, { dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear" }); state.deshacer = null; guardarSemana(); state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
     case "sem-reportar": {
       const p = prod(v), m = mercLista();
       if (!m || m.tipo === "super") break;
