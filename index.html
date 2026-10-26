@@ -235,6 +235,7 @@
   .opina span { font-size: 1.05rem; }
   .prem { display: inline-block; justify-self: start; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.04em; border-radius: 6px; padding: 4px 8px; }
   a.btn { text-decoration: none; }
+  .choice .prem { color: var(--bg); font-size: 0.72rem; }
   textarea.big { width: 100%; min-height: 120px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); padding: 10px 14px; font: inherit; color: inherit; }
 
   /* Plan Restaurante */
@@ -515,6 +516,34 @@ function guardarDoc(k) {
   }, 700);
 }
 const guardarSemana = () => guardarDoc("semana"), guardarResto = () => guardarDoc("resto");
+
+/* ---------------------------- datos de uso (solo versión web, Supabase) ----------------------------
+   Anónimo: un identificador al azar por celular, sin nombre ni teléfono. La clave es la pública de Supabase:
+   solo permite INSERTAR (RLS); nadie puede leer las filas desde la app. Dentro de Claude no se usa. */
+const SUPA = { url: "https://oospzzziyyvrsnesdbhz.supabase.co", key: "sb_publishable_RwcfIrlGFa-ZQb4v6oe29A_1gwiPv4_" };
+const supaOn = () => !window.claude && !!(SUPA.url && SUPA.key);
+function sesionId() {
+  let s = LS.get("acuanto.sesion");
+  if (!s) { s = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12)); LS.set("acuanto.sesion", s); }
+  return s;
+}
+function supaPost(tabla, filas, keepalive) {
+  if (!supaOn() || !filas.length) return Promise.resolve(false);
+  const h = { apikey: SUPA.key, "Content-Type": "application/json", Prefer: "return=minimal" };
+  if (SUPA.key.startsWith("eyJ")) h.Authorization = "Bearer " + SUPA.key;   // clave anon antigua (JWT)
+  return fetch(SUPA.url.replace(/\/$/, "") + "/rest/v1/" + tabla, { method: "POST", keepalive: !!keepalive, headers: h, body: JSON.stringify(filas) })
+    .then((r) => r.ok).catch(() => false);
+}
+let colaEventos = [], tCola = null;
+function evento(nombre, datos) {
+  if (!supaOn()) return;
+  colaEventos.push({ sesion: sesionId(), version: VERSION, rol: (state.perfil && state.perfil.rol) || null, evento: nombre, datos: datos || {} });
+  clearTimeout(tCola);
+  if (colaEventos.length >= 20) vaciarEventos(); else tCola = setTimeout(vaciarEventos, 4000);
+}
+function vaciarEventos(keepalive) { const f = colaEventos.splice(0, 50); if (f.length) supaPost("eventos", f, keepalive); }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") vaciarEventos(true); });
+window.addEventListener("error", (e) => evento("error", { msg: String(e.message || "").slice(0, 120), v: state.view }));
 let guardando = Promise.resolve();
 function guardar() {
   LS.set("acuanto.perfil", state.perfil); LS.set("acuanto.puntos", state.puntos);
@@ -750,6 +779,9 @@ async function enviarReportes(items, fuente) {
   if (state.db) {
     for (const d of docs) { try { await state.db.collection("reportes").add(d); } catch (e) { state.reportes.push(d); } }
   } else { state.reportes.push(...docs); }
+  supaPost("aportes", docs.map((d) => ({ sesion: sesionId(), mercado: d.mercado, producto: d.producto, libre: d.libre,
+    precio: d.precio, unidad: d.unidad ? String(d.unidad).slice(0, 20) : null, fuente: d.fuente })));
+  evento("aporte", { fuente, n: docs.length, mercado: m.id });
   return docs;
 }
 
@@ -774,7 +806,8 @@ function vBienvenida() {
       <span class="ic" aria-hidden="true">🍲</span><span><b>Tengo un restaurante o menú</b><span>Costo de mi menú y pedido a mis proveedores</span>
         <span class="prem" style="margin-top:6px">PREMIUM · GRATIS EN LA PRUEBA</span></span>
     </button>
-    <p class="note">Versión de prueba con precios de ejemplo. Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>`;
+    <p class="note">Versión de prueba con precios de ejemplo. Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>
+    ${supaOn() ? `<p class="small muted">Para mejorar la app registramos de forma anónima qué pantallas, platos y productos usas. Sin tu nombre ni tu número.</p>` : ""}`;
   if (state.paso === 2) return `
     <button class="back" data-act="paso" data-v="1">‹ Atrás</button>
     <h1>¿Cómo lees mejor?</h1>
@@ -1422,6 +1455,7 @@ function ir(view) {
   if (["aportar", "puesto", "inicio", "puntos", "semana"].includes(view)) { state.borrador = null; state.volverA = null; }
   if (view === "semana") { state.semPaso = nPlatos() ? "lista" : "personas"; state.restoPaso = null; state.menuFoto = null; state.copia = null; }
   state.view = view; render(); window.scrollTo(0, 0); enfocarTitulo();
+  evento("vista", { v: view });
 }
 let tToast = null;
 function toast(t) {
@@ -1529,6 +1563,7 @@ async function leerMenu(e, modo) {
       if (nPl) S.dias = dias;
       guardarSemana();
     }
+    evento("foto_menu", { modo, platos: nPl, dias: nDias, sin_receta: [...desconocidos].slice(0, 5) });
     state.menuFoto = nPl ? { estado: "lista", resumen: `Leímos ${nPl} ${nPl === 1 ? "plato" : "platos"}${nDias > 1 ? ` de ${nDias} días` : ""} y ya los pusimos en tu ${modo === "resto" ? "menú" : "semana"}. Revisa y corrige lo que haga falta.`, desconocidos: [...desconocidos].slice(0, 8) }
       : { estado: "error", error: desconocidos.size ? `Leímos ${[...desconocidos].slice(0, 5).join(", ")}, pero aún no tenemos esas recetas.` : "No pudimos leer platos en la foto. Prueba con más luz y más cerca." };
   } catch (err) {
@@ -1572,10 +1607,10 @@ async function accion(act, v) {
       else state.aviso = `Puedes seguir hasta ${limiteMercados()} mercados. Quita uno para cambiarlo, o canjea puntos para ver más.`;
       guardar(); break;
     }
-    case "empezar": P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar(); return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
+    case "empezar": evento("empezar", { rol: P.rol, mercados: P.mercados, distrito: P.distrito }); P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar(); return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
     case "activo": state.mercadoActivo = v; break;
     case "editar-mercados": state.paso = 3; state.view = "bienvenida"; break;
-    case "producto": state.productoActivo = v; state.view = "producto"; window.scrollTo(0, 0); break;
+    case "producto": evento("ver_producto", { producto: v, mercado: state.mercadoActivo }); state.productoActivo = v; state.view = "producto"; window.scrollTo(0, 0); break;
     case "confirmar": {
       const p = prod(v), m = merc(state.mercadoActivo);
       await enviarReportes([{ producto: p.id, precio: precioHoy(p, m).precio, unidad: p.unidad }], "confirmacion");
@@ -1635,7 +1670,14 @@ async function accion(act, v) {
       if (!P.mercados.includes(r.mercado)) P.mercados = [r.mercado, ...P.mercados].slice(0, limiteMercados());
       state.mercadoActivo = r.mercado; state.borrador = null; guardar(); break;
     }
-    case "sem-paso": state.semPaso = v; state.menuFoto = null; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "sem-paso": {
+      if (v === "platos" && state.semPaso === "personas") evento("personas", { n: state.semana.personas });
+      if (v === "lista") { const its = porComprar(), b = its.length ? totalesSemana(its)[0] : null;
+        evento("ver_canasta", { total: b ? b.t : 0, lugar: b ? nombreLugar(b.m) : null, tipo_lugar: b ? (b.m.tipo === "super" ? "super" : "mercado") : null,
+          dias: diasLlenos(), personas: state.semana.personas, productos: its.length, frutas: Object.keys(state.semana.frutas || {}).length }); }
+      if (v === "frutas") evento("abrir_frutas", {});
+      state.semPaso = v; state.menuFoto = null; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    }
     case "sem-per": case "sem-per-fijo": {
       const S = state.semana, paso = S.personas >= 20 ? 5 : 1;
       S.personas = act === "sem-per-fijo" ? +v : Math.min(150, Math.max(1, S.personas + (+v) * paso));
@@ -1645,7 +1687,7 @@ async function accion(act, v) {
     case "sem-tipo": state.semTipo = v; break;
     case "sem-poner": {
       const [d, id] = v.split(":"), S = state.semana, its = [...itemsDia(d)], i = its.indexOf(id);
-      if (i >= 0) its.splice(i, 1); else if (its.length < 3) its.push(id);
+      if (i >= 0) its.splice(i, 1); else if (its.length < 3) { its.push(id); evento("plato_dia", { dia: d, plato: id, tipo: plato(id).tipo, personas: S.personas }); }
       S.dias = { ...S.dias, [d]: its }; guardarSemana();
       state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo();
       avisarSR(`${dia(d).n}: ${its.map((x) => plato(x).nombre).join(", ") || "sin plato"}`); return;
@@ -1657,6 +1699,7 @@ async function accion(act, v) {
     case "fruta-mas": case "fruta-menos": {
       const S = state.semana, x = Math.min(21, Math.max(0, (S.frutas[v] || 0) + (act === "fruta-mas" ? 1 : -1)));
       S.frutas = { ...S.frutas }; if (x) S.frutas[v] = x; else delete S.frutas[v];
+      if (act === "fruta-mas") evento("fruta", { fruta: v, n: x });
       guardarSemana(); avisarSR(`${plato(v).nombre}: ${x} por persona`); break;
     }
     case "sem-economica": {
@@ -1666,22 +1709,23 @@ async function accion(act, v) {
       const vacios = DIAS.filter((x) => !itemsDia(x.id).length); let k = 0;
       S.dias = { ...S.dias }; for (const x of vacios) S.dias[x.id] = [baratos[k++ % baratos.length]];
       state.aviso = `Llenamos ${vacios.length} ${vacios.length === 1 ? "día" : "días"} con platos baratos que no dependen de lo que sube por El Niño. Cámbialos si quieres.`;
+      evento("semana_economica", { dias: vacios.length });
       guardarSemana(); avisarSR(state.aviso); break;
     }
-    case "sem-ver-lista": state.semVerLista = !state.semVerLista; break;
+    case "sem-ver-lista": state.semVerLista = !state.semVerLista; if (state.semVerLista) evento("ver_lista", {}); break;
     case "sem-ver-lugares": state.semVerLugares = !state.semVerLugares; break;
     case "sem-tengo": case "sem-compre": {
       const k = act === "sem-tengo" ? "tengo" : "compre", S = state.semana;
       if (S[k][v]) delete S[k][v]; else S[k][v] = true;
       guardarSemana(); break;
     }
-    case "sem-modo": state.semana.modo = v; guardarSemana(); break;
-    case "sem-merc": state.semana.mercado = v; guardarSemana(); break;
+    case "sem-modo": state.semana.modo = v; guardarSemana(); if (v === "comprar") evento("modo_mercado", {}); break;
+    case "sem-merc": state.semana.mercado = v; guardarSemana(); evento("lugar_lista", { lugar: v }); break;
     case "sem-cambiar": {
       const S = state.semana, d = plato(v), alt = plato(d.cambio);
       S.dias = Object.fromEntries(Object.entries(S.dias).map(([k, its]) => [k, [...new Set(its.map((x) => (x === d.id ? alt.id : x)))]]));
       state.toast = `Listo: cambiamos ${d.nombre.toLowerCase()} por ${alt.nombre.toLowerCase()}.`;
-      guardarSemana(); break;
+      evento("cambiar_plato", { de: d.id, a: alt.id }); guardarSemana(); break;
     }
     case "sem-limpiar": Object.assign(state.semana, { dias: {}, frutas: {}, tengo: {}, compre: {}, modo: "planear" }); guardarSemana(); state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
     case "sem-reportar": {
@@ -1702,7 +1746,10 @@ async function accion(act, v) {
     case "rubro-inicio": state.rubroInicio = v; break;
 
     /* Plan Restaurante */
-    case "resto-paso": leerPrecioMenu(); leerTPrecios(); state.restoPaso = v; state.menuFoto = null; state.copia = null; guardarResto(); render(); window.scrollTo(0, 0); enfocarTitulo(); return;
+    case "resto-paso": leerPrecioMenu(); leerTPrecios();
+      if (v === "costos") { const ds = diasConMenu(); if (ds.length) { const prom = ds.reduce((a, d) => a + costoDia(d).t, 0) / ds.length;
+        evento("ver_costos", { food_cost: Math.round((prom / state.resto.precioMenu) * 1000) / 1000, menus_dia: state.resto.menusDia, precio_menu: state.resto.precioMenu, dias: ds.length }); } }
+      state.restoPaso = v; state.menuFoto = null; state.copia = null; guardarResto(); render(); window.scrollTo(0, 0); enfocarTitulo(); return;
     case "resto-menus": { const R = state.resto; leerPrecioMenu(); R.menusDia = Math.min(500, Math.max(5, R.menusDia + (+v) * 5)); guardarResto(); avisarSR(`${R.menusDia} menús al día`); break; }
     case "resto-dia-on": {
       const R = state.resto; leerPrecioMenu();
@@ -1730,7 +1777,7 @@ async function accion(act, v) {
     }
     case "resto-copiar": {
       leerTPrecios(); const pv = PROVEEDORES.find((x) => x.id === v), its = compraResto().filter((it) => pv.rubros.includes(it.p.rubro));
-      await copiar(v, textoPedido(pv, its)); break;
+      await copiar(v, textoPedido(pv, its)); evento("pedido_copiado", { proveedor: v, productos: its.length }); break;
     }
     case "resto-recalcular": leerTPrecios(); guardarResto(); state.toast = "Listo, recalculamos con tus precios."; break;
     case "resto-aportar": {
@@ -1738,6 +1785,8 @@ async function accion(act, v) {
       if (!its.length || R.aportadoDia === hoy()) break;
       const docs = its.map((it) => ({ dia: hoy(), ts: Date.now(), mercado: "proveedor-lima", producto: it.p.id, libre: null, precio: Number(R.precios[it.p.id]), unidad: it.p.unidad, fuente: "proveedor", autor: null }));
       if (state.db) { for (const d of docs) { try { await state.db.collection("reportes").add(d); } catch (e) {} } }
+      supaPost("aportes", docs.map((d) => ({ sesion: sesionId(), mercado: d.mercado, producto: d.producto, precio: d.precio, unidad: d.unidad, fuente: "proveedor" })));
+      evento("aporte", { fuente: "proveedor", n: docs.length });
       R.aportadoDia = hoy(); guardarResto();
       const n = sumarPuntos(10, `Precios de proveedor (${its.length})`, false);
       state.toast = `Gracias. Aportaste ${its.length} precios (+${n} puntos en revisión).`; break;
@@ -1763,7 +1812,12 @@ async function accion(act, v) {
             frecuencia: I.frecuencia, pago: I.pago, texto: I.texto.trim().slice(0, 1000) });
           I.enviado = "db"; if (state.perfil.acepto) sumarPuntos(10, "Tu opinión", true);
         } catch (e) { I.enviado = "share"; }
+      } else if (supaOn()) {
+        const ok = await supaPost("opiniones", [{ sesion: sesionId(), version: VERSION, rol: state.perfil.rol || null, nota: I.nota, util: I.util,
+          frecuencia: I.frecuencia, pago: I.pago, texto: I.texto.trim().slice(0, 1000) }]);
+        I.enviado = ok ? "db" : "share"; if (ok && state.perfil.acepto) sumarPuntos(10, "Tu opinión", true);
       } else I.enviado = "share";
+      evento("opinion", { nota: I.nota, guardada: I.enviado === "db" });
       render(); window.scrollTo(0, 0); enfocarTitulo(); return;
     }
     case "editar-puesto": state.borrador = { registro: { mercado: P.puesto.mercado, numero: P.puesto.numero, rubros: [...P.puesto.rubros] } }; break;
@@ -1788,6 +1842,7 @@ async function accion(act, v) {
 }
 function alertaInline(t) { const p = document.createElement("p"); p.className = "note"; p.setAttribute("role", "alert"); p.textContent = t; $("#main").append(p); p.scrollIntoView({ block: "center" }); }
 
+document.addEventListener("click", (e) => { const a = e.target.closest('a[href^="https://wa.me"]'); if (a) evento("whatsapp", { de: state.view, paso: state.restoPaso || state.semPaso || null }); }, true);
 document.addEventListener("click", async (e) => {
   const go = e.target.closest("[data-go]"); if (go) { ir(go.dataset.go); return; }
   const a = e.target.closest("[data-act]"); if (!a) return;
@@ -1837,6 +1892,8 @@ async function cargarPreciosSuper() {
   if (sample) { try { const lim = await sample.limits(); state.puedeFoto = !!lim.images; } catch (e) { state.puedeFoto = false; } }
   await cargar();
   await cargarPreciosSuper();
+  evento("abrir", { distrito: state.perfil.distrito || null, mercados: (state.perfil.mercados || []).length, nuevo: !state.perfil.acepto,
+    precios_super: !!state.superReal, instalada: matchMedia("(display-mode: standalone)").matches });
   if (state.perfil.acepto && state.perfil.mercados.length) {
     state.mercadoActivo = state.perfil.rol === "puesto" && state.perfil.puesto ? state.perfil.puesto.mercado : state.perfil.mercados[0];
     state.view = state.perfil.rol === "puesto" ? "puesto" : state.perfil.rol === "resto" ? "semana" : "inicio";
