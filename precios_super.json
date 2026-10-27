@@ -1,6 +1,6 @@
 {
- "fecha": "2026-10-26",
- "generado": "2026-10-26T12:34-05:00",
+ "fecha": "2026-10-27",
+ "generado": "2026-10-27T11:48-05:00",
  "fuente": "Catálogo online público de cada supermercado (VTEX)",
  "cadenas": {
   "plazavea": {
@@ -25,12 +25,12 @@
      "candidatos": 3
     },
     "cebolla": {
-     "precio": 3.37,
+     "precio": 3.99,
      "unidad": "kilo",
-     "mediana": 3.37,
+     "mediana": 3.99,
      "item": "Cebolla Roja x kg",
      "url": "https://www.plazavea.com.pe/cebolla-roja-x-kg-1/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 1
     },
     "papa-amarilla": {
@@ -70,9 +70,9 @@
      "candidatos": 1
     },
     "camote": {
-     "precio": 2.58,
+     "precio": 2.98,
      "unidad": "kilo",
-     "mediana": 3.19,
+     "mediana": 3.38,
      "item": "Camote Amarillo Procesado x kg",
      "url": "https://www.plazavea.com.pe/camote-amarillo-procesado-x-k-g-1/p",
      "oferta": true,
@@ -106,30 +106,30 @@
      "candidatos": 1
     },
     "platano": {
-     "precio": 3.6,
+     "precio": 3.89,
      "unidad": "kilo",
-     "mediana": 3.6,
+     "mediana": 3.89,
      "item": "Plátano de Seda x kg",
      "url": "https://www.plazavea.com.pe/platano-de-seda-x-k-g-1/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 1
     },
     "manzana": {
-     "precio": 5.99,
+     "precio": 5.86,
      "unidad": "kilo",
-     "mediana": 7.96,
+     "mediana": 8.68,
      "item": "Manzana Delicia x kg",
      "url": "https://www.plazavea.com.pe/manzana-delicia-xk-g-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 5
     },
     "mandarina": {
-     "precio": 3.99,
+     "precio": 2.94,
      "unidad": "kilo",
-     "mediana": 3.99,
+     "mediana": 2.94,
      "item": "Mandarina W MURCOTT x kg",
      "url": "https://www.plazavea.com.pe/mandarina-w-murcott-x-k-g-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "papaya": {
@@ -144,7 +144,7 @@
     "pina": {
      "precio": 3.99,
      "unidad": "kilo",
-     "mediana": 5.29,
+     "mediana": 4.5,
      "item": "Piña Hawai x kg",
      "url": "https://www.plazavea.com.pe/pina-hawai-x-k-g-1/p",
      "oferta": false,
@@ -162,7 +162,7 @@
     "pollo": {
      "precio": 8.9,
      "unidad": "kilo",
-     "mediana": 11.2,
+     "mediana": 12.9,
      "item": "Pollo Entero Fresco con Menudencia x kg",
      "url": "https://www.plazavea.com.pe/pollo-entero-fresco-con-menudencia-x-kg-135484/p",
      "oferta": false,
@@ -196,21 +196,21 @@
      "candidatos": 12
     },
     "arroz": {
-     "precio": 3.3,
+     "precio": 3.38,
      "unidad": "kilo",
-     "mediana": 4.26,
+     "mediana": 4.5,
      "item": "Arroz Superior BELL'S Bolsa 5Kg",
      "url": "https://www.plazavea.com.pe/arroz-superior-bells-bolas-5kg/p",
-     "oferta": true,
-     "candidatos": 22
+     "oferta": false,
+     "candidatos": 23
     },
     "lenteja": {
-     "precio": 7.8,
+     "precio": 8.4,
      "unidad": "kilo",
-     "mediana": 11.8,
+     "mediana": 12.4,
      "item": "Lenteja Bebé BELL'S Bolsa 500g",
      "url": "https://www.plazavea.com.pe/lenteja-bebe-bells-bolsa-500g-20220358/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 9
     },
     "frejol": {
@@ -225,7 +225,7 @@
     "fideos": {
      "precio": 4.3,
      "unidad": "kilo",
-     "mediana": 5.4,
+     "mediana": 6.2,
      "item": "Fideos NICOLINI Tallarín Grueso Bolsa 1kg",
      "url": "https://www.plazavea.com.pe/fideo-tallarin-grueso-nicolini-bolsa-1kg/p",
      "oferta": true,
@@ -243,7 +243,7 @@
     "avena": {
      "precio": 7.9,
      "unidad": "kilo",
-     "mediana": 17.69,
+     "mediana": 19.84,
      "item": "Avena BELL'S Bolsa 1Kg",
      "url": "https://www.plazavea.com.pe/avena-bells-bolsa-1kg/p",
      "oferta": true,
@@ -270,7 +270,7 @@
     "aceite": {
      "precio": 6.11,
      "unidad": "litro",
-     "mediana": 8.36,
+     "mediana": 8.86,
      "item": "Aceite de Soya BELL'S Botella 900ml",
      "url": "https://www.plazavea.com.pe/aceite-de-soya-bells-botella-900ml-21592/p",
      "oferta": false,
@@ -315,12 +315,12 @@
      "candidatos": 3
     },
     "tomate": {
-     "precio": 5.99,
+     "precio": 6.99,
      "unidad": "kilo",
-     "mediana": 5.99,
+     "mediana": 6.99,
      "item": "Tomate Italiano Metro x kg",
      "url": "https://www.metro.pe/tomate-italiano-metro-x-kg-2-2/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 1
     },
     "cebolla": {
@@ -344,7 +344,7 @@
     "papa-blanca": {
      "precio": 1.79,
      "unidad": "kilo",
-     "mediana": 3.9,
+     "mediana": 3.69,
      "item": "Papa Blanca Cocktail x kg",
      "url": "https://www.metro.pe/papa-blanca-cocktail-x-kg-20795-2/p",
      "oferta": true,
@@ -423,13 +423,13 @@
      "candidatos": 1
     },
     "platano": {
-     "precio": 3.49,
+     "precio": 2.99,
      "unidad": "kilo",
-     "mediana": 3.49,
-     "item": "Platano de Seda x kg",
-     "url": "https://www.metro.pe/platano-de-seda-x-kg-2/p",
+     "mediana": 4.49,
+     "item": "Plátano de Seda Metro x kg",
+     "url": "https://www.metro.pe/platano-de-seda-metro-x-kg-2-2/p",
      "oferta": true,
-     "candidatos": 3
+     "candidatos": 2
     },
     "manzana": {
      "precio": 3.69,
@@ -468,12 +468,12 @@
      "candidatos": 4
     },
     "pina": {
-     "precio": 5.69,
+     "precio": 4.69,
      "unidad": "kilo",
-     "mediana": 8.34,
+     "mediana": 7.84,
      "item": "Piña Golden Metro x kg",
      "url": "https://www.metro.pe/pina-golden-metro-x-kg-2/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 2
     },
     "maracuya": {
@@ -510,7 +510,7 @@
      "item": "Bisteck de Tapa Nacional x kg",
      "url": "https://www.metro.pe/bisteck-de-tapa-nacional-en-bandeja-x-kg-390616-2/p",
      "oferta": false,
-     "candidatos": 11
+     "candidatos": 10
     },
     "huevo": {
      "precio": 8.31,
@@ -596,11 +596,11 @@
     "aceite": {
      "precio": 6.3,
      "unidad": "litro",
-     "mediana": 7.33,
+     "mediana": 7.5,
      "item": "Aceite Vegetal de Soya Máxima 5L",
      "url": "https://www.metro.pe/aceite-vegetal-de-soya-maxima-5l-973623-2/p",
      "oferta": false,
-     "candidatos": 13
+     "candidatos": 14
     },
     "leche": {
      "precio": 3.2,
@@ -674,12 +674,12 @@
      "candidatos": 3
     },
     "aji": {
-     "precio": 16.3,
+     "precio": 12.97,
      "unidad": "kilo",
-     "mediana": 18.64,
+     "mediana": 16.98,
      "item": "Ají Amarillo Meza 300g",
      "url": "https://www.wong.pe/aji-amarillo-meza-300g-1044384/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 2
     },
     "zapallo": {
@@ -703,11 +703,11 @@
     "camote": {
      "precio": 3.59,
      "unidad": "kilo",
-     "mediana": 4.19,
+     "mediana": 4.09,
      "item": "Camote Amarillo x kg",
      "url": "https://www.wong.pe/camote-amarillo-x-kg-4008/p",
      "oferta": false,
-     "candidatos": 7
+     "candidatos": 8
     },
     "zanahoria": {
      "precio": 6.6,
@@ -772,6 +772,15 @@
      "oferta": false,
      "candidatos": 1
     },
+    "papaya": {
+     "precio": 5.99,
+     "unidad": "kilo",
+     "mediana": 6.74,
+     "item": "Papaya x kg",
+     "url": "https://www.wong.pe/papaya-x-kg-3936/p",
+     "oferta": true,
+     "candidatos": 2
+    },
     "pina": {
      "precio": 5.89,
      "unidad": "kilo",
@@ -811,11 +820,11 @@
     "huevo": {
      "precio": 9.28,
      "unidad": "kilo",
-     "mediana": 18.33,
+     "mediana": 18.12,
      "item": "Huevos Pardos Wong 30un",
      "url": "https://www.wong.pe/huevos-pardos-wong-30un-1035228/p",
      "oferta": false,
-     "candidatos": 13
+     "candidatos": 14
     },
     "arroz": {
      "precio": 3.7,
@@ -910,7 +919,6 @@
    },
    "sin_precio": [
     "ajo",
-    "papaya",
     "pollo",
     "jurel",
     "frejol"
