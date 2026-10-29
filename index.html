@@ -237,6 +237,8 @@
   .s3 { stroke: var(--viz-3); } .f3 { fill: var(--viz-3); background: var(--viz-3); }
   .s4 { stroke: var(--viz-4); } .f4 { fill: var(--viz-4); background: var(--viz-4); }
   .s5 { stroke: var(--viz-5); } .f5 { fill: var(--viz-5); background: var(--viz-5); }
+  .sm { stroke: var(--ink); stroke-dasharray: 5 4; } .fm { fill: var(--ink); background: var(--ink); }
+  .leg .kl.fm { background: repeating-linear-gradient(90deg, var(--ink) 0 5px, transparent 5px 8px); }
   .vtip { position: relative; min-height: 1.4em; font-size: 0.88rem; }
   .vtip b { font-variant-numeric: tabular-nums; }
   .causa { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
@@ -998,7 +1000,8 @@ const MAX_DIA = 6;
 const DIAS = [{ id: "lun", c: "Lun", n: "lunes" }, { id: "mar", c: "Mar", n: "martes" }, { id: "mie", c: "Mié", n: "miércoles" },
   { id: "jue", c: "Jue", n: "jueves" }, { id: "vie", c: "Vie", n: "viernes" }, { id: "sab", c: "Sáb", n: "sábado" }, { id: "dom", c: "Dom", n: "domingo" }];
 const dia = (id) => DIAS.find((x) => x.id === id);
-/* Ejemplo: referencia mayorista = precio de mercado × 0.78. En la app real viene del boletín diario de precios mayoristas de Lima. */
+/* Referencia mayorista: precio promedio del día en el Gran Mercado Mayorista de Lima (EMMSA, precios_mayorista.json)
+   para los productos que vende por kilo; si no hay dato, se estima como precio de mercado × 0.78. */
 const MERMA = 0.05, FACTOR_MAYORISTA = 0.78;
 const PROVEEDORES = [
   { id: "verduras", emo: "🥬", nombre: "Verduras y frutas", quien: "Para tu casero del mercado mayorista", rubros: ["verduras", "frutas"] },
@@ -1006,7 +1009,13 @@ const PROVEEDORES = [
   { id: "pescado", emo: "🐟", nombre: "Pescado", quien: "Para tu pescadero o el terminal pesquero", rubros: ["pescado"] },
   { id: "abarrotes", emo: "🛒", nombre: "Abarrotes y lácteos", quien: "Para tu distribuidor de abarrotes", rubros: ["abarrotes"] },
 ];
-const precioRef = (p) => r10(p.base * FACTOR_MAYORISTA * (1 + ruido(p.id, "mayorista")));
+function mayHoy(pid) {   // último precio mayorista real del producto, o null
+  const M = state.may, s = M && M.productos && M.productos[pid];
+  if (!s || !Array.isArray(s.prom) || (prod(pid) || {}).unidad !== "kilo") return null;
+  for (let i = s.prom.length - 1; i >= 0; i--) if (s.prom[i] > 0) return { v: s.prom[i], fecha: M.fechas[i] };
+  return null;
+}
+const precioRef = (p) => { const m = mayHoy(p.id); return m ? m.v : r10(p.base * FACTOR_MAYORISTA * (1 + ruido(p.id, "mayorista"))); };
 const precioResto = (p) => { const x = Number(state.resto.precios[p.id]); return x > 0 ? x : precioRef(p); };
 const diaMenu = (id) => state.resto.menu[id] || { entrada: [], segundo: [], refresco: null, postre: null };
 function diaEditable(id) { const R = state.resto; if (!R.menu[id]) R.menu[id] = { entrada: [], segundo: [], refresco: null, postre: null }; return R.menu[id]; }
@@ -1824,7 +1833,7 @@ function restoMenu() {
     <h2>Postre</h2><div class="opts">${ninguno("postre", "Sin postre")}${lista(["postre"], "postre", false)}</div>
     ${sig && c.lleno ? `<button class="btn quiet" data-act="resto-copiar-dia">Copiar este menú al ${dia(sig).n}</button>` : ""}
     <p class="small muted">Repartimos los menús del día en partes iguales entre las entradas y segundos que marques. Sumamos 5% de merma.
-      Los precios son la referencia mayorista de ejemplo, o lo que te cobra tu proveedor si lo escribes en el pedido.</p>
+      Los precios son la referencia mayorista, o lo que te cobra tu proveedor si lo escribes en el pedido.</p>
     ${lleno ? `<div class="stick"><button class="btn" data-act="resto-paso" data-v="costos">Ver costos y pedido de la semana</button></div>` : ""}`;
 }
 
@@ -1838,7 +1847,7 @@ function filaPedido(it) {
     <span class="sub">${soles(it.compra * pu)}</span>
     <span class="inp"><label for="tp-${it.p.id}">Te cobra S/</label><input id="tp-${it.p.id}" inputmode="decimal" data-tprecio="${it.p.id}" value="${mio ? mio.toFixed(2) : ""}" placeholder="¿cuánto?"
       aria-describedby="rf-${it.p.id}"> <span>${POR_CORTO[it.p.unidad] || porUnidad(it.p)}</span>
-      <span id="rf-${it.p.id}">· ref. ${soles(ref)}</span> ${pill}</span></div>`;
+      <span id="rf-${it.p.id}">· ref. ${soles(ref)}${mayHoy(it.p.id) ? " mayorista" : ""}</span> ${pill}</span></div>`;
 }
 
 function restoCostos() {
@@ -1907,7 +1916,7 @@ function restoCostos() {
     ${tarjetaIngenieria()}
     ${tarjetaFichas()}
     ${tarjetaDespensa([...aparte, "sal", "condimentos", "gas"], "resto")}
-    <p class="note">Porciones de menú aproximadas; la referencia mayorista es de ejemplo (en la app real sale del boletín diario de precios mayoristas de Lima).</p>
+    <p class="note">Porciones de menú aproximadas. ${state.may && state.may.fecha ? `Referencia mayorista: Gran Mercado Mayorista de Lima (EMMSA), ${esc(fechaCorta(state.may.fecha))}, para verduras y tubérculos que vende por kilo; el resto es estimado.` : "La referencia mayorista es estimada: en la versión web sale del Gran Mercado Mayorista de Lima."}</p>
     <button class="btn sec" data-act="ir-ideas">💬 ¿Te sirvió? Danos tu opinión</button>`;
 }
 
@@ -2835,9 +2844,11 @@ function cardOnline() {
   if (!pid) return `<div class="card">${titulo}<p class="muted">Todavía no hay precios guardados.</p></div>`;
   const p = prod(pid), series = cads.map((c) => ({ c, n: (SUPERS.find((s) => s.id === c) || {}).nombre || c, slot: SLOT_CADENA[c], vals: (H.cadenas[c][pid] || []).map((x) => (x > 0 ? x : null)) }))
     .filter((s) => s.vals.some((x) => x));
+  const may = maySerie(pid, H.fechas);
+  if (may) series.push({ c: "mayorista", n: "Mercado mayorista", slot: "m", vals: may });
   const chips = `<div class="chips" role="group" aria-label="Producto">${cand.map((x) => `<button class="chip" data-act="alza-prod" data-v="${x}" aria-pressed="${x === pid}">${emoP(prod(x))} ${esc(prod(x).nombre)}</button>`).join("")}</div>`;
   const ult = (s) => { for (let i = s.vals.length - 1; i >= 0; i--) if (s.vals[i]) return s.vals[i]; return null; };
-  const tabla = `<table class="tv"><thead><tr><th>Supermercado</th><th>${porUnidad(p)}</th></tr></thead><tbody>${series.map((s) => `<tr><td>${esc(s.n)}</td><td>${soles(ult(s))}</td></tr>`).join("")}</tbody></table>`;
+  const tabla = `<table class="tv"><thead><tr><th>Dónde</th><th>${porUnidad(p)}</th></tr></thead><tbody>${series.map((s) => `<tr><td>${esc(s.n)}</td><td>${soles(ult(s))}</td></tr>`).join("")}</tbody></table>`;
   const dias = H.fechas.length;
   if (dias < 3) return `<div class="card" style="gap:10px">${titulo}${chips}
     <p class="muted">Estamos juntando precios desde el ${esc(fechaCorta(H.fechas[0]))}: la curva aparece cuando haya 3 días. Hoy:</p>${tabla}
@@ -2849,7 +2860,15 @@ function cardOnline() {
     ${graficoLineas(H.fechas, series)}
     <div class="vtip" id="lc-tip" aria-live="polite"></div>
     <details><summary>Ver como tabla</summary>${tablaLineas(H.fechas, series)}</details>
-    <p class="small muted">Precio de la tienda online de cada cadena, guardado cada mañana; en el local puede variar.</p></div>`;
+    <p class="small muted">Precio de la tienda online de cada cadena, guardado cada mañana; en el local puede variar.${may ? " La línea punteada es el promedio del Gran Mercado Mayorista de Lima (EMMSA): lo que se paga al por mayor." : ""}</p></div>`;
+}
+/* Precio mayorista del producto en las mismas fechas que el precio online (null donde no hay dato). */
+function maySerie(pid, fechas) {
+  const M = state.may, s = M && M.productos && M.productos[pid];
+  if (!s || (prod(pid) || {}).unidad !== "kilo") return null;
+  const i = new Map(M.fechas.map((f, k) => [f, k]));
+  const vals = fechas.map((f) => (i.has(f) && s.prom[i.get(f)] > 0 ? s.prom[i.get(f)] : null));
+  return vals.some((x) => x) ? vals : null;
 }
 function escalaLineas(fechas, series) {
   const W = 320, Hh = 170, pl = 44, pr = 50, pt = 10, pb = 22;
@@ -2916,6 +2935,16 @@ async function cargarHist() {
     if (!r.ok) return;
     const d = await r.json();
     if (d && Array.isArray(d.fechas) && d.cadenas && typeof d.cadenas === "object") state.hist = d;
+  } catch (e) {}
+}
+async function cargarMayorista() {   // precios del Gran Mercado Mayorista de Lima (lo arma la tarea diaria)
+  if (window.claude || !/^https?:$/.test(location.protocol)) return;
+  try {
+    const ctl6 = new AbortController(), t = setTimeout(() => ctl6.abort(), 5000);
+    const r = await fetch("precios_mayorista.json", { cache: "no-cache", signal: ctl6.signal }); clearTimeout(t);
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && Array.isArray(d.fechas) && d.productos && typeof d.productos === "object") state.may = d;
   } catch (e) {}
 }
 async function cargarPopulares() {
@@ -3297,7 +3326,7 @@ async function cargarLugaresWeb() {
   state.perfil.mercados = (state.perfil.mercados || []).filter((id) => merc(id));   // quita mercados que ya no existen
   const u = LS.get("acuanto.ubic");
   if (u && Number.isFinite(u.la) && Number.isFinite(u.lo) && dentroDeLima(u.la, u.lo) && Date.now() - (u.ts || 0) < 90 * 864e5) state.ubic = u;
-  await Promise.all([cargarPreciosSuper(), cargarLugaresWeb(), cargarHist(), cargarPopulares()]);
+  await Promise.all([cargarPreciosSuper(), cargarLugaresWeb(), cargarHist(), cargarMayorista(), cargarPopulares()]);
   evento("abrir", { distrito: state.perfil.distrito || null, mercados: (state.perfil.mercados || []).length, nuevo: !state.perfil.acepto,
     precios_super: !!state.superReal, ubicacion: !!state.ubic, lugares: LUG.fecha, instalada: matchMedia("(display-mode: standalone)").matches });
   if (state.perfil.acepto && state.perfil.mercados.length) {
