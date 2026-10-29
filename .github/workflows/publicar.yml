@@ -1,4 +1,5 @@
-# Publica Acuánto en GitHub Pages; cada mañana actualiza los precios online de supermercados y cada lunes los mercados cercanos (OpenStreetMap).
+# Publica Acuánto en GitHub Pages; cada mañana actualiza los precios online de supermercados y los del Gran Mercado Mayorista de Lima (EMMSA),
+# y cada lunes los mercados cercanos (OpenStreetMap).
 # Requisito (una sola vez): Settings → Pages → Build and deployment → Source: "GitHub Actions".
 name: Publicar Acuánto
 
@@ -10,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # para guardar precios_super.json en el repositorio
+  contents: write   # para guardar los precios del día en el repositorio
   pages: write
   id-token: write
 
@@ -47,6 +48,12 @@ jobs:
         run: |
           if [ -f precios_super.json ]; then python scripts/historial_precios.py --hoy precios_super.json --hist precios_hist.json; fi
 
+      # Precio del día en el Gran Mercado Mayorista de Lima (consulta pública de EMMSA). Solo pide los días nuevos, con pausa.
+      - name: Precios mayoristas (EMMSA)
+        if: github.event_name != 'push'
+        continue-on-error: true
+        run: python scripts/mayorista.py --csv precios_mayorista.csv --json precios_mayorista.json
+
       # Mercados y supermercados de Lima y Callao desde OpenStreetMap: los lunes (el extracto de BBBike es semanal),
       # al correrlo a mano, o si falta el archivo. Una sola descarga de ~30 MB.
       - name: Mercados y supermercados cercanos (OpenStreetMap)
@@ -65,7 +72,7 @@ jobs:
         run: |
           git config user.name "acuanto-bot"
           git config user.email "acuanto-bot@users.noreply.github.com"
-          for f in precios_super.json precios_hist.json lugares.json; do [ -f "$f" ] && git add "$f"; done
+          for f in precios_super.json precios_hist.json precios_mayorista.csv precios_mayorista.json lugares.json; do [ -f "$f" ] && git add "$f"; done
           git diff --cached --quiet || git commit -m "Precios del día y lugares"
           git push
 
