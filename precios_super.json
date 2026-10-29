@@ -1,6 +1,6 @@
 {
  "fecha": "2026-10-29",
- "generado": "2026-10-29T12:30-05:00",
+ "generado": "2026-10-29T13:21-05:00",
  "fuente": "Catálogo online público de cada supermercado (VTEX)",
  "cadenas": {
   "plazavea": {
@@ -159,6 +159,15 @@
      "oferta": false,
      "candidatos": 3
     },
+    "maracuya": {
+     "precio": 9.9,
+     "unidad": "kilo",
+     "mediana": 9.9,
+     "item": "Maracuyá x kg",
+     "url": "https://www.plazavea.com.pe/maracuya-x-k-g-1/p",
+     "oferta": false,
+     "candidatos": 1
+    },
     "pollo": {
      "precio": 8.9,
      "unidad": "kilo",
@@ -286,19 +295,18 @@
      "candidatos": 1
     },
     "queso": {
-     "precio": 28.33,
+     "precio": 33.5,
      "unidad": "kilo",
-     "mediana": 28.33,
-     "item": "Queso Fresco BELL'S Paquete 300g",
-     "url": "https://www.plazavea.com.pe/queso-fresco-bells-paquete-300g/p",
+     "mediana": 39.7,
+     "item": "Queso Fresco BONLÉ x kg",
+     "url": "https://www.plazavea.com.pe/queso-fresco-bonle-x-k-g/p",
      "oferta": true,
-     "candidatos": 1
+     "candidatos": 4
     }
    },
    "sin_precio": [
     "aji",
     "naranja",
-    "maracuya",
     "jurel"
    ]
   },
@@ -461,7 +469,7 @@
     "papaya": {
      "precio": 5.69,
      "unidad": "kilo",
-     "mediana": 6.34,
+     "mediana": 5.84,
      "item": "Papaya Metro x kg",
      "url": "https://www.metro.pe/papaya-metro-x-kg-2/p",
      "oferta": true,
