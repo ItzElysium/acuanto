@@ -238,6 +238,13 @@
   .s4 { stroke: var(--viz-4); } .f4 { fill: var(--viz-4); background: var(--viz-4); }
   .s5 { stroke: var(--viz-5); } .f5 { fill: var(--viz-5); background: var(--viz-5); }
   .sm { stroke: var(--ink); stroke-dasharray: 5 4; } .fm { fill: var(--ink); background: var(--ink); }
+  .gente { display: grid; gap: 8px; }
+  .grow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  .gtxt { min-width: 0; line-height: 1.35; }
+  .gstep { display: flex; align-items: center; gap: 8px; flex: none; }
+  .gstep button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; }
+  .gstep button:disabled { opacity: .35; cursor: default; }
+  .gstep output { min-width: 2.2ch; text-align: center; font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
   .leg .kl.fm { background: repeating-linear-gradient(90deg, var(--ink) 0 5px, transparent 5px 8px); }
   .vtip { position: relative; min-height: 1.4em; font-size: 0.88rem; }
   .vtip b { font-variant-numeric: tabular-nums; }
@@ -838,19 +845,35 @@ const state = {
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
   historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.8";
+const VERSION = "Prueba 0.9";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
   distrito: MERCADOS[0].distrito, ampliadoHasta: null, puesto: null, acepto: false });
 /* La semana empieza el lunes: al cambiar de semana se borran las marcas de "ya tengo" y "comprado", no los platos. */
 function semanaClave() { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-const semanaVacia = () => ({ personas: 4, conCena: false, taper: 0, compras: 1, despensa: {}, dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
+const semanaVacia = () => ({ personas: 4, gente: { adulto: 2, nino: 2 }, porcion: "normal", conCena: false, taper: 0, compras: 1, despensa: {}, dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear", mercado: null, clave: semanaClave() });
 const restoVacio = () => ({ despensa: {}, ventas: {}, menusDia: 40, dias: ["lun", "mar", "mie", "jue", "vie", "sab"], precioMenu: 12, menu: {}, precios: {}, diaActivo: "lun", aportadoDia: null });
 
 /* Persistencia: base compartida del artefacto si está disponible; si no, solo este teléfono. */
 const LS = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
              set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+/* Quiénes comen: cada grupo de edad come una parte de la porción de un adulto (referencial, según los requerimientos
+   de energía por edad del INS-CENAN y la FAO). "Bien servido": más arroz, papa, fideos, camote y choclo, como en muchas casas. */
+const GRUPOS = [
+  { id: "adulto", emo: "🧑", n: "Adultos", sub: "18 a 59 años", f: 1, etq: "1 porción" },
+  { id: "mayor", emo: "👵", n: "Adultos mayores", sub: "60 años a más", f: 0.85, etq: "un poco menos" },
+  { id: "joven", emo: "🧑‍🎓", n: "Jóvenes", sub: "12 a 17 años", f: 1.1, etq: "un poco más" },
+  { id: "nino", emo: "🧒", n: "Niños", sub: "6 a 11 años", f: 0.75, etq: "¾ de porción" },
+  { id: "peque", emo: "👶", n: "Niños pequeños", sub: "2 a 5 años", f: 0.5, etq: "media porción" },
+];
+const ALMIDON = new Set(["arroz", "fideos", "papa-blanca", "papa-amarilla", "camote", "choclo"]);
+const gente = (S = state.semana) => (S.gente && typeof S.gente === "object" ? S.gente : { adulto: S.personas || 1 });
+const nPersonas = (S = state.semana) => GRUPOS.reduce((a, g) => a + (Number(gente(S)[g.id]) || 0), 0);
+const eqAdulto = (S = state.semana) => Math.round(GRUPOS.reduce((a, g) => a + (Number(gente(S)[g.id]) || 0) * g.f, 0) * 100) / 100;
+const fPorcion = (pid) => (state.semana.porcion === "bien" ? (ALMIDON.has(pid) ? 1.3 : 1.1) : 1);
+const fmtEq = (x) => String(Math.round(x * 10) / 10).replace(".", ",");
+function sincronizarGente(S = state.semana) { S.gente = { ...gente(S) }; S.personas = Math.max(1, nPersonas(S)); }
 async function cargar() {
   let perfil = null, puntos = null, semana = null, resto = null, historial = null;
   if (state.db && state.uid) {
@@ -874,6 +897,8 @@ async function cargar() {
   state.puntos = Object.assign(state.puntos, puntos ? structuredClone(puntos) : {});
   if (state.puntos.dia !== hoy()) { state.puntos.dia = hoy(); state.puntos.hoyGanados = 0; }
   state.semana = Object.assign(semanaVacia(), semana ? structuredClone(semana) : {});
+  if (semana && !semana.gente) state.semana.gente = { adulto: semana.personas || 4 };   // semanas guardadas antes de la 0.9
+  sincronizarGente();
   if (state.semana.clave !== semanaClave()) Object.assign(state.semana, { clave: semanaClave(), tengo: {}, compre: {}, modo: "planear" });
 }
 const tGuardar = {};
@@ -1177,7 +1202,7 @@ function sugerencias(L) {
   const protege = (d) => [["jurel"], ["lenteja", "frejol"], ["sangrecita", "higado"]].some((pids) => pids.some((p) => (d.ing[p] || 0) >= 0.05) && n(pids) <= 2);
   return usados.map(plato).filter((d) => d && d.cambio && !enReuso.has(d.id) && !protege(d)).map((d) => {
     const alt = plato(d.cambio), precio = (p) => precioLugar(p, L);
-    const ahorro = r2((costoPlatoCon(d, precio).t - costoPlatoCon(alt, precio).t) * veces(d.id) * S.personas);
+    const ahorro = r2((costoPlatoCon(d, precio).t - costoPlatoCon(alt, precio).t) * veces(d.id) * eqAdulto(S));
     const evita = Object.keys(d.ing).filter((pid) => prod(pid).riesgo && !(pid in alt.ing)).map((pid) => prod(pid).nombre.toLowerCase());
     return { d, alt, ahorro, evita };
   }).filter((s) => s.ahorro >= 1).sort((a, b) => b.ahorro - a.ahorro).slice(0, 2);
@@ -1527,19 +1552,23 @@ function vSemana() {
 const numFs = (n) => (String(n).length >= 3 ? ' style="font-size:2.3rem"' : "");
 
 function semPersonas() {
-  const S = state.semana;
+  const S = state.semana, G = gente(S), nP = nPersonas(S), eq = eqAdulto(S);
   return `${nPlatos() ? `<button class="back" data-act="sem-paso" data-v="lista">‹ Volver a mi lista</button>` : ""}
-    <div style="display:grid;gap:6px"><h1>¿Para cuántas personas cocinas?</h1>
-      <p class="muted">Te decimos qué comprar en la semana y cuánto te costará en tus mercados.</p></div>
-    <div class="bigstep" role="group" aria-label="Personas">
-      <button type="button" data-act="sem-per" data-v="-1" aria-label="Una persona menos" ${S.personas > 1 ? "" : "disabled"}>−</button>
-      <output${numFs(S.personas)}>${S.personas}</output>
-      <button type="button" data-act="sem-per" data-v="1" aria-label="Una persona más">+</button></div>
-    <p style="text-align:center;margin-top:-8px" class="muted">${S.personas === 1 ? "persona" : "personas"}</p>
-    <div class="chips wrap" role="group" aria-label="Elegir rápido">${[1, 2, 3, 4, 5, 6].map((n) => `
-      <button class="chip" data-act="sem-per-fijo" data-v="${n}" aria-pressed="${S.personas === n}" style="min-width:52px">${n}</button>`).join("")}
-      <button class="chip" data-act="sem-per-fijo" data-v="50" aria-pressed="${S.personas === 50}">Olla común: 50</button></div>
-    <p class="note">Contamos la porción de una persona adulta. Dos niños pequeños cuentan como una persona.</p>
+    <div style="display:grid;gap:6px"><h1>¿Quiénes comen en casa?</h1>
+      <p class="muted">Un niño come menos que un adulto: así tu lista trae lo justo y no se pierde comida.</p></div>
+    <div class="gente" role="group" aria-label="Personas por edad">${GRUPOS.map((g) => { const n = Number(G[g.id]) || 0; return `
+      <div class="grow"><span class="gtxt"><b><span aria-hidden="true">${g.emo}</span> ${g.n}</b><br><span class="small muted">${g.sub} · ${g.etq}</span></span>
+        <span class="gstep"><button type="button" data-act="sem-gente" data-v="${g.id}:-1" aria-label="${g.n}: uno menos" ${n > 0 && nP > 1 ? "" : "disabled"}>−</button>
+          <output aria-live="polite">${n}</output>
+          <button type="button" data-act="sem-gente" data-v="${g.id}:1" aria-label="${g.n}: uno más">+</button></span></div>`; }).join("")}</div>
+    <p class="muted" style="text-align:center;margin:0">${nP} ${nP === 1 ? "persona" : "personas"} · comen como <b>${fmtEq(eq)} ${eq === 1 ? "adulto" : "adultos"}</b></p>
+    <div class="chips wrap" role="group" aria-label="Elegir rápido">
+      <button class="chip" data-act="sem-per-fijo" data-v="50" aria-pressed="${G.adulto === 50 && nP === 50}">Olla común: 50 adultos</button></div>
+    <div style="display:grid;gap:8px"><h2>🍛 ¿Cómo sirves?</h2>
+      <div class="seg" role="group" aria-label="Tamaño de porción">
+        <button type="button" data-act="sem-porcion" data-v="normal" aria-pressed="${S.porcion !== "bien"}">Porción normal</button>
+        <button type="button" data-act="sem-porcion" data-v="bien" aria-pressed="${S.porcion === "bien"}">Bien servido</button></div>
+      <p class="small muted">Normal: el plato casero de un adulto (100 g de arroz crudo en el segundo). Bien servido: 30% más de arroz, papa, fideos, camote y choclo, y 10% más del resto.</p></div>
     <div style="display:grid;gap:8px"><h2>🥡 ¿Alguien lleva táper?</h2>
       <p class="small muted">Cocinamos porciones extra del segundo del almuerzo para el trabajo o el colegio del día siguiente.</p>
       <div class="chips wrap" role="group" aria-label="Táper">${[0, 1, 2, 3].map((n) => `
@@ -1609,7 +1638,7 @@ function semDias() {
 /* Elegir un plato para un día: una sola decisión por pantalla. */
 function semElegir() {
   const id = state.semDia, comida = state.semComida || "almuerzo", x = dia(id), its = itemsDe(id, comida), tipo = state.semTipo || "segundo", ls = lugares();
-  const S = state.semana, nP = S.personas;
+  const S = state.semana, nP = S.personas, eq = eqAdulto(S);
   const tipos = [...TIPOS.filter((t) => t.id !== "fruta"), { id: "fit", nombre: "💪 Fit", por: "por plato" }, { id: "rapido", nombre: "⏱ Rápidos", por: "por plato" }];
   const fit = tipo === "fit", rapido = tipo === "rapido";
   const lista = (fit ? PLATOS.filter((d) => d.tipo !== "fruta" && esFit(d)).sort((a, b) => nutri(b).prot - nutri(a).prot)
@@ -1632,11 +1661,11 @@ function semElegir() {
       const unidad = d.tipo === "refresco" ? "el vaso" : "por persona";
       return `<button class="opt" data-act="sem-poner" data-v="${id}:${d.id}" aria-pressed="${on}" ${lleno && !on ? "disabled" : ""}>
         <span class="emo" aria-hidden="true">${emoD(d)}</span><span class="name">${d.nombre}</span>
-        <span class="meta"><span>≈ ${soles(c.t)} ${unidad}${nP > 1 ? ` · ${soles(c.t * nP)} para ${nP}` : ""}</span>${badge}${marca}${fe}${esFit(d) && !fit ? `<span class="pill fit">💪 Fit</span>` : ""}${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}
+        <span class="meta"><span>≈ ${soles(c.t)} ${unidad}${nP > 1 ? ` · ${soles(c.t * (d.tipo === "refresco" ? nP : eq))} para tu casa` : ""}</span>${badge}${marca}${fe}${esFit(d) && !fit ? `<span class="pill fit">💪 Fit</span>` : ""}${c.riesgo >= 0.35 ? `<span class="pill up">Sube con El Niño</span>` : ""}
           ${n.kcal ? `<span class="kcal">${TIEMPO[d.id] ? `⏱ ${TIEMPO[d.id]} min · ` : ""}≈ ${n.kcal} kcal · ${n.prot} g proteína por porción</span>` : ""}</span>
         <span class="chk" aria-hidden="true">${on ? "✓" : ""}</span></button>`;
     }).join("")}</div>
-    <p class="small muted">Precio de una porción en el lugar más barato hoy (ejemplo); al lado, lo que cuesta para las ${nP} ${nP === 1 ? "persona" : "personas"} de tu casa. Calorías y proteína: referenciales, según la receta casera.</p>`;
+    <p class="small muted">Precio de una porción en el lugar más barato hoy (ejemplo); al lado, lo que cuesta para tu casa (${nP} ${nP === 1 ? "persona" : "personas"}, que comen como ${fmtEq(eq)} ${eq === 1 ? "adulto" : "adultos"}). Calorías y proteína: referenciales, según la receta casera.</p>`;
 }
 
 /* Frutas: sección aparte para no mezclar con los platos. */
@@ -1703,7 +1732,7 @@ function semLista() {
       <b class="pr">${soles(sub)}</b></div>`;
   }).join("");
   return `<div style="display:grid;gap:6px"><h1>Tu canasta de la semana</h1>
-      <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"}${S.taper ? ` + ${S.taper} ${S.taper === 1 ? "táper" : "tápers"}` : ""}${S.conCena ? " · almuerzo y cena" : ""} · ${llenos} de 7 días con plato</p>
+      <p class="muted">Para ${S.personas} ${S.personas === 1 ? "persona" : "personas"}${eqAdulto(S) !== S.personas ? ` (comen como ${fmtEq(eqAdulto(S))} adultos)` : ""}${S.porcion === "bien" ? " · bien servido" : ""}${S.taper ? ` + ${S.taper} ${S.taper === 1 ? "táper" : "tápers"}` : ""}${S.conCena ? " · almuerzo y cena" : ""} · ${llenos} de 7 días con plato</p>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="sem-paso" data-v="platos">Cambiar platos</button>
         <button class="link" data-act="sem-paso" data-v="personas">Cambiar personas o comidas</button>
         ${(state.historial.items || []).length ? `<button class="link" data-act="sem-paso" data-v="historial">📅 Mi historial</button>` : ""}</div></div>
@@ -2274,7 +2303,7 @@ async function accion(act, v) {
     case "hist-usar": {
       const h = (state.historial.items || []).find((x) => x.clave === v); if (!h) break;
       const S = state.semana;
-      S.dias = structuredClone(h.dias || {}); S.conCena = !!h.conCena; S.cenas = structuredClone(h.cenas || {}); S.frutas = structuredClone(h.frutas || {}); S.personas = h.personas || S.personas; S.tengo = {}; S.compre = {}; S.sust = {};
+      S.dias = structuredClone(h.dias || {}); S.conCena = !!h.conCena; S.cenas = structuredClone(h.cenas || {}); S.frutas = structuredClone(h.frutas || {}); S.gente = h.gente ? structuredClone(h.gente) : { adulto: h.personas || S.personas }; S.porcion = h.porcion || S.porcion; sincronizarGente(S); S.tengo = {}; S.compre = {}; S.sust = {};
       guardarSemana(); state.semPaso = "lista"; state.toast = `Listo: cargamos tu semana del ${fechaCorta(h.clave)}.`;
       evento("historial_usar", { semana: h.clave }); window.scrollTo(0, 0); break;
     }
@@ -2370,7 +2399,7 @@ async function accion(act, v) {
       state.mercadoActivo = r.mercado; state.borrador = null; guardar(); break;
     }
     case "sem-paso": {
-      if (v === "platos" && state.semPaso === "personas") evento("personas", { n: state.semana.personas });
+      if (v === "platos" && state.semPaso === "personas") evento("personas", { n: state.semana.personas, eq: eqAdulto(), porcion: state.semana.porcion, gente: gente() });
       if (v === "lista") { const its = porComprar(), b = its.length ? totalesSemana(its)[0] : null;
         evento("ver_canasta", { total: b ? b.t : 0, lugar: b ? nombreLugar(b.m) : null, tipo_lugar: b ? (b.m.tipo === "super" ? "super" : "mercado") : null,
           dias: diasLlenos(), personas: state.semana.personas, productos: its.length, frutas: Object.keys(state.semana.frutas || {}).length }); }
@@ -2380,9 +2409,19 @@ async function accion(act, v) {
     }
     case "sem-per": case "sem-per-fijo": {
       const S = state.semana, paso = S.personas >= 20 ? 5 : 1;
-      S.personas = act === "sem-per-fijo" ? +v : Math.min(150, Math.max(1, S.personas + (+v) * paso));
+      const n = act === "sem-per-fijo" ? +v : Math.min(150, Math.max(1, S.personas + (+v) * paso));
+      S.gente = { adulto: n }; sincronizarGente(S);
       guardarSemana(); avisarSR(`${S.personas} ${S.personas === 1 ? "persona" : "personas"}`); break;
     }
+    case "sem-gente": {
+      const S = state.semana, [g, d] = v.split(":"), G = { ...gente(S) }, n = Number(G[g]) || 0;
+      if (!GRUPOS.some((x) => x.id === g)) break;
+      G[g] = Math.min(150, Math.max(0, n + Number(d) * (n >= 20 ? 5 : 1)));
+      if (GRUPOS.reduce((a, x) => a + (Number(G[x.id]) || 0), 0) < 1) break;   // al menos una persona
+      S.gente = G; sincronizarGente(S); guardarSemana();
+      avisarSR(`${GRUPOS.find((x) => x.id === g).n}: ${G[g]}. Comen como ${fmtEq(eqAdulto(S))} adultos`); break;
+    }
+    case "sem-porcion": state.semana.porcion = v === "bien" ? "bien" : "normal"; evento("porcion", { porcion: state.semana.porcion }); guardarSemana(); break;
     case "sem-elegir": { const [d, c] = v.split(":"); state.semDia = d; state.semComida = c === "cena" ? "cena" : "almuerzo"; state.repetir = null; state.semPaso = "elegir"; render(); window.scrollTo(0, 0); enfocarTitulo(); return; }
     case "sem-comidas": { const S = state.semana; S.conCena = v === "1"; S.cenas = S.cenas || {}; evento("comidas", { cena: S.conCena }); guardarSemana(); break; }
     case "sem-repetir": state.repetir = state.repetir === v ? null : v; break;
@@ -2721,7 +2760,7 @@ const isoDia = (x) => x.getFullYear() + "-" + dos(x.getMonth() + 1) + "-" + dos(
 const lunesDe = (f) => { const x = new Date(f); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return isoDia(x); };
 function guardarHistorial(L, total) {
   const S = state.semana;
-  const snap = { clave: S.clave, fecha: hoy(), personas: S.personas, taper: S.taper || 0, dias: structuredClone(S.dias || {}), conCena: !!S.conCena, cenas: structuredClone(S.conCena ? S.cenas || {} : {}), frutas: structuredClone(S.frutas || {}),
+  const snap = { clave: S.clave, fecha: hoy(), personas: S.personas, gente: gente(S), porcion: S.porcion || "normal", taper: S.taper || 0, dias: structuredClone(S.dias || {}), conCena: !!S.conCena, cenas: structuredClone(S.conCena ? S.cenas || {} : {}), frutas: structuredClone(S.frutas || {}),
     total: r2(total), lugar: nombreLugar(L), productos: porComprar().map((it) => [it.p.id, r2(it.compra)]) };
   state.historial = { items: [snap, ...(state.historial.items || []).filter((h) => h.clave !== S.clave)].slice(0, 52) };
   guardarDoc("historial");
@@ -2792,6 +2831,21 @@ const CAUSAS = [
 ];
 const SLOT_CADENA = { plazavea: 1, metro: 2, wong: 3, tottus: 4, mass: 5 };   // el color sigue a la cadena, no a su orden
 const fmtPct = (v) => (v > 0 ? "+" : "−") + String(Math.round(Math.abs(v) * 10) / 10) + "%";
+function cardSemanaMayorista() {
+  const W = cambiosMayorista(); if (!W.length) return "";
+  const sube = W.filter((w) => w.v >= SEM_SUBE).slice(0, 4), baja = W.filter((w) => w.v <= SEM_BAJA).reverse().slice(0, 3);
+  const mios = new Set(porComprar().map((it) => it.p.id));
+  const fila = (w) => `<div class="srow"><span class="emo" aria-hidden="true">${emoP(w.p)}</span>
+      <span class="txt"><b>${esc(w.p.nombre)}</b>${mios.has(w.pid) ? " 🛒" : ""}<br><span class="small muted">S/ ${w.precio.toFixed(2)} el kilo al por mayor</span></span>
+      <span class="pr"><span class="pill ${w.v > 0 ? "up" : "down"}">${w.v > 0 ? "▲" : "▼"} ${fmtPct(w.v)}</span></span>
+      ${w.v > 0 ? `<span class="btnw"><button class="chip" data-act="producto" data-v="${w.pid}">Ver qué usar en su lugar</button></span>` : ""}</div>`;
+  return `<div class="card" style="gap:10px"><h2>Esta semana en el mercado mayorista</h2>
+    <p class="small muted">Promedio de los últimos 7 días frente a los 7 anteriores en el Gran Mercado Mayorista de Lima. Lo que pasa ahí llega a tu mercado en pocos días.</p>
+    ${sube.length ? `<h3 class="grp-t">Subiendo</h3>${sube.map(fila).join("")}` : ""}
+    ${baja.length ? `<h3 class="grp-t">Bajando: buen momento</h3>${baja.map(fila).join("")}` : ""}
+    ${!sube.length && !baja.length ? `<p class="muted">Precios estables: nada cambió 10% o más esta semana. 👍</p>` : ""}
+    <p class="small muted">Fuente: EMMSA, Gran Mercado Mayorista de Lima (${esc(fechaCorta(W[0].fecha))}). 🛒 = está en tu canasta.</p></div>`;
+}
 function vAlzas() {
   const M = ALZAS.find((m) => m.mes === state.alzaMes) || ALZAS[0];
   const filas = [...M.datos].sort((a, b) => b[1] - a[1]), max = Math.max(...filas.map((f) => Math.abs(f[1])));
@@ -2807,7 +2861,8 @@ function vAlzas() {
   const tuyos = [...mios].map((pid) => { for (const m of ALZAS.slice(0, 2)) { const f = m.datos.find((x) => x[2] === pid); if (f) return { p: prod(pid), v: f[1], m }; } return null; })
     .filter(Boolean).sort((a, b) => b.v - a.v);
   return `<div style="display:grid;gap:6px"><h1>¿Qué está subiendo?</h1>
-      <p class="muted">Alimentos que más subieron y bajaron de precio en Lima, según el INEI.</p></div>
+      <p class="muted">Lo que cambió esta semana en el mercado mayorista y en el mes, según el INEI.</p></div>
+    ${cardSemanaMayorista()}
     <div class="chips" role="group" aria-label="Mes">${ALZAS.map((m) => `
       <button class="chip" data-act="alza-mes" data-v="${m.mes}" aria-pressed="${m === M}">${m.nombre[0].toUpperCase() + m.nombre.slice(1)}</button>`).join("")}</div>
     <div class="card" style="gap:10px"><h2>Lo que más cambió en ${M.nombre}</h2>
@@ -3001,10 +3056,32 @@ const VERDURAS = ["tomate", "cebolla", "zapallo", "zanahoria", "arveja", "choclo
 const ANIMAL = ["pollo", "gallina", "carne", "huevo", "jurel", "queso", "higado", "sangrecita", "leche"];
 
 /* ---------- precios del mes: qué conviene y qué evitar ---------- */
+/* Cambio semanal en el Gran Mercado Mayorista de Lima: promedio de los últimos 7 días con precio frente a los 7 anteriores. */
+const SEM_SUBE = 10, SEM_BAJA = -10;
+function cambiosMayorista() {
+  const M = state.may; if (!M || !M.productos) return [];
+  const out = [];
+  for (const [pid, s] of Object.entries(M.productos)) {
+    const p = prod(pid); if (!p || p.unidad !== "kilo" || !Array.isArray(s.prom)) continue;
+    const xs = s.prom.map((v, i) => [M.fechas[i], v]).filter((x) => x[1] > 0);
+    if (xs.length < 14) continue;
+    const prom = (a) => a.reduce((t, x) => t + x[1], 0) / a.length;
+    const ult = xs.slice(-7), ant = xs.slice(-14, -7);
+    out.push({ pid, p, v: (prom(ult) / prom(ant) - 1) * 100, precio: xs[xs.length - 1][1], fecha: xs[xs.length - 1][0] });
+  }
+  return out.sort((a, b) => b.v - a.v);
+}
+/* Señales de precio: lo semanal del mayorista (más reciente) manda sobre lo mensual del INEI. */
 function senalesMes() {
-  const M = ALZAS[0], sube = {}, baja = {};
-  for (const [n, v, pid] of M.datos) if (pid) { if (v >= 10) sube[pid] = v; else if (v <= -4) baja[pid] = v; }
-  return { M, sube, baja };
+  const M = ALZAS[0], sube = {}, baja = {}, fuente = {};
+  for (const [n, v, pid] of M.datos) if (pid) { if (v >= 10) { sube[pid] = v; fuente[pid] = "mes"; } else if (v <= -4) { baja[pid] = v; fuente[pid] = "mes"; } }
+  const W = cambiosMayorista();
+  for (const w of W) {
+    if (w.v >= SEM_SUBE) { sube[w.pid] = w.v; delete baja[w.pid]; fuente[w.pid] = "semana"; }
+    else if (w.v <= SEM_BAJA) { baja[w.pid] = w.v; delete sube[w.pid]; fuente[w.pid] = "semana"; }
+    else if (fuente[w.pid] === "mes") { delete sube[w.pid]; delete baja[w.pid]; delete fuente[w.pid]; }   // esta semana ya está estable
+  }
+  return { M, sube, baja, fuente, semanal: W.length > 0 };
 }
 /* Lo que pesa cada producto en el costo del plato (0 a 1). */
 function pesoEnPlato(d, pid) {
@@ -3012,22 +3089,23 @@ function pesoEnPlato(d, pid) {
   const c = costoPlatoCon(d, (p) => precioLugar(p, L)).t; return c ? (d.ing[pid] * precioLugar(prod(pid), L)) / c : 0;
 }
 function marcaMes(d) {
-  const { sube, baja } = senalesMes();
+  const { sube, baja, fuente } = senalesMes();
+  const cuando = (pid) => (fuente[pid] === "semana" ? " esta semana" : "");
   const s = Object.keys(sube).map((pid) => ({ pid, v: sube[pid], w: pesoEnPlato(d, pid) })).filter((x) => x.w >= 0.15).sort((a, b) => b.w - a.w)[0];
-  if (s) return { tipo: "sube", txt: `${prod(s.pid).nombre} ${fmtPct(s.v)}` };
+  if (s) return { tipo: "sube", txt: `${prod(s.pid).nombre} ${fmtPct(s.v)}${cuando(s.pid)}` };
   const b = Object.keys(baja).map((pid) => ({ pid, v: baja[pid], w: pesoEnPlato(d, pid) })).filter((x) => x.w >= 0.3).sort((a, b) => b.w - a.w)[0];
-  if (b) return { tipo: "baja", txt: `${prod(b.pid).nombre} ${fmtPct(b.v)}` };
+  if (b) return { tipo: "baja", txt: `${prod(b.pid).nombre} ${fmtPct(b.v)}${cuando(b.pid)}` };
   return null;
 }
 function tarjetaMes() {
-  const { M } = senalesMes(), segs = PLATOS.filter((d) => d.tipo === "segundo");
+  const { M, semanal } = senalesMes(), segs = PLATOS.filter((d) => d.tipo === "segundo");
   const conv = segs.filter((d) => (marcaMes(d) || {}).tipo === "baja").sort((a, b) => puntaje(b) - puntaje(a)).slice(0, 4);
   const evit = segs.filter((d) => (marcaMes(d) || {}).tipo === "sube").sort((a, b) => puntaje(b) - puntaje(a)).slice(0, 4);
   if (!conv.length && !evit.length) return "";
-  return `<div class="card" style="gap:8px"><h2>📈 Con los precios de ${M.nombre}</h2>
+  return `<div class="card" style="gap:8px"><h2>📈 Con los precios ${semanal ? "de esta semana" : "de " + M.nombre}</h2>
     ${conv.length ? `<p><b>Conviene:</b> ${conv.map((d) => `${esc(d.nombre)} <span class="pill down">▼ ${esc(marcaMes(d).txt)}</span>`).join(" · ")}</p>` : ""}
     ${evit.length ? `<p><b>Mejor otra semana:</b> ${evit.map((d) => `${esc(d.nombre)} <span class="pill up">▲ ${esc(marcaMes(d).txt)}</span>`).join(" · ")}</p>` : ""}
-    <p class="small muted">Según el INEI. Un chef cocina con lo que está bueno y barato.</p></div>`;
+    <p class="small muted">${semanal ? "Según el Gran Mercado Mayorista de Lima (cambio de la semana) y el INEI (cambio del mes)." : "Según el INEI."} Un chef cocina con lo que está bueno y barato.</p></div>`;
 }
 
 /* ---------- aprovechamiento: lo que sobra hoy es parte del plato de mañana ---------- */
@@ -3067,12 +3145,12 @@ function reusosActivos() {
 }
 function ajusteReusos() {
   const S = state.semana, tot = {};
-  for (const u of reusosActivos()) for (const [pid, q] of Object.entries(u.r.ajuste)) tot[pid] = (tot[pid] || 0) + q * S.personas;
+  for (const u of reusosActivos()) for (const [pid, q] of Object.entries(u.r.ajuste)) tot[pid] = (tot[pid] || 0) + q * eqAdulto(S) * fPorcion(pid);
   return tot;
 }
 function ahorroReuso(u) {
   const L = mercLista() || lugares()[0]; if (!L) return 0;
-  return r2(-Object.entries(u.r.ajuste).reduce((a, [pid, q]) => a + q * precioLugar(prod(pid), L), 0) * state.semana.personas);
+  return r2(-Object.entries(u.r.ajuste).reduce((a, [pid, q]) => a + q * fPorcion(pid) * precioLugar(prod(pid), L), 0) * eqAdulto());
 }
 /* Sugerencias: hay un plato "de" pero al día siguiente no está su pareja. */
 function sugReusos() {
@@ -3083,7 +3161,7 @@ function sugReusos() {
       if (!r.de(deId) || act.some((u) => u.r === r && u.deDia.id === x.id)) continue;
       const aId = r.a.find((id) => !itemsTodo(sig.id).includes(id)); if (!aId) continue;
       if (out.some((s) => s.aDia.id === sig.id)) continue;
-      const ahorro = r2(-Object.entries(r.ajuste).reduce((a, [pid, q]) => a + q * precioLugar(prod(pid), mercLista() || lugares()[0]), 0) * state.semana.personas);
+      const ahorro = r2(-Object.entries(r.ajuste).reduce((a, [pid, q]) => a + q * fPorcion(pid) * precioLugar(prod(pid), mercLista() || lugares()[0]), 0) * eqAdulto());
       if (ahorro < 1 && !r.min) continue;
       out.push({ r, deId, deDia: x, aId, aDia: sig, ahorro, reemplaza: itemsDia(sig.id).find((id) => plato(id).tipo === "segundo") || null });
     }
@@ -3161,9 +3239,10 @@ function semanaInteligente(diasAlm, diasCena) {
 const PRIMERA = ["lun", "mar", "mie"];   // compra del lunes cubre lunes a miércoles; la del jueves, de jueves a domingo
 function necesidadDia(dId) {
   const S = state.semana, tot = {};
-  const add = (d, gente) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * gente; };
-  for (const id of itemsDia(dId)) { const d = plato(id); if (d) add(d, S.personas + (d.tipo === "segundo" ? S.taper || 0 : 0)); }
-  for (const id of itemsCena(dId)) { const d = plato(id); if (d) add(d, S.personas); }
+  const add = (d, porciones) => { for (const [pid, q] of Object.entries(d.ing)) tot[pid] = (tot[pid] || 0) + q * porciones * fPorcion(pid); };
+  const eq = eqAdulto(S);
+  for (const id of itemsDia(dId)) { const d = plato(id); if (d) add(d, eq + (d.tipo === "segundo" ? S.taper || 0 : 0)); }
+  for (const id of itemsCena(dId)) { const d = plato(id); if (d) add(d, eq); }
   return tot;
 }
 function dosCompras() {
