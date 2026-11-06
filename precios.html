@@ -28,6 +28,7 @@
   --down: #2a78d6;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
   --band: rgba(42, 120, 214, .14);
+  --band2: rgba(235, 104, 52, .14);
   --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-tag: "Permanent Marker", "Comic Sans MS", cursive;
@@ -36,13 +37,13 @@
   :root:not([data-theme="light"]) {
     --bg: #121612; --surface: #1a1f1b; --ink: #eef1ea; --ink-2: #c1c8bf; --ink-3: #8f978d; --rule: #2c332d; --grid: #252b26;
     --tag: #ffd23f; --tag-ink: #1b1a14; --accent: #7cc48c; --up: #e66767; --down: #5598e7;
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --band: rgba(57, 135, 229, .2); color-scheme: dark;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --band: rgba(57, 135, 229, .2); --band2: rgba(217, 89, 38, .2); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #121612; --surface: #1a1f1b; --ink: #eef1ea; --ink-2: #c1c8bf; --ink-3: #8f978d; --rule: #2c332d; --grid: #252b26;
   --tag: #ffd23f; --tag-ink: #1b1a14; --accent: #7cc48c; --up: #e66767; --down: #5598e7;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --band: rgba(57, 135, 229, .2); color-scheme: dark;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --band: rgba(57, 135, 229, .2); --band2: rgba(217, 89, 38, .2); color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.5; }
@@ -84,6 +85,16 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outlin
 .chart svg .lbl2 { fill: var(--ink-2); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--ink-2); }
 .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.legend i.dash { width: 18px; height: 0; border-top: 2px dashed var(--s2); border-radius: 0; background: none; }
+.legend .rombo { display: inline-block; width: 9px; height: 9px; background: var(--ink); transform: rotate(45deg); margin: 0 8px 1px 2px; vertical-align: middle; }
+.supuestos { margin-top: 12px; border-top: 1px dashed var(--rule); padding-top: 12px; display: grid; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.supuestos ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 72ch; }
+.supuestos b { color: var(--ink); font-weight: 600; }
+.ajuste { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.ajuste label { font-weight: 500; color: var(--ink); }
+.ajuste input[type=range] { width: min(220px, 100%); accent-color: var(--s2); }
+.ajuste output { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); min-width: 3ch; }
+button.link { font: 500 14px var(--f-body); background: none; border: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; padding: 4px 0; }
 .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.35; padding: 7px 10px; border-radius: 6px; white-space: nowrap; z-index: 2; font-variant-numeric: tabular-nums; }
 .tip[hidden] { display: none !important; }
 .tip b { font-weight: 600; }
@@ -120,7 +131,7 @@ footer a { color: var(--accent); }
   <header>
     <div class="eyebrow">Lima · precios de alimentos</div>
     <h1>Radar de Precios</h1>
-    <p class="lead">Cuánto cuestan hoy los alimentos básicos en el Mercado Mayorista de Lima y en los supermercados online, y cómo vienen cambiando.</p>
+    <p class="lead">Cuánto cuestan hoy los alimentos básicos en el Mercado Mayorista de Lima, en los mercados de barrio y en los supermercados online, y cómo vienen cambiando.</p>
     <div class="meta"><span>Datos al <b id="fecha">—</b></span><span>Mayorista: EMMSA</span><span>Supermercados: Plaza Vea, Metro y Wong (precio online)</span></div>
   </header>
 
@@ -136,8 +147,26 @@ footer a { color: var(--accent); }
     <div class="tags" id="tags"></div>
     <div class="charts">
       <div class="panel">
-        <div class="row"><h3 id="t-may">Mercado Mayorista · últimos 6 meses</h3><span class="note">S/ por kilo · línea: promedio del día · franja: mínimo a máximo</span></div>
+        <div class="row"><h3 id="t-may">Mayorista y mercado de barrio · últimos 6 meses</h3><span class="note">S/ por kilo</span></div>
+        <div class="legend">
+          <span><i style="background:var(--s1)"></i>Mercado Mayorista (real, con su mínimo y máximo del día)</span>
+          <span><i class="dash"></i>Mercado de barrio (estimado, con su rango por zona)</span>
+          <span id="leg-obs"><b class="rombo" aria-hidden="true"></b>Precio de mercado de barrio observado</span>
+        </div>
         <div class="chart" id="c-may"></div>
+        <div class="supuestos" id="supuestos" aria-live="polite">
+          <h3>Supuestos del precio en mercado de barrio</h3>
+          <ul>
+            <li><b>Cálculo:</b> precio mayorista del día × factor del producto × factor de zona.</li>
+            <li id="sup-factor"></li>
+            <li><b>Zona:</b> la línea es el promedio de Lima (×1.00). La franja va de ×0.92 (Lima Norte, Este y Sur) a ×1.14 (San Isidro y Miraflores).</li>
+            <li><b>Qué cubre el factor:</b> el flete del mayorista al mercado, lo que se pierde por merma y la ganancia del puesto.</li>
+            <li><b>Es un estimado:</b> los rombos son precios reales de mercados de barrio publicados por Midagri o la prensa, para comparar.</li>
+          </ul>
+          <div class="ajuste"><label for="f-rango">Prueba otro factor para este producto</label>
+            <input type="range" id="f-rango" min="1.2" max="2.6" step="0.1" value="1.7"><output id="f-valor" for="f-rango">×1.7</output>
+            <button type="button" class="link" id="f-reset">Volver al supuesto</button></div>
+        </div>
       </div>
       <div class="panel" id="p-sup">
         <div class="row"><h3>Supermercados online · desde el 25 de octubre</h3><span class="note" id="u-sup"></span></div>
@@ -167,6 +196,7 @@ footer a { color: var(--accent); }
     <ul>
       <li><b>Mercado Mayorista:</b> precio mínimo, máximo y promedio del día en el Gran Mercado Mayorista de Lima, de la consulta pública de EMMSA. Para cada producto se sigue siempre la misma variedad (por ejemplo, papa amarilla, tomate katia, limón en cajón).</li>
       <li><b>Unidades:</b> desde el 30 de octubre EMMSA publica algunos productos por saco, jaba o cajón. Aquí todo está convertido a soles por kilo para que se pueda comparar con los meses anteriores.</li>
+      <li><b>Mercado de barrio (estimado):</b> precio mayorista × un factor por producto, medido comparando el precio minorista que publica Midagri (SISAP) el 26 de octubre de 2026 con el mayorista de esa semana: papa amarilla ×1.6, limón ×1.7 y choclo ×2.3. Para los demás productos se usa ×1.7, el valor central de esos tres. Luego se ajusta por zona, de ×0.92 a ×1.14. Fuente del precio minorista: El Comercio, con datos de Midagri.</li>
       <li><b>Supermercados:</b> precio público de la tienda online de cada cadena, tomado cada mañana. Puede ser por kilo, por unidad o por paquete, y puede incluir ofertas del día.</li>
       <li><b>INEI:</b> variación mensual del Índice de Precios al Consumidor de Lima Metropolitana, según las notas de prensa citadas.</li>
       <li>Un proyecto de <a href="https://itzelysium.github.io/acuanto/" target="_blank" rel="noopener">Acuánto</a>, la app para planificar las compras de la semana en Lima.</li>
@@ -253,7 +283,8 @@ function lineas(container, fechas, series, opts) {
   container.innerHTML = '';
   const W = Math.max(300, Math.round(container.clientWidth || 640)), compact = W < 520;
   const H = compact ? Math.round((opts.h || 240) * .85) : (opts.h || 240), pL = 40, pR = compact ? (opts.endLabels ? 46 : 12) : (opts.pR || 16), pT = 12, pB = 26;
-  const vals = series.flatMap(s => [...s.v, ...(s.lo || []), ...(s.hi || [])]).filter(v => v != null);
+  const puntos = opts.points || [];
+  const vals = series.flatMap(s => [...s.v, ...(s.lo || []), ...(s.hi || [])]).concat(puntos.map(p => p.v)).filter(v => v != null);
   if (!vals.length) { container.innerHTML = '<p class="note">Sin datos para este producto.</p>'; return; }
   let lo = Math.min(...vals), hi = Math.max(...vals);
   const pad = (hi - lo) * .12 || hi * .1 || 1; lo = Math.max(0, lo - pad); hi = hi + pad;
@@ -276,16 +307,25 @@ function lineas(container, fechas, series, opts) {
     if (s.lo && s.hi) {
       let d = '', up = [], dn = [];
       s.v.forEach((v, i) => { if (s.lo[i] != null && s.hi[i] != null) { up.push([X(i), Y(s.hi[i])]); dn.unshift([X(i), Y(s.lo[i])]); } });
-      if (up.length) { d = 'M' + up.map(p => p.join(',')).join('L') + 'L' + dn.map(p => p.join(',')).join('L') + 'Z'; el('path', { d, fill: 'var(--band)', stroke: 'none' }, svg); }
+      if (up.length) { d = 'M' + up.map(p => p.join(',')).join('L') + 'L' + dn.map(p => p.join(',')).join('L') + 'Z'; el('path', { d, fill: s.band || 'var(--band)', stroke: 'none' }, svg); }
     }
+  });
+  series.forEach(s => {
     let d = '', pen = false;
     s.v.forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v).toFixed(1); pen = true; });
-    el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+    const ln = el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+    if (s.dash) ln.setAttribute('stroke-dasharray', '6 4');
     const li = s.v.map((v, i) => v == null ? -1 : i).filter(i => i >= 0).pop();
     if (li != null) {
       el('circle', { cx: X(li), cy: Y(s.v[li]), r: 4, fill: s.color, stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
       if (opts.endLabels) { const t = el('text', { x: X(li) + 8, y: Y(s.v[li]) + 4 + (s.dy || 0), class: 'lbl' }, svg); t.textContent = (s.short && !compact ? s.short + ' ' : '') + s.v[li].toFixed(2); }
     }
+  });
+  // precios minoristas observados (rombos): contraste del estimado
+  puntos.forEach(p => {
+    if (p.i < 0) return;
+    const x = X(p.i), y = Y(p.v);
+    el('path', { d: `M${x},${y - 6}L${x + 6},${y}L${x},${y + 6}L${x - 6},${y}Z`, fill: 'var(--ink)', stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
   });
   // capa de lectura: línea vertical + ficha con los valores del día
   const cross = el('line', { y1: pT, y2: H - pB, stroke: 'var(--ink-3)', 'stroke-width': 1, 'stroke-dasharray': '3 3', visibility: 'hidden' }, svg);
@@ -302,8 +342,9 @@ function lineas(container, fechas, series, opts) {
       if (v == null) { dots[k].setAttribute('visibility', 'hidden'); return; }
       dots[k].setAttribute('cx', X(i)); dots[k].setAttribute('cy', Y(v)); dots[k].setAttribute('visibility', 'visible');
       html += '<br>' + (series.length > 1 ? s.name + ': ' : 'Promedio: ') + sol(v);
-      if (s.lo && s.lo[i] != null) html += '<br>Mín. ' + sol(s.lo[i]) + ' · Máx. ' + sol(s.hi[i]);
+      if (s.lo && s.lo[i] != null) html += '<br>' + (s.bandLabel ? s.bandLabel + ' ' + sol(s.lo[i]) + ' a ' + sol(s.hi[i]) : 'Mín. ' + sol(s.lo[i]) + ' · Máx. ' + sol(s.hi[i]));
     });
+    puntos.filter(p => p.i === i).forEach(p => { html += '<br>◆ Observado: ' + sol(p.v) + '<br><span style="opacity:.8">' + p.label + '</span>'; });
     const cb = container.getBoundingClientRect();
     tt.show(html, X(i) * b.width / W + (b.left - cb.left), Y(Math.max(...series.map(s => s.v[i] ?? -Infinity).filter(isFinite), lo)) * b.height / H + (b.top - cb.top));
   };
@@ -347,10 +388,46 @@ function pintarChips() {
   });
 }
 
+// ---------- supuestos del mercado de barrio ----------
+// Factor = precio minorista de Midagri (SISAP, 26 oct 2026, vía El Comercio) ÷ precio mayorista promedio de EMMSA del 23 al 27 oct.
+const FACTOR_MEDIDO = { 'papa-amarilla': 1.6, limon: 1.7, choclo: 2.3 };
+const FACTOR_GENERAL = 1.7;            // valor central de los tres medidos, para el resto de productos
+const ZONA_BAJA = 0.92, ZONA_ALTA = 1.14;   // Lima Norte, Este y Sur ↔ San Isidro y Miraflores (factores de zona de la app Acuánto)
+const OBSERVADOS = {
+  'papa-amarilla': [['2026-10-26', 6.32, 'Promedio de mercados de Lima, Midagri (SISAP), vía El Comercio']],
+  choclo: [['2026-10-26', 12.34, 'Promedio de mercados de Lima, Midagri (SISAP), vía El Comercio']],
+  limon: [['2026-10-26', 4.79, 'Limón en bolsa, mercados de Lima, Midagri (SISAP), vía El Comercio']],
+  zanahoria: [['2026-11-04', 3.25, 'Mercado de Los Olivos, S/ 3 a 3.50 el kilo, vía Caretas']],
+};
+const factorProbado = {};
+const factorSupuesto = id => FACTOR_MEDIDO[id] ?? FACTOR_GENERAL;
+const factor = id => factorProbado[id] ?? factorSupuesto(id);
+const x1 = v => '×' + v.toFixed(1);
+
+function pintarSupuestos() {
+  const f = factor(sel), medido = FACTOR_MEDIDO[sel] != null, probado = factorProbado[sel] != null;
+  $('sup-factor').innerHTML = '<b>Factor de ' + nombre(sel).toLowerCase() + ': ' + x1(factorSupuesto(sel)) + '.</b> ' +
+    (medido ? 'Medido con el precio minorista de Midagri del 26 de octubre de 2026 contra el mayorista de esa semana.'
+            : 'Supuesto general: el valor central de los tres productos medidos (papa amarilla ×1.6, limón ×1.7, choclo ×2.3).') +
+    (probado ? ' <b>Ahora estás probando ' + x1(f) + '.</b>' : '');
+  $('f-rango').value = f.toFixed(1); $('f-valor').textContent = x1(f);
+  $('f-reset').hidden = !probado;
+}
+
 function pintarProducto() {
   const p = MAY.productos[sel], F = MAY.fechas, li = p.prom.map((v, i) => v == null ? -1 : i).filter(i => i >= 0).pop();
-  $('t-may').textContent = 'Mercado Mayorista · ' + nombre(sel) + ' · últimos 6 meses';
-  lineas($('c-may'), F, [{ name: nombre(sel), v: p.prom, lo: p.min, hi: p.max, color: 'var(--s1)' }], { aria: 'Precio mayorista de ' + nombre(sel), endLabels: false });
+  const f = factor(sel), r2 = v => v == null ? null : Math.round(v * 100) / 100;
+  const barrio = p.prom.map(v => r2(v == null ? null : v * f));
+  const bajo = p.prom.map(v => r2(v == null ? null : v * f * ZONA_BAJA)), alto = p.prom.map(v => r2(v == null ? null : v * f * ZONA_ALTA));
+  const puntos = (OBSERVADOS[sel] || []).map(([d, v, label]) => ({ i: F.indexOf(d), v, label: label + ' · ' + fmtFL(d) }));
+  $('t-may').textContent = nombre(sel) + ' · mayorista y mercado de barrio · últimos 6 meses';
+  lineas($('c-may'), F, [
+    { name: 'Mercado de barrio (estimado)', short: 'Barrio ~', v: barrio, lo: bajo, hi: alto, band: 'var(--band2)', bandLabel: 'Según zona:', color: 'var(--s2)', dash: true },
+    { name: 'Mayorista', short: 'Mayorista', v: p.prom, lo: p.min, hi: p.max, color: 'var(--s1)' },
+  ], { aria: 'Precio mayorista y precio estimado en mercado de barrio de ' + nombre(sel), endLabels: true, pR: 118, points: puntos });
+  fixLabels($('c-may'));
+  pintarSupuestos();
+  $('leg-obs').hidden = !puntos.some(q => q.i >= 0);
   // supermercados
   const HF = HIST.fechas, cad = Object.keys(HIST.cadenas), colores = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
   let ocultos = 0;
@@ -375,16 +452,17 @@ function pintarProducto() {
   // carteles de precio
   const tags = $('tags'), u = unidades[0] || '';
   let html = '<div class="tag"><span class="k">Mayorista hoy</span><span class="v">' + (li != null ? sol(p.prom[li]) : '—') + '</span><span class="u">el kilo · ' + (li != null ? fmtF(F[li]) : '') + '</span></div>';
+  if (li != null) html += '<div class="tag"><span class="k">Mercado de barrio (estimado)</span><span class="v">' + sol(barrio[li]) + '</span><span class="u">el kilo · según zona ' + sol(bajo[li]) + ' a ' + sol(alto[li]) + '</span></div>';
   if (hoySup.length) html += '<div class="tag"><span class="k">Supermercado más barato</span><span class="v">' + sol(hoySup[0].v) + '</span><span class="u">' + hoySup[0].name + ' · por ' + (u || 'unidad') + '</span></div>';
   const c = cambios().find(r => r.id === sel);
   if (c) html += '<div class="tag plain"><span class="k">Contra hace 4 semanas</span><span class="v" style="color:' + (c.v >= 0 ? 'var(--up)' : 'var(--down)') + '">' + pct(c.v) + '</span><span class="u">en el mayorista</span></div>';
   tags.innerHTML = html;
   // tabla
   const desde = Math.max(0, F.length - 14);
-  let t = '<table><thead><tr><th>Fecha</th><th>Mayorista (kilo)</th>' + series.map(s => '<th>' + s.name + '</th>').join('') + '</tr></thead><tbody>';
+  let t = '<table><thead><tr><th>Fecha</th><th>Mayorista (kilo)</th><th>Mercado de barrio, estimado (kilo)</th>' + series.map(s => '<th>' + s.name + '</th>').join('') + '</tr></thead><tbody>';
   for (let i = F.length - 1; i >= desde; i--) {
     const hi = HF.indexOf(F[i]);
-    t += '<tr><td>' + fmtFL(F[i]) + '</td><td>' + (p.prom[i] != null ? sol(p.prom[i]) : '—') + '</td>' + series.map(s => '<td>' + (hi >= 0 && s.v[hi] != null ? sol(s.v[hi]) : '—') + '</td>').join('') + '</tr>';
+    t += '<tr><td>' + fmtFL(F[i]) + '</td><td>' + (p.prom[i] != null ? sol(p.prom[i]) : '—') + '</td><td>' + (barrio[i] != null ? sol(barrio[i]) : '—') + '</td>' + series.map(s => '<td>' + (hi >= 0 && s.v[hi] != null ? sol(s.v[hi]) : '—') + '</td>').join('') + '</tr>';
   }
   $('tabla').innerHTML = t + '</tbody></table>';
 }
@@ -419,6 +497,8 @@ function pintarNews() {
   const h = (location.hash || '').slice(1);
   sel = MAY.productos[h] ? h : cambios()[0].id;
   pintarChips(); pintarProducto(); pintarSemana(); pintarInei('oct'); pintarNews();
+  $('f-rango').addEventListener('input', e => { factorProbado[sel] = Number(e.target.value); pintarProducto(); });
+  $('f-reset').addEventListener('click', () => { delete factorProbado[sel]; pintarProducto(); });
   $('m-oct').addEventListener('click', () => pintarInei('oct')); $('m-sep').addEventListener('click', () => pintarInei('sep'));
   addEventListener('hashchange', () => { const k = location.hash.slice(1); if (MAY.productos[k] && k !== sel) elegir(k, false); });
   // los gráficos se dibujan al ancho real (texto legible en el celular): se redibujan si cambia el ancho
