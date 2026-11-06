@@ -7,7 +7,7 @@ porque EMMSA puede corregirlos durante el día.
 Uso: python scripts/mayorista.py [--csv precios_mayorista.csv] [--json precios_mayorista.json] [--dias 180]
 
 - precios_mayorista.csv: todas las variedades, una fila por día y variedad (S/ por kilo: mínimo, máximo y promedio).
-  Lo usa el tablero de gerencia.
+  Lo usa el tablero de gerencia. Las variedades que EMMSA pasó a publicar por bulto se convierten con POR_BULTO.
 - precios_mayorista.json: solo la variedad de referencia de cada producto que la app cotiza, como series por día.
   Lo usa la app (pestaña Alzas y referencia del Plan Restaurante).
 """
@@ -34,6 +34,19 @@ REF = {
     ("35", "01"): "olluco", ("31", "11"): "maiz-morado",
 }
 COLS = ["fecha", "producto_id", "producto_emmsa", "variedad", "codpro", "coddet", "precio_min", "precio_max", "precio_prom"]
+# Desde el 30 de octubre de 2026 EMMSA publica estas 30 variedades en otra unidad (por bulto: cajón, jaba, saco...;
+# o en unas pocas, una unidad menor) y lo aplicó también a su histórico. Precio nuevo = precio anterior × factor,
+# medido en 20 días de traslape (oct 2026). Se divide para que cada serie siga en la unidad de siempre.
+POR_BULTO = {
+    ("02", "09"): 18, ("04", "01"): 0.65, ("05", "02"): 4, ("06", "01"): 3, ("08", "01"): 2.5, ("09", "01"): 0.75,
+    ("10", "02"): 12, ("11", "01"): 4, ("15", "02"): 35, ("16", "01"): 35, ("17", "01"): 1.5, ("18", "04"): 60,
+    ("20", "01"): 0.5, ("26", "02"): 12, ("26", "03"): 6, ("28", "01"): 6, ("28", "02"): 3, ("28", "03"): 3,
+    ("28", "04"): 6, ("30", "01"): 21, ("30", "02"): 41, ("34", "01"): 0.15, ("40", "01"): 6, ("42", "01"): 18,
+    ("43", "01"): 2.6, ("45", "01"): 0.75, ("48", "06"): 20, ("53", "01"): 45, ("54", "01"): 12, ("54", "02"): 3,
+}
+# Freno: si el precio del día es 6 veces mayor (o menor) que la mediana de los últimos 10 días guardados, es casi
+# seguro otro cambio de unidad y no un alza real: esa variedad no se guarda ese día y queda un aviso en el log y en el JSON.
+SALTO_MAX = 6
 
 
 def pedir(op, data=None):
@@ -49,10 +62,23 @@ def pedir(op, data=None):
     raise RuntimeError(f"EMMSA no respondió ({op})")
 
 
-def actualizar(filas, dias, pausa):
+def referencias(filas):
+    """Mediana de los últimos 10 precios promedio guardados de cada variedad."""
+    por_var = {}
+    for r in sorted(filas, key=lambda r: r["fecha"]):
+        por_var.setdefault((str(r["codpro"]), str(r["coddet"])), []).append(float(r["precio_prom"]))
+    out = {}
+    for k, v in por_var.items():
+        u = sorted(v[-10:])
+        out[k] = u[len(u) // 2]
+    return out
+
+
+def actualizar(filas, dias, pausa, avisos):
     recientes = set(sorted({r["fecha"] for r in filas})[-2:])
     filas = [r for r in filas if r["fecha"] not in recientes]
     ya = {r["fecha"] for r in filas}
+    ref = referencias(filas)
     inicio = (datetime.now(LIMA).date() - timedelta(days=dias)).isoformat()
     fechas = [f for f in pedir("listar_fechas")
               if inicio <= f["fecha"].replace("/", "-") and f["fecha"].replace("/", "-") not in ya]
@@ -65,9 +91,16 @@ def actualizar(filas, dias, pausa):
         dia, nuevos = f["fecha"].replace("/", "-"), nuevos + 1
         for r in d.get("data") or []:
             k = (str(r["codpro"]).strip(), str(r["coddet"]).strip())
+            f = POR_BULTO.get(k, 1)
+            pmin, pmax, prom = (round(float(r[c]) / f, 2) for c in ("precio_min", "precio_max", "precio_prom"))
+            base = ref.get(k)
+            if base and prom > 0 and (prom / base > SALTO_MAX or base / prom > SALTO_MAX):
+                avisos.append(f"{dia} {str(r['variedad']).strip()} ({k[0]}/{k[1]}): S/ {prom} contra una mediana de S/ {base}. "
+                              "Posible cambio de unidad en EMMSA; no se guardó ese día.")
+                continue
             filas.append({"fecha": dia, "producto_id": REF.get(k, ""), "producto_emmsa": str(r["producto"]).strip().title(),
                           "variedad": str(r["variedad"]).strip(), "codpro": k[0], "coddet": k[1],
-                          "precio_min": float(r["precio_min"]), "precio_max": float(r["precio_max"]), "precio_prom": float(r["precio_prom"])})
+                          "precio_min": pmin, "precio_max": pmax, "precio_prom": prom})
         time.sleep(pausa)
     filas = [r for r in filas if r["fecha"] >= inicio]
     filas.sort(key=lambda r: (r["fecha"], r["codpro"], r["coddet"]))
@@ -99,15 +132,19 @@ def main(argv=None):
 
     ruta = pathlib.Path(a.csv)
     filas = list(csv.DictReader(ruta.open(encoding="utf-8"))) if ruta.exists() else []
-    filas, nuevos = actualizar(filas, a.dias, a.pausa)
+    avisos = []
+    filas, nuevos = actualizar(filas, a.dias, a.pausa, avisos)
     if not filas:
         raise SystemExit("EMMSA no devolvió precios")
+    for x in avisos:
+        print("AVISO", x, file=sys.stderr)
     with ruta.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLS, lineterminator="\n")
         w.writeheader()
         for r in filas:
             w.writerow({c: r.get(c, "") for c in COLS})
     app = series_app(filas)
+    app["avisos"] = avisos
     pathlib.Path(a.json).write_text(json.dumps(app, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"{nuevos} días pedidos · {len(app['fechas'])} días guardados (último: {app['fecha']}) · {len(app['productos'])} productos de la app")
 
