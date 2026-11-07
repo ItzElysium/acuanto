@@ -187,6 +187,8 @@
   nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 2px solid var(--line);
             padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
   nav.bar .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); gap: 4px; padding: 8px 6px; }
+  nav.bar .in.sin-aportar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  nav.bar button[hidden] { display: none; }
   nav.bar button { min-height: 64px; min-width: 0; border: none; background: transparent; border-radius: 14px; display: grid; justify-items: center; align-content: center; gap: 2px;
                    font-weight: 700; font-size: 0.8rem; line-height: 1.1; text-align: center; padding: 4px 2px; color: var(--muted); }
   nav.bar button svg { width: 28px; height: 28px; }
@@ -391,7 +393,7 @@
 <body>
 <div class="app">
   <header class="top">
-    <div class="brand"><b>ACUÁNTO</b><span>El precio de hoy en tu mercado</span></div>
+    <div class="brand"><b>ACUÁNTO</b><span id="brand-sub">El precio de hoy en tu mercado</span></div>
     <div class="hbtns">
       <button class="opina" id="btn-opinar" type="button" aria-label="Dar mi opinión sobre la app"><span aria-hidden="true">💬</span>Opinar</button>
       <button class="aa" id="btn-letra" type="button" aria-label="Cambiar tamaño de letra">Aa</button>
@@ -419,7 +421,7 @@
       </button>
       <button type="button" data-go="puntos" id="nav-puntos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
-        Mis puntos
+        <span id="nav-puntos-txt">Mis puntos</span>
       </button>
     </div>
   </nav>
@@ -733,6 +735,7 @@ function cargarLugares(d) {
 function rehacerMapa() {
   const propios = ((state.perfil && state.perfil.propios) || []).map((m) => ({ ...m, f: zonaF(m.distrito), propio: true }));
   MERC_MAP = new Map([...MERCADOS, ...LUG.mercados, ...propios].map((m) => [m.id, m]));
+  if (!MINORISTAS) for (const m of MERC_MAP.values()) if (esMayorista(m)) m.tipo = "mayorista";
 }
 function listaDistritos() {
   return [...new Set([...Object.keys(ZONA_F), ...Object.keys(LUG.distritos), ...MERCADOS.map((m) => m.distrito)])].sort((a, b) => a.localeCompare(b, "es"));
@@ -802,7 +805,7 @@ function buscarMercados(q) {
 function autoSupers(ref) {
   const P = state.perfil;
   if (!ref || P.supersElegidos) return;
-  const cerca = SUPERS.map((s) => ({ s, b: sedeCercana(s.id, ref) })).filter((x) => x.b && x.b.d < 6000).sort((a, b) => a.b.d - b.b.d);
+  const cerca = SUPERS.filter(conDatos).map((s) => ({ s, b: sedeCercana(s.id, ref) })).filter((x) => x.b && x.b.d < 6000).sort((a, b) => a.b.d - b.b.d);
   if (cerca.length) P.supers = cerca.slice(0, limiteMercados()).map((x) => x.s.id);
 }
 function ubicar() {
@@ -819,9 +822,10 @@ function ubicar() {
     state.ubic = { la, lo, ts: Date.now() }; state.verDistrito = false; state.verMas = 0; P.zona = null; LS.set("acuanto.ubic", state.ubic);
     const d = distritoCercano(la, lo); if (d) P.distrito = d;
     let auto = false;
-    if (!P.mercados.length) { P.mercados = cercanos(state.ubic, Math.min(2, limiteMercados())).map((x) => x.m.id); auto = P.mercados.length > 0; }
+    if (MINORISTAS && !P.mercados.length) { P.mercados = cercanos(state.ubic, Math.min(2, limiteMercados())).map((x) => x.m.id); auto = P.mercados.length > 0; }
     autoSupers(state.ubic);
-    state.aviso = auto ? "Te marcamos los mercados más cercanos. Cámbialos si compras en otro." : null;
+    state.aviso = !MINORISTAS ? "Te mostramos el mayorista y los supermercados más cercanos. Cámbialos si compras en otro."
+      : auto ? "Te marcamos los mercados más cercanos. Cámbialos si compras en otro." : null;
     guardar(); evento("ubicacion", { ok: true, distrito: d, auto });
     render();
   }, (err) => {
@@ -849,7 +853,7 @@ const state = {
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
   historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.9.1";
+const VERSION = "Prueba 0.10";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
@@ -967,9 +971,41 @@ function precioHoy(p, m) {
   return { precio: est, observado: false, n: 0 };
 }
 function escasez(p, m) { return reportesDe(p.id, m.id).filter((r) => r.fuente === "nohay").length; }
-function misMercados() { return (state.perfil.mercados || []).map(merc).filter(Boolean); }
+function misMercados() {
+  if (!MINORISTAS) { const m = miMayorista(); return m ? [m] : []; }
+  return (state.perfil.mercados || []).map(merc).filter(Boolean);
+}
 function limiteMercados() { const h = state.perfil.ampliadoHasta; return h && h >= hoy() ? AMPLIADO : GRATIS; }
 const corto = (m) => m.nombre.replace("Mercado ", "");
+/* Versión web: los mercados minoristas quedan ocultos hasta tener sus precios reales (MINORISTAS = true los vuelve a mostrar,
+   con sus aportes y fotos de pizarra). Mientras tanto se compara el mercado mayorista más cercano, con el precio real de EMMSA,
+   y los supermercados cerca de ti, con el precio de su web. */
+const MINORISTAS = false;
+const EMMSA_ID = "osm-w357292885";   // Gran Mercado Mayorista de Lima (Santa Anita): de aquí sale el precio mayorista
+const esMayorista = (m) => !!m && /mayorista|productores/i.test(m.nombre) && !/minorista|pl[aá]tanos/i.test(m.nombre) && (m.a || 0) >= 5000;
+function mayoristasCerca(ref) {
+  const ms = todosMercados().filter(esMayorista);
+  return ref && ref.la ? ms.map((m) => ({ m, d: distM(ref.la, ref.lo, m.la, m.lo) })).sort((a, b) => a.d - b.d)
+    : ms.map((m) => ({ m, d: null })).sort((a, b) => (b.m.a || 0) - (a.m.a || 0));
+}
+/* El mayorista elegido; si no eligió, el mayorista grande y general (no solo de frutas) más cercano a su ubicación o distrito. */
+function miMayorista() {
+  const elegido = (state.perfil.mercados || []).map(merc).find((m) => m && m.tipo === "mayorista");
+  if (elegido) return elegido;
+  const cs = mayoristasCerca(state.ubic || puntoLista()), c = cs.find((x) => (x.m.a || 0) >= 25000 && !/frutas/i.test(x.m.nombre)) || cs[0];
+  return (c && c.m) || merc(EMMSA_ID) || null;
+}
+/* Precio real de hoy en un lugar (web del súper o EMMSA), o null si no hay. */
+function realEn(p, L) {
+  if (L.tipo === "super") return precioReal(p, L);
+  if (L.tipo === "mayorista") { const m = mayHoy(p.id); return m ? m.v : null; }
+  return null;
+}
+let cacheCambios = { may: null, mapa: new Map() };
+function cambioSemana(pid) {   // cambio de la semana en el mayorista (%), o null
+  if (cacheCambios.may !== state.may) cacheCambios = { may: state.may, mapa: new Map(cambiosMayorista().map((c) => [c.pid, c.v])) };
+  return cacheCambios.mapa.has(pid) ? cacheCambios.mapa.get(pid) : null;
+}
 
 /* ---------------------------- mi semana: cálculo ---------------------------- */
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -1153,19 +1189,26 @@ const precioReal = (p, L) => { const x = state.superReal && state.superReal.cade
 const tieneReal = (L) => !!(state.superReal && state.superReal.cadenas[L.id] && Object.keys(state.superReal.cadenas[L.id].precios).length);
 function fechaCorta(iso) { try { return new Date(iso + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "short" }); } catch (e) { return iso; } }
 const lugar = (id) => merc(id) || SUPERS.find((s) => s.id === id);
-const misSupers = () => SUPERS.filter((x) => (state.perfil.supers || []).includes(x.id));
+/* En la versión web solo se comparan las cadenas de las que tenemos precio real de su web (si aún no cargan, todas). */
+const conDatos = (x) => MINORISTAS || !state.superReal || tieneReal(x);
+const misSupers = () => SUPERS.filter((x) => (state.perfil.supers || []).includes(x.id) && conDatos(x));
 const lugares = () => [...misMercados(), ...misSupers()];
 const nombreLugar = (L) => (L.tipo === "super" ? L.nombre : corto(L));
 function precioLugar(p, L) {
   if (L.tipo === "super") return precioReal(p, L) ?? r10(p.base * (L.fr[p.rubro] || 1) * (1 + ruido(p.id, L.id)));
+  if (L.tipo === "mayorista") {   // lo que el mayorista no publica (abarrotes, carnes, lácteos) se cuenta al precio del súper más barato
+    const m = mayHoy(p.id); if (m) return m.v;
+    const xs = misSupers().map((S) => precioReal(p, S)).filter((x) => x > 0);
+    return xs.length ? Math.min(...xs) : precioRef(p);
+  }
   return precioHoy(p, L).precio;
 }
 function totalEn(L, items) {
   let t = 0, r = 0, vistos = 0, reales = 0;
   for (const it of items) {
     const pr = precioLugar(it.p, L), c = it.compra * pr; t += c; if (it.p.riesgo) r += c;
-    if (L.tipo !== "super" && precioHoy(it.p, L).observado) vistos++;
-    if (L.tipo === "super" && precioReal(it.p, L)) reales++;
+    if (!L.tipo && precioHoy(it.p, L).observado) vistos++;
+    if (L.tipo && realEn(it.p, L)) reales++;
   }
   return { m: L, t: r2(t), r: r2(r), vistos, reales, n: items.length };
 }
@@ -1213,6 +1256,7 @@ function sugerencias(L) {
 }
 /* Estado de un producto en un mercado: caro (subió 10% o más en la semana), escaso (reportan que no hay) o en riesgo por El Niño. */
 function estadoProd(p, M) {
+  if (!MINORISTAS) { const v = cambioSemana(p.id); return { caro: v != null && v >= SEM_SUBE, sube: v != null ? v / 100 : 0, escaso: false, riesgo: p.riesgo }; }
   const m = M && M.tipo !== "super" ? M : misMercados()[0];
   if (!m) return { caro: false, sube: 0, escaso: false, riesgo: p.riesgo };
   const hoyP = precioHoy(p, m).precio, antes = semanaPasada(p, m), sube = antes ? (hoyP - antes) / antes : 0;
@@ -1272,20 +1316,21 @@ function vBienvenida() {
   if (state.paso === 1) return `
     <div style="display:grid;gap:10px;padding-top:8px">
       <h1>¿A cuánto está hoy?</h1>
-      <p class="muted">Mira el precio en tus mercados antes de salir. Lo cuentan las caseras y los caseros que compran y venden ahí.</p>
+      <p class="muted">${MINORISTAS ? "Mira el precio en tus mercados antes de salir. Lo cuentan las caseras y los caseros que compran y venden ahí."
+        : "Compara el mercado mayorista y los supermercados cerca de ti, y arma los almuerzos de tu semana con lo que está barato."}</p>
     </div>
     <h2>¿Cómo vas a usar la app?</h2>
     <button class="choice" data-act="rol" data-v="compra" aria-pressed="${p.rol === "compra"}">
-      <span class="ic" aria-hidden="true">${icono.compra}</span><span><b>Compro en el mercado</b><span>Veo precios y aviso cuando algo cambia</span></span>
+      <span class="ic" aria-hidden="true">${icono.compra}</span><span><b>${MINORISTAS ? "Compro en el mercado" : "Compro para mi casa"}</b><span>${MINORISTAS ? "Veo precios y aviso cuando algo cambia" : "Veo precios y armo mi semana"}</span></span>
     </button>
-    <button class="choice" data-act="rol" data-v="puesto" aria-pressed="${p.rol === "puesto"}">
+    ${MINORISTAS ? `<button class="choice" data-act="rol" data-v="puesto" aria-pressed="${p.rol === "puesto"}">
       <span class="ic" aria-hidden="true">${icono.puesto}</span><span><b>Tengo un puesto</b><span>Publico mis precios para que me encuentren</span></span>
-    </button>
+    </button>` : ""}
     <button class="choice" data-act="rol" data-v="resto" aria-pressed="${p.rol === "resto"}">
       <span class="ic" aria-hidden="true">🍲</span><span><b>Tengo un restaurante o menú</b><span>Costo de mi menú y pedido a mis proveedores</span>
         <span class="prem" style="margin-top:6px">PREMIUM · GRATIS EN LA PRUEBA</span></span>
     </button>
-    <p class="note">Versión de prueba con precios de ejemplo. Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>
+    <p class="note">${MINORISTAS ? "Versión de prueba con precios de ejemplo." : "Versión de prueba con precios reales del Gran Mercado Mayorista de Lima y de las webs de los supermercados."} Cuando quieras, toca <b>💬 Opinar</b> arriba y cuéntanos qué mejorarías.</p>
     ${supaOn() ? `<p class="small muted">Para mejorar la app registramos de forma anónima qué pantallas, platos y productos usas. Tu nombre y celular, solo si tú decides dejarlos.</p>` : ""}`;
   if (state.paso === 4) return vRegistro();
   if (state.paso === 2) return `
@@ -1298,6 +1343,7 @@ function vBienvenida() {
         <span class="tag"><span class="p" style="font-size:${(l.px / 19) * 1.45}rem">S/ 4.50</span></span>
       </button>`).join("")}</div>
     <button class="btn" data-act="paso" data-v="3">Seguir</button>`;
+  if (!MINORISTAS) return vLugaresWeb();
   const ref = puntoLista(), n = 6 + (state.verMas || 0);
   const elegidos = misMercados().map((m) => ({ m, d: distLugar(m) }));
   const zona = zonaActiva();
@@ -1349,6 +1395,49 @@ function vBienvenida() {
     ${hayLugares ? `<p class="small muted">Mercados y tiendas: © colaboradores de OpenStreetMap. Precios de ejemplo hasta que la gente reporte los reales.</p>` : ""}
     <p class="small muted">Tus aportes se publican sin tu nombre y tu número no se comparte. Al seguir aceptas el uso de tus aportes para calcular precios (Ley 29733).</p>
     <button class="btn" data-act="empezar" ${p.mercados.length ? "" : "disabled"}>Empezar</button>`;
+}
+/* Paso 3 de la versión web: el mayorista y los supermercados más cercanos (sin mercados minoristas). */
+function vLugaresWeb() {
+  const p = state.perfil, refS = state.ubic || puntoLista(), may = miMayorista();
+  const lista = mayoristasCerca(refS).slice(0, 4 + (state.verMas || 0)), total = todosMercados().filter(esMayorista).length;
+  const supers = SUPERS.map((x) => ({ x, b: sedeCercana(x.id, refS) })).sort((a, b) => (a.b ? a.b.d : 1e9) - (b.b ? b.b.d : 1e9));
+  const conUbic = state.ubic && !state.verDistrito;
+  return `
+    <button class="back" data-act="paso" data-v="2">‹ Atrás</button>
+    <h1>¿Dónde compras?</h1>
+    <p class="muted">Te mostramos el mercado mayorista y los supermercados más cerca de ti, con sus precios de hoy.</p>
+    <div class="card" style="gap:10px">${conUbic
+      ? `<p class="status" style="margin:0">📍 Ordenado por cercanía a ti${p.distrito ? " · " + esc(p.distrito) : ""}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:4px 12px"><button class="link" data-act="ubicar">Actualizar mi ubicación</button>
+          <button class="link" data-act="olvidar-ubic">Olvidar mi ubicación</button></div>`
+      : `<button class="btn" data-act="ubicar" ${state.ubicando ? "disabled" : ""}>${state.ubicando ? "Buscando dónde estás…" : "📍 Ver lo más cerca de mí"}</button>
+        <p class="small muted">Tu ubicación se usa solo en tu celular para ordenar por cercanía. No la guardamos ni la enviamos.</p>`}
+      ${state.ubicError ? `<p class="note" role="alert">${esc(state.ubicError)}</p>` : ""}
+      <div><label class="lbl" for="sel-distrito">${conUbic ? "¿Compras en otro distrito?" : "O elige tu distrito"}</label>
+        <select class="big" id="sel-distrito">${listaDistritos().map((d) => `<option ${d === p.distrito ? "selected" : ""}>${esc(d)}</option>`).join("")}</select></div></div>
+    ${state.aviso ? `<p class="note" role="alert">${esc(state.aviso)}</p>` : ""}
+
+    <div style="display:grid;gap:8px"><h2>Tu mercado mayorista</h2>
+      <p class="small muted">Elige uno. El precio es el del Gran Mercado Mayorista de Lima (EMMSA), por mayor; en otros mayoristas y al por menor puede variar un poco.</p>
+      <div class="list">${lista.map(({ m, d }) => filaMayorista(m, conUbic ? d : null, may)).join("") || `<p class="muted">Cargando mayoristas…</p>`}</div>
+      ${lista.length < total ? `<button class="btn quiet" data-act="merc-mas">Ver más mayoristas</button>` : ""}</div>
+
+    <div style="display:grid;gap:8px"><h2>Supermercados ${conUbic ? "cerca de ti" : "para comparar"}</h2>
+      <p class="small muted">Elige hasta ${limiteMercados()}. Usamos el precio de su web.${conUbic ? " La distancia es a su tienda más cercana." : ""}</p>
+      <div class="chips wrap" role="group" aria-label="Supermercados">${supers.map(({ x, b }) => {
+        if (!conDatos(x)) return `<button class="chip" disabled>${esc(x.nombre)} · pronto</button>`;
+        const on = (p.supers || []).includes(x.id);
+        return `<button class="chip" data-act="super" data-v="${x.id}" aria-pressed="${on}">${on ? "✓ " : ""}${esc(x.nombre)}${b ? (conUbic ? " · " + fmtDist(b.d) : b.d < 6000 ? " · " + esc(b.s.distrito) : "") : ""}</button>`; }).join("")}</div>
+      ${conUbic ? `<p class="small muted">${supers.filter(({ x, b }) => b && conDatos(x) && (p.supers || []).includes(x.id)).map(({ x, b }) => `${esc(x.nombre)}: ${esc(b.s.sede ? b.s.sede + ", " : "")}${esc(b.s.distrito)}`).join(" · ")}</p>` : ""}</div>
+
+    <p class="small muted">Mercados y tiendas: © colaboradores de OpenStreetMap. Estamos preparando los precios de los mercados de barrio.</p>
+    <button class="btn" data-act="empezar" ${may || (p.supers || []).length ? "" : "disabled"}>Empezar</button>`;
+}
+function filaMayorista(m, d, sel) {
+  const on = !!sel && sel.id === m.id;
+  return `<button class="choice" data-act="mayorista" data-v="${esc(m.id)}" aria-pressed="${on}" style="grid-template-columns:1fr auto;min-height:72px">
+    <span><b>${esc(m.nombre)}</b><span>${esc(m.distrito)}${d != null ? " · " + fmtDist(d) : ""}${m.id === EMMSA_ID ? " · de aquí sale el precio" : ""}</span></span>
+    <span aria-hidden="true" style="font-size:1.5rem">${on ? "✔" : "＋"}</span></button>`;
 }
 function filaMercado(m, d) {
   const on = state.perfil.mercados.includes(m.id);
@@ -1405,7 +1494,64 @@ function chipsMercados() {
     <button class="chip add" data-act="editar-mercados">+ Mercados</button></div>`;
 }
 
+function chipsLugares(L) {
+  return `<div class="chips" role="group" aria-label="Dónde ver precios">${lugares().map((x) => `
+    <button class="chip" data-act="activo" data-v="${esc(x.id)}" aria-pressed="${x.id === L.id}">${esc(x.tipo === "super" ? x.nombre : corto(x))}</button>`).join("")}
+    <button class="chip add" data-act="editar-mercados">Cambiar lugares</button></div>`;
+}
+function filaPrecio(p, L) {
+  const x = realEn(p, L), v = cambioSemana(p.id);
+  const est = L.tipo !== "mayorista" || v == null ? "" : v >= 3 ? `<span class="pill up">▲ ${fmtPct(v)} en la semana</span>`
+    : v <= -3 ? `<span class="pill down">▼ ${fmtPct(v)} en la semana</span>` : `<span class="pill same">= Estable en la semana</span>`;
+  const sr = L.tipo === "super" && state.superReal ? ((state.superReal.cadenas[L.id] || {}).precios || {})[p.id] : null;
+  const oferta = sr && sr.oferta ? `<span class="pill down">Oferta</span>` : "";
+  const otros = lugares().filter((o) => o.id !== L.id).map((o) => ({ o, x: realEn(p, o) })).filter((z) => z.x).sort((a, b) => a.x - b.x);
+  const barato = otros.length && otros[0].x <= x - 0.3 ? `<span class="cheap">Más barato en ${esc(nombreLugar(otros[0].o))}: ${soles(otros[0].x)}</span>` : "";
+  const e = estadoProd(p, L), sub = e.caro ? sustitutos(p, L).find((z) => z.ahorro > 0.1) : null;
+  const pista = sub ? `<span class="hint">💡 Prueba ${esc(sub.s.nombre.toLowerCase())}</span>` : "";
+  return `<button class="prod" data-act="producto" data-v="${p.id}">
+    <span class="emo" aria-hidden="true">${emoP(p)}</span>
+    <span class="name">${p.nombre}</span>
+    <span class="tag"><span class="p">${soles(x)}</span><br><span class="u">${porUnidad(p)}</span></span>
+    <span class="meta">${est} ${oferta} ${barato} ${pista}</span>
+  </button>`;
+}
+function botonSemana() {
+  if (state.perfil.rol === "resto") {
+    const ds = diasConMenu(), prom = ds.length ? ds.reduce((a, d) => a + costoDia(d).t, 0) / ds.length : 0;
+    return `<button class="btn sec" data-go="semana">🍲 ${ds.length ? `Tu menú: ${soles(prom)} de insumos (${Math.round((prom / state.resto.precioMenu) * 100)}% del precio)` : "¿Cuánto te cuesta tu menú? Calcúlalo"}</button>`;
+  }
+  const best = nPlatos() ? totalesSemana(porComprar())[0] : null;
+  return best ? `<button class="btn sec" data-go="semana">🛒 Tu compra de la semana: ${soles(best.t)} en ${esc(corto(best.m))}</button>`
+    : `<button class="btn sec" data-go="semana">🛒 ¿Cuánto gastarás esta semana? Arma tu lista</button>`;
+}
+/* Precios de la versión web: un lugar a la vez (mayorista o súper), solo con precios reales de hoy. */
+function vPreciosWeb() {
+  const ls = lugares(), L = ls.find((x) => x.id === state.mercadoActivo) || ls[0];
+  if (!L) return `<h1>¿Dónde compras?</h1><p class="muted">Elige el mayorista y los supermercados que quieres comparar.</p><button class="btn" data-act="editar-mercados">Elegir lugares</button>`;
+  state.mercadoActivo = L.id;
+  const riesgo = PRODUCTOS.filter((p) => p.riesgo).map((p) => p.nombre.toLowerCase());
+  const conPrecio = PRODUCTOS.filter((p) => realEn(p, L)), filtro = state.rubroInicio || "todo";
+  const sede = L.tipo === "super" ? sedeCercana(L.id, state.ubic || puntoLista()) : null;
+  const fechaMay = (() => { const x = PRODUCTOS.map((p) => mayHoy(p.id)).filter(Boolean).map((m) => m.fecha).sort().pop(); return x ? fechaCorta(x) : ""; })();
+  const sub = L.tipo === "super"
+    ? `Precio de su web${state.superReal ? " del " + fechaCorta(state.superReal.fecha) : ""}${sede ? ` · tienda más cercana: ${esc(sede.s.sede ? sede.s.sede + ", " : "")}${esc(sede.s.distrito)}${state.ubic ? " · " + fmtDist(sede.d) : ""}` : ""}. En la tienda puede variar.`
+    : `${esc(L.distrito)}${distTxt(L)}. ${L.id === EMMSA_ID ? "Precio por mayor" : "Precio de referencia del Gran Mercado Mayorista de Lima"} (EMMSA${fechaMay ? ", " + fechaMay : ""}); al por menor puede costar algo más.`;
+  return `${chipsLugares(L)}
+    <div class="alert" role="note"><span class="bang" aria-hidden="true">!</span>
+      <span><b>Por El Niño pueden subir:</b> ${riesgo.join(", ")}. Compra lo que necesitas y compara antes.</span></div>
+    ${botonSemana()}
+    <div style="display:grid;gap:4px"><h1>Hoy en ${esc(L.tipo === "super" ? L.nombre : L.nombre)}</h1>
+      <p class="muted small">${sub}</p></div>
+    ${conPrecio.length ? `<div class="chips" role="group" aria-label="Ver productos">${[{ id: "todo", corto: "Todo" }, ...RUBROS].filter((r) => r.id === "todo" || conPrecio.some((p) => p.rubro === r.id)).map((r) => `
+      <button class="chip" data-act="rubro-inicio" data-v="${r.id}" aria-pressed="${filtro === r.id}">${r.corto}</button>`).join("")}</div>
+    <div class="list">${RUBROS.filter((r) => filtro === "todo" || r.id === filtro).map((r) => { const ps = conPrecio.filter((p) => p.rubro === r.id);
+      return ps.length ? `<h2 class="grp-t">${r.nombre}</h2>${ps.map((p) => filaPrecio(p, L)).join("")}` : ""; }).join("")}</div>
+    <p class="note">Solo mostramos precios reales de hoy: ${conPrecio.length} de ${PRODUCTOS.length} productos tienen precio en ${esc(nombreLugar(L))}.${L.tipo === "mayorista" ? " EMMSA publica verduras, frutas y tubérculos; para abarrotes, carnes y lácteos mira los supermercados." : ""}</p>`
+    : `<p class="note">Todavía no cargan los precios de hoy de ${esc(nombreLugar(L))}. Revisa tu conexión y vuelve a abrir la app.</p>`}`;
+}
 function vInicio() {
+  if (!MINORISTAS) return vPreciosWeb();
   const m = merc(state.mercadoActivo);
   if (!m) return `<p>Elige un mercado para empezar.</p><button class="btn" data-act="editar-mercados">Elegir mercados</button>`;
   const riesgo = PRODUCTOS.filter((p) => p.riesgo).map((p) => p.nombre.toLowerCase());
@@ -1434,8 +1580,31 @@ function vInicio() {
     <p class="note">Prototipo con datos de ejemplo. Los precios reales vendrán del mercado mayorista y de los aportes de la gente.</p>`;
 }
 
+function vProductoWeb(p) {
+  const todas = lugares().map((L) => ({ L, x: precioLugar(p, L), real: realEn(p, L) }));
+  const filas = (todas.some((f) => f.real) ? todas.filter((f) => f.real) : todas).sort((a, b) => a.x - b.x);
+  const e = estadoProd(p, null), motivo = motivoProd(e), subs = filas[0] ? sustitutos(p, filas[0].L).slice(0, 3) : [];
+  const v = cambioSemana(p.id), m = mayHoy(p.id);
+  const fuente = (f) => f.L.tipo === "super" ? (f.real ? `Súper · web del ${fechaCorta(state.superReal.fecha)}` : "Súper · estimado")
+    : f.real ? `Mayorista · EMMSA del ${fechaCorta(m.fecha)}${f.L.id !== EMMSA_ID ? " (referencia)" : ""}` : "Mayorista · estimado";
+  return `<button class="back" data-go="inicio">‹ Volver a precios</button>
+    <div style="display:flex;gap:14px;align-items:center"><span style="font-size:3rem" aria-hidden="true">${emoP(p)}</span><h1>${p.nombre}</h1></div>
+    <div class="card"><h2>¿Dónde está más barato hoy?</h2>${filas.map((f, i) => `
+      <div class="mrow"><span><b>${esc(nombreLugar(f.L))}</b><br><span class="small muted">${fuente(f)}${distTxt(f.L)}${i ? ` · ${soles(f.x - filas[0].x)} más` : ""}</span>
+      ${i === 0 && filas.length > 1 ? `<br><span class="cheap">Más barato</span>` : ""}</span>
+      <span class="tag"><span class="p">${soles(f.x)}</span><br><span class="u">${porUnidad(p)}</span></span></div>`).join("")}
+      ${m && v != null ? `<p class="small muted">En el mayorista, esta semana: ${v >= 0 ? "subió" : "bajó"} ${fmtPct(Math.abs(v)).replace(/^[+−]/, "")} frente a la semana anterior.</p>` : ""}
+    </div>
+    ${subs.length ? `<div class="card"><h2>${motivo ? "¿Caro? Prueba con" : "Si no encuentras, prueba con"}</h2>
+      ${motivo ? `<span class="pill up" style="justify-self:start">${esc(motivo)}</span>` : ""}
+      ${subs.map((x) => `<div class="mrow"><span><b>${emoP(x.s)} ${esc(x.s.nombre)}</b>${x.nota ? `<br><span class="small muted">${esc(x.nota)}</span>` : ""}
+        ${x.ahorro > 0.05 ? `<br><span class="pill down">${Math.round(x.ahorro * 100)}% más barato</span>` : ""}</span>
+        <span class="tag"><span class="p">${soles(x.eq)}</span><br><span class="u">por ${unidadSola(p)}</span></span></div>`).join("")}
+      <p class="small muted">Lo que cuesta reemplazar 1 ${unidadSola(p)} de ${esc(p.nombre.toLowerCase())}, en ${esc(nombreLugar(filas[0].L))}.</p></div>` : ""}`;
+}
 function vProducto(pid) {
   const p = prod(pid);
+  if (!MINORISTAS) return vProductoWeb(p);
   const filas = lugares().map((L) => ({ L, x: precioLugar(p, L), h: L.tipo === "super" ? null : precioHoy(p, L) })).sort((a, b) => a.x - b.x);
   const m = merc(state.mercadoActivo), h = precioHoy(p, m), antes = semanaPasada(p, m);
   const pts = [antes, r10((antes * 2 + h.precio) / 3), r10((antes + h.precio * 2) / 3), h.precio];
@@ -1692,7 +1861,7 @@ function semFrutas() {
 
 function filaLista(it, mL) {
   const S = state.semana, pr = precioLugar(it.p, mL), tengo = !!S.tengo[it.p.id], compre = !!S.compre[it.p.id];
-  const visto = mL.tipo !== "super" && precioHoy(it.p, mL).observado;
+  const visto = !mL.tipo && precioHoy(it.p, mL).observado;
   const planear = S.modo !== "comprar", off = planear ? tengo : compre;
   return `<div class="lrow${off ? " off" : ""}">
     <span class="emo" aria-hidden="true">${emoP(it.p)}</span>
@@ -1701,7 +1870,7 @@ function filaLista(it, mL) {
     <span class="pr">${planear && tengo ? "—" : soles(it.compra * pr)}</span>
     <span class="act">${planear
       ? `<button class="chip" data-act="sem-tengo" data-v="${it.p.id}" aria-pressed="${tengo}">${tengo ? "✓ Ya tengo" : "Ya tengo en casa"}</button>`
-      : `<button class="chip" data-act="sem-compre" data-v="${it.p.id}" aria-pressed="${compre}">${compre ? "✓ Comprado" : "Lo compré"}</button>${compre && mL.tipo !== "super"
+      : `<button class="chip" data-act="sem-compre" data-v="${it.p.id}" aria-pressed="${compre}">${compre ? "✓ Comprado" : "Lo compré"}</button>${compre && !mL.tipo
         ? `<button class="chip add" data-act="sem-reportar" data-v="${it.p.id}">¿A cuánto estaba? +${PUNTOS.manual}</button>` : ""}`}</span>
   </div>`;
 }
@@ -1744,16 +1913,18 @@ function semLista() {
     ${items.length ? `<div class="card" style="gap:10px"><h2>¿Dónde te sale más barato?</h2>
       <div class="best"><span class="small muted">Lo más barato para toda tu canasta</span>
         <span class="tag big" style="justify-self:start"><span class="p">${soles(best.t)}</span></span>
-        <p><b>en ${esc(best.m.tipo === "super" ? "el súper " + best.m.nombre : best.m.nombre)}</b>${distTxt(best.m) ? `<span class="muted">${distTxt(best.m)}</span>` : ""}<br><span class="muted">≈ ${soles(best.t / S.personas)} por persona a la semana</span></p></div>
+        <p><b>en ${esc(best.m.tipo === "super" ? "el súper " + best.m.nombre : best.m.nombre)}</b>${distTxt(best.m) ? `<span class="muted">${distTxt(best.m)}</span>` : ""}<br><span class="muted">≈ ${soles(best.t / S.personas)} por persona a la semana</span>${best.m.tipo === "mayorista" ? `<br><span class="small muted">${best.reales} de ${best.n} productos al precio del mayorista; lo demás (abarrotes, carnes, lácteos), al del súper más barato.</span>` : ""}</p></div>
       ${tot.slice(1, state.semVerLugares ? tot.length : 3).map((x) => `
       <div class="mrow"><span><b>${esc(nombreLugar(x.m))}</b><br>
-        <span class="small muted">${x.m.tipo === "super" ? (!x.reales ? "Súper · ejemplo" : x.reales === x.n ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : `Súper · online del ${fechaCorta(state.superReal.fecha)} en ${x.reales} de ${x.n} productos`) : "Mercado"}${distTxt(x.m)}${x.vistos ? ` · ${x.vistos} precios vistos hoy` : ""} · ${soles(x.t - best.t)} más</span></span>
+        <span class="small muted">${x.m.tipo === "super" ? (!x.reales ? "Súper · ejemplo" : x.reales === x.n ? `Súper · online del ${fechaCorta(state.superReal.fecha)}` : `Súper · online del ${fechaCorta(state.superReal.fecha)} en ${x.reales} de ${x.n} productos`)
+          : x.m.tipo === "mayorista" ? `Mayorista en ${x.reales} de ${x.n} productos; lo demás, al súper más barato` : "Mercado"}${distTxt(x.m)}${x.vistos ? ` · ${x.vistos} precios vistos hoy` : ""} · ${soles(x.t - best.t)} más</span></span>
         <span class="tag"><span class="p">${soles(x.t)}</span></span></div>`).join("")}
       ${tot.length > 3 ? `<button class="btn quiet" data-act="sem-ver-lugares">${state.semVerLugares ? "Ver solo los 3 más baratos" : `Ver los ${tot.length} lugares`}</button>` : ""}
       ${comboOk ? (() => { const rb = rubrosDe(combo); return `<p>💡 <b>Combina y ahorra ${soles(best.t - combo.t)}:</b> ${esc(rb[combo.a.id].join(", ") || "algunas cosas")} en ${esc(nombreLugar(combo.a))}
         y ${esc(rb[combo.b.id].join(", ") || "lo demás")} en ${esc(nombreLugar(combo.b))}. Pagas ${soles(combo.t)}.</p>`; })()
         : worst.t - best.t >= 1 ? `<p>Ahorras <b>${soles(worst.t - best.t)}</b> si compras en ${esc(nombreLugar(best.m))} y no en ${esc(nombreLugar(worst.m))}.</p>` : ""}
-      <p class="small muted">${state.superReal ? `Los súper marcados "online" usan el precio de su tienda virtual (${fechaCorta(state.superReal.fecha)}); en el local puede variar. Lo demás es de ejemplo.` : "Precios de ejemplo de tus mercados y supermercados."} <button class="link" data-act="editar-mercados" style="min-height:0">Cambiar lugares</button></p></div>` : ""}
+      <p class="small muted">${!MINORISTAS ? `Súper: precio de su web${state.superReal ? " (" + fechaCorta(state.superReal.fecha) + ")" : ""}; en el local puede variar. Mayorista: precio por mayor de EMMSA; lo que no publica se cuenta al precio del súper más barato.`
+        : state.superReal ? `Los súper marcados "online" usan el precio de su tienda virtual (${fechaCorta(state.superReal.fecha)}); en el local puede variar. Lo demás es de ejemplo.` : "Precios de ejemplo de tus mercados y supermercados."} <button class="link" data-act="editar-mercados" style="min-height:0">Cambiar lugares</button></p></div>` : ""}
 
     ${subsCanasta.length || Object.keys(S.sust || {}).length ? `<div class="card"><h2>💡 Ahorra con sustitutos</h2>
       ${subsCanasta.length ? `<p class="small muted">Productos de tu canasta que están caros, escasos o pueden subir por El Niño.</p>` : ""}
@@ -1990,6 +2161,7 @@ function vIdeas() {
 }
 
 function vPuntos() {
+  if (!MINORISTAS) return vCuentaWeb();
   const pt = state.puntos, ampl = state.perfil.ampliadoHasta && state.perfil.ampliadoHasta >= hoy();
   const nivel = pt.total >= 500 ? "Casera de confianza" : pt.total >= 100 ? "Casera activa" : "Casera nueva";
   return `<div class="card points"><span class="small muted">Tus puntos</span><span class="n">${pt.total}</span>
@@ -2022,6 +2194,22 @@ function vPuntos() {
       <p class="small muted">${VERSION}</p></div>`;
 }
 
+function vCuentaWeb() {
+  const pt = state.puntos, may = miMayorista();
+  return `<h1>Mi cuenta</h1>
+    <div class="card"><h2>Dónde comparas</h2>
+      <p>${may ? `Mayorista: <b>${esc(may.nombre)}</b>${distTxt(may)}<br>` : ""}Supermercados: <b>${esc(misSupers().map((x) => x.nombre).join(", ") || "ninguno")}</b></p>
+      <button class="btn quiet" data-act="editar-mercados">Cambiar lugares</button></div>
+    ${pt.total ? `<div class="card points"><span class="small muted">Tus puntos</span><span class="n">${pt.total}</span><span class="small muted">Los guardamos para cuando vuelvan los aportes de precios.</span></div>` : ""}
+    ${supaOn() ? `<h2>Tus datos</h2><div class="card">${state.perfil.registro
+      ? `<p>Registrado como <b>${esc(state.perfil.registro.nombre)}</b> · celular que termina en ${esc(state.perfil.registro.fin)}</p><button class="btn quiet" data-act="reg-abrir">Actualizar mis datos</button>`
+      : `<p class="muted">Opcional: déjanos tu nombre y celular para avisarte de novedades de la prueba.</p><button class="btn sec" data-act="reg-abrir">Dejar mis datos</button>`}</div>` : ""}
+    <h2>Ajustes</h2>
+    <div class="card"><button class="btn quiet" data-act="cambiar-rol">Cambiar cómo uso la app</button>
+      <button class="btn sec" data-act="ir-ideas">💬 Dar mi opinión</button>
+      ${state.db && state.uid ? `<p class="small muted">Tus datos se guardan en tu cuenta.</p>` : `<p class="small muted">Modo de prueba: tus datos se guardan solo en este teléfono.</p>`}
+      <p class="small muted">${VERSION}</p></div>`;
+}
 function vPuesto() {
   const pu = state.perfil.puesto;
   if (!pu || state.borrador?.registro) {
@@ -2067,6 +2255,8 @@ function render() {
   if (enApp) document.documentElement.style.setProperty("--nav-h", $("#bar").offsetHeight + "px");
   const esPuesto = state.perfil.rol === "puesto";
   $("#nav-aportar-txt").textContent = esPuesto ? "Mi puesto" : "Aportar";
+  $("#nav-aportar").hidden = !MINORISTAS; $("#bar .in").classList.toggle("sin-aportar", !MINORISTAS);
+  $("#nav-puntos-txt").textContent = MINORISTAS ? "Mis puntos" : "Mi cuenta";
   $("#nav-semana-txt").textContent = state.perfil.rol === "resto" ? "Mi menú" : "Mi semana";
   const im = $("#in-menu"); if (im) im.addEventListener("change", (e) => leerMenu(e, state.perfil.rol === "resto" ? "resto" : "casa"));
   if (state.toast) { toast(state.toast); state.toast = null; }
@@ -2078,6 +2268,7 @@ function render() {
   const sd = $("#sel-distrito"); if (sd) sd.addEventListener("change", (e) => { state.perfil.distrito = e.target.value; state.perfil.zona = null; state.verDistrito = true; state.verMas = 0; autoSupers(puntoLista()); guardar(); render(); });
 }
 function ir(view) {
+  if (!MINORISTAS && ["aportar", "puesto", "foto", "manual", "nohay"].includes(view)) view = "inicio";   // aportes de mercados: ocultos en la versión web
   if (view === "aportar" && state.perfil.rol === "puesto") view = "puesto";
   if (["aportar", "puesto", "inicio", "puntos", "semana", "alzas"].includes(view)) { state.borrador = null; state.volverA = null; }
   if (view === "semana") { state.semPaso = nPlatos() ? "lista" : "personas"; state.restoPaso = null; state.menuFoto = null; state.copia = null; }
@@ -2275,6 +2466,10 @@ async function accion(act, v) {
     case "rol": P.rol = v; state.paso = 2; guardar(); break;
     case "paso": state.paso = +v; break;
     case "letra": P.letra = v; guardar(); break;
+    case "mayorista": {
+      P.mercados = [v, ...(P.mercados || []).filter((id) => id !== v && !(merc(id) && merc(id).tipo === "mayorista"))];
+      evento("elegir_mayorista", { mayorista: v }); guardar(); break;
+    }
     case "mercado": {
       const i = P.mercados.indexOf(v);
       if (i >= 0) P.mercados.splice(i, 1); else if (P.mercados.length < limiteMercados()) P.mercados.push(v);
@@ -2406,7 +2601,7 @@ async function accion(act, v) {
     case "sem-paso": {
       if (v === "platos" && state.semPaso === "personas") evento("personas", { n: state.semana.personas, eq: eqAdulto(), porcion: state.semana.porcion, gente: gente() });
       if (v === "lista") { const its = porComprar(), b = its.length ? totalesSemana(its)[0] : null;
-        evento("ver_canasta", { total: b ? b.t : 0, lugar: b ? nombreLugar(b.m) : null, tipo_lugar: b ? (b.m.tipo === "super" ? "super" : "mercado") : null,
+        evento("ver_canasta", { total: b ? b.t : 0, lugar: b ? nombreLugar(b.m) : null, tipo_lugar: b ? (b.m.tipo || "mercado") : null,
           dias: diasLlenos(), personas: state.semana.personas, productos: its.length, frutas: Object.keys(state.semana.frutas || {}).length }); }
       if (v === "frutas") evento("abrir_frutas", {});
       state.semPaso = v; state.menuFoto = null; state.deshacer = null; state.repetir = null; state.llenar = false; state.confLimpiar = false;
@@ -2557,7 +2752,7 @@ async function accion(act, v) {
         }
       }
       evento("descargar_lista", { via, productos: itsH.length, semana: state.semana.clave, personas: state.semana.personas, dias: diasLlenos(),
-        platos: [...new Set(DIAS.flatMap((x) => itemsTodo(x.id)))], cena: !!state.semana.conCena, total: r2(totH), lugar: Lh.id, tipo_lugar: Lh.tipo === "super" ? "super" : "mercado" });
+        platos: [...new Set(DIAS.flatMap((x) => itemsTodo(x.id)))], cena: !!state.semana.conCena, total: r2(totH), lugar: Lh.id, tipo_lugar: Lh.tipo || "mercado" });
       state.histGuardado = true; break;
     }
     case "sem-tengo": case "sem-compre": {
@@ -2576,7 +2771,7 @@ async function accion(act, v) {
     case "sem-limpiar": Object.assign(state.semana, { dias: {}, cenas: {}, frutas: {}, sust: {}, tengo: {}, compre: {}, modo: "planear" }); state.deshacer = null; guardarSemana(); state.semPaso = "platos"; render(); window.scrollTo(0, 0); enfocarTitulo(); return;
     case "sem-reportar": {
       const p = prod(v), m = mercLista();
-      if (!m || m.tipo === "super") break;
+      if (!m || m.tipo) break;
       state.mercadoActivo = m.id; state.volverA = "semana"; state.view = "manual";
       state.borrador = { items: [{ producto: p.id, precio: precioHoy(p, m).precio, unidad: p.unidad }] };
       render(); window.scrollTo(0, 0); enfocarTitulo(); return;
@@ -2751,7 +2946,8 @@ function vRegistro() {
 function empezarApp() {
   const P = state.perfil;
   evento("empezar", { rol: P.rol, mercados: P.mercados, distrito: P.distrito });
-  P.acepto = true; state.mercadoActivo = P.mercados[0]; guardar();
+  if (!MINORISTAS && P.rol === "puesto") P.rol = "compra";
+  P.acepto = true; state.mercadoActivo = MINORISTAS ? P.mercados[0] : (lugares()[0] || {}).id; guardar();
   return ir(P.rol === "puesto" ? "puesto" : P.rol === "resto" ? "semana" : "inicio");
 }
 function terminarRegistro() {
@@ -2851,7 +3047,7 @@ function cardMinoristas() {
       <div><h2>En camino: precios de tu mercado de barrio</h2>
       <p class="small">Estamos armando la versión con precios de mercados minoristas, distrito por distrito. Mientras tanto ves el Mercado Mayorista y los supermercados (cada día) y el INEI (cada mes).</p></div></div>
     ${quiero ? `<p class="small"><b>¡Anotado!</b> Apenas esté lista la verás aquí.</p>`
-      : `<div class="btnrow" style="display:flex;flex-wrap:wrap;gap:8px"><button class="chip" data-act="minorista-quiero">🙋 La quiero</button><button class="chip" data-go="aportar">📷 Ayudar con una foto de precios</button></div>`}</div>`;
+      : `<div class="btnrow" style="display:flex;flex-wrap:wrap;gap:8px"><button class="chip" data-act="minorista-quiero">🙋 La quiero</button>${MINORISTAS ? `<button class="chip" data-go="aportar">📷 Ayudar con una foto de precios</button>` : ""}</div>`}</div>`;
 }
 const SLOT_CADENA = { plazavea: 1, metro: 2, wong: 3, tottus: 4, mass: 5 };   // el color sigue a la cadena, no a su orden
 const fmtPct = (v) => (v > 0 ? "+" : "−") + String(Math.round(Math.abs(v) * 10) / 10) + "%";
@@ -3439,9 +3635,11 @@ async function cargarLugaresWeb() {
   await Promise.all([cargarPreciosSuper(), cargarLugaresWeb(), cargarHist(), cargarMayorista(), cargarPopulares()]);
   evento("abrir", { distrito: state.perfil.distrito || null, mercados: (state.perfil.mercados || []).length, nuevo: !state.perfil.acepto,
     precios_super: !!state.superReal, ubicacion: !!state.ubic, lugares: LUG.fecha, instalada: matchMedia("(display-mode: standalone)").matches });
-  if (state.perfil.acepto && state.perfil.mercados.length) {
+  if (!MINORISTAS) { $("#brand-sub").textContent = "Mayorista y súper, cerca de ti"; if (state.perfil.rol === "puesto") state.perfil.rol = "compra"; }
+  if (state.perfil.acepto && (state.perfil.mercados.length || !MINORISTAS)) {
     state.mercadoActivo = state.perfil.rol === "puesto" && state.perfil.puesto ? state.perfil.puesto.mercado : state.perfil.mercados[0];
     state.view = state.perfil.rol === "puesto" ? "puesto" : state.perfil.rol === "resto" ? "semana" : "inicio";
+    if (!MINORISTAS) state.mercadoActivo = (lugares()[0] || {}).id;
   }
   render();
   if (db) {
