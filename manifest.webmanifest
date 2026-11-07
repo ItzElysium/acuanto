@@ -1,9 +1,10 @@
 {
+  "id": "./",
   "name": "Acuánto (prueba)",
   "short_name": "Acuánto",
   "lang": "es-PE",
   "description": "Precios del día en mercados y supermercados de Lima, canasta de la semana y costos para restaurantes de menú.",
-  "start_url": "./",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
