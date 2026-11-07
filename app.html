@@ -250,6 +250,10 @@
   .vtip b { font-variant-numeric: tabular-nums; }
   .causa { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .causa:last-child { border-bottom: none; }
+  .card.pm { border: 2px dashed var(--kraft); background: var(--surface); background: color-mix(in srgb, var(--kraft) 16%, var(--surface)); }
+  .pm-h { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .pm-h .emo { font-size: 1.6rem; text-align: center; }
+  .pm h2 { font-size: 1.1rem; margin-bottom: 4px; }
   .causa .emo { font-size: 1.5rem; text-align: center; }
   table.tv { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
   table.tv th, table.tv td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
@@ -845,7 +849,7 @@ const state = {
   ubic: null, ubicando: false, ubicError: null, verDistrito: false, verMas: 0, qMerc: "", nuevoMerc: null,
   historial: { items: [] }, histMes: 0, popReal: null, hist: null, alzaMes: null, alzaProd: null, regError: null, regBorrador: null, regDesde: null, regEnviando: false,
 };
-const VERSION = "Prueba 0.9";
+const VERSION = "Prueba 0.9.1";
 /* Número de WhatsApp que recibe las opiniones (código de país + número, sin + ni espacios). Vacío: la persona elige a quién mandarla. */
 const WHATSAPP_OPINIONES = "";
 const perfilVacio = () => ({ rol: null, letra: "normal", mercados: [], supers: ["plazavea", "metro", "wong"], supersElegidos: false, propios: [], zona: null,
@@ -2308,6 +2312,7 @@ async function accion(act, v) {
       evento("historial_usar", { semana: h.clave }); window.scrollTo(0, 0); break;
     }
     case "alza-mes": state.alzaMes = v; evento("alza_mes", { mes: v }); break;
+    case "minorista-quiero": if (!LS.get("acuanto.minorista")) { LS.set("acuanto.minorista", 1); evento("minorista_interes", { desde: state.view }); } state.toast = "Gracias por avisarnos."; break;
     case "alza-prod": state.alzaProd = v; evento("alza_producto", { producto: v }); break;
     case "activo": state.mercadoActivo = v; break;
     case "editar-mercados": state.paso = 3; state.view = "bienvenida"; state.qMerc = ""; state.nuevoMerc = null; state.verMas = 0; window.scrollTo(0, 0); break;
@@ -2802,6 +2807,10 @@ function semHistorial() {
    INEI, IPC de Lima Metropolitana: alimentos con mayor y menor variación de precio del mes. Se actualiza a mano cada mes
    (el INEI publica el día 1). Tercer valor: producto de la app, si existe (uno por producto y mes). */
 const ALZAS = [
+  { mes: "2026-10", nombre: "octubre", ipc: 0.57, anual: 5.25, fuente: "INEI, Informe Técnico N.° 11, nov 2026", url: "https://www.inei.gob.pe/media/principales_indicadores/informe-de-precios-octubre2026.pdf",
+    datos: [["Choclo", 45.29, "choclo"], ["Bonito", 26.9], ["Zanahoria", 24.56, "zanahoria"], ["Arveja verde", 24.31, "arveja"], ["Caballa", 17.48], ["Papa color", 14.38],
+      ["Olluco", 13.87, "olluco"], ["Papa amarilla", 13.54, "papa-amarilla"],
+      ["Manzana israel", -10.65, "manzana"], ["Pepinillo", -9.79], ["Mango", -7.72], ["Tomate", -6.8, "tomate"], ["Tuna", -5.93], ["Albahaca", -5.91], ["Papaya", -5.85, "papaya"], ["Huevos de gallina", -5.34, "huevo"]] },
   { mes: "2026-09", nombre: "setiembre", ipc: 0.12, fuente: "INEI, vía Finanzas Digital, 1 oct 2026", url: "https://finanzasdigital.com/inflacion-peru-septiembre-2026/",
     datos: [["Maracuyá", 34.83, "maracuya"], ["Tomate", 28.9, "tomate"], ["Arveja verde", 18.5, "arveja"], ["Choclo", 16.8, "choclo"], ["Poro", 16.4],
       ["Azúcar rubia", 16.2, "azucar"], ["Ají pimiento", 16.0], ["Pepinillo", 15.0], ["Azúcar blanca", 10.4],
@@ -2824,11 +2833,26 @@ const CAUSAS = [
   { emo: "🌊", titulo: "El Niño costero sigue en alerta", fecha: "21 oct 2026", fuente: "Infobae, con datos del ENFEN",
     url: "https://www.infobae.com/peru/2026/10/21/enfen-emite-alerta-ante-el-calentamiento-del-mar-hasta-cuando-se-prolongarian-los-efectos-de-el-nino-en-peru/",
     texto: "El ENFEN prevé una magnitud extraordinaria hasta enero de 2027 y fuerte hasta el otoño. El mar caliente mueve a los peces y el calor altera algunos cultivos." },
-  { emo: "⛽", titulo: "Combustibles más caros", fecha: "1 oct 2026", fuente: "INEI, vía Finanzas Digital", url: "https://finanzasdigital.com/inflacion-peru-septiembre-2026/",
-    texto: "En setiembre el gasohol subió 5.8% y el diésel 3.9% en Lima. Traer alimentos desde provincias cuesta más." },
+  { emo: "⛽", titulo: "Combustibles más caros", fecha: "1 nov 2026", fuente: "INEI, vía Finanzas Digital", url: "https://finanzasdigital.com/inflacion-peru-octubre-2026/",
+    texto: "En octubre el gasohol subió 3.8% y el GLP vehicular 5.8%, después de otra alza en setiembre. Traer alimentos desde provincias cuesta más." },
   { emo: "🚛", titulo: "Transportistas en alerta", fecha: "oct 2026", fuente: "RPP y Gestión", url: "https://rpp.pe/noticias/paro-de-transportistas",
     texto: "Gremios de transporte evalúan un paro nacional por las extorsiones. En el paro de marzo, la papa yungay subió 30% en un día en el mercado mayorista." },
 ];
+/* El mes que sigue al último publicado: se muestra "en curso" hasta que el INEI lo publique (el día 1 del mes siguiente). */
+const MESES_L = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "setiembre", "octubre", "noviembre", "diciembre"];
+function mesEnCurso() {
+  const [y, m] = ALZAS[0].mes.split("-").map(Number), nm = m % 12 + 1, ny = m === 12 ? y + 1 : y, sm = nm % 12 + 1, sy = nm === 12 ? ny + 1 : ny;
+  return { mes: `${ny}-${String(nm).padStart(2, "0")}`, nombre: MESES_L[nm - 1], sale: `1 de ${MESES_L[sm - 1]}`, yaSalio: new Date() >= new Date(sy, sm - 1, 1) };
+}
+/* Aviso: la versión con precios de mercados minoristas está en camino. Cuenta el interés de forma anónima. */
+function cardMinoristas() {
+  const quiero = !!LS.get("acuanto.minorista");
+  return `<div class="card pm" style="gap:10px"><div class="pm-h"><span class="emo" aria-hidden="true">🧺</span>
+      <div><h2>En camino: precios de tu mercado de barrio</h2>
+      <p class="small">Estamos armando la versión con precios de mercados minoristas, distrito por distrito. Mientras tanto ves el Mercado Mayorista y los supermercados (cada día) y el INEI (cada mes).</p></div></div>
+    ${quiero ? `<p class="small"><b>¡Anotado!</b> Apenas esté lista la verás aquí.</p>`
+      : `<div class="btnrow" style="display:flex;flex-wrap:wrap;gap:8px"><button class="chip" data-act="minorista-quiero">🙋 La quiero</button><button class="chip" data-go="aportar">📷 Ayudar con una foto de precios</button></div>`}</div>`;
+}
 const SLOT_CADENA = { plazavea: 1, metro: 2, wong: 3, tottus: 4, mass: 5 };   // el color sigue a la cadena, no a su orden
 const fmtPct = (v) => (v > 0 ? "+" : "−") + String(Math.round(Math.abs(v) * 10) / 10) + "%";
 function cardSemanaMayorista() {
@@ -2847,6 +2871,7 @@ function cardSemanaMayorista() {
     <p class="small muted">Fuente: EMMSA, Gran Mercado Mayorista de Lima (${esc(fechaCorta(W[0].fecha))}). 🛒 = está en tu canasta.</p></div>`;
 }
 function vAlzas() {
+  const P = mesEnCurso(), enCurso = state.alzaMes === P.mes;
   const M = ALZAS.find((m) => m.mes === state.alzaMes) || ALZAS[0];
   const filas = [...M.datos].sort((a, b) => b[1] - a[1]), max = Math.max(...filas.map((f) => Math.abs(f[1])));
   const mios = new Set(porComprar().map((it) => it.p.id));
@@ -2862,16 +2887,22 @@ function vAlzas() {
     .filter(Boolean).sort((a, b) => b.v - a.v);
   return `<div style="display:grid;gap:6px"><h1>¿Qué está subiendo?</h1>
       <p class="muted">Lo que cambió esta semana en el mercado mayorista y en el mes, según el INEI.</p></div>
+    ${cardMinoristas()}
     ${cardSemanaMayorista()}
-    <div class="chips" role="group" aria-label="Mes">${ALZAS.map((m) => `
-      <button class="chip" data-act="alza-mes" data-v="${m.mes}" aria-pressed="${m === M}">${m.nombre[0].toUpperCase() + m.nombre.slice(1)}</button>`).join("")}</div>
+    <div class="chips" role="group" aria-label="Mes">
+      <button class="chip" data-act="alza-mes" data-v="${P.mes}" aria-pressed="${enCurso}">${P.nombre[0].toUpperCase() + P.nombre.slice(1)} · en curso</button>${ALZAS.map((m) => `
+      <button class="chip" data-act="alza-mes" data-v="${m.mes}" aria-pressed="${!enCurso && m === M}">${m.nombre[0].toUpperCase() + m.nombre.slice(1)}</button>`).join("")}</div>
+    ${enCurso ? `<div class="card" style="gap:10px"><h2>${P.nombre[0].toUpperCase() + P.nombre.slice(1)} todavía está en curso</h2>
+      <p class="muted">${P.yaSalio ? `El INEI ya publicó los precios de ${P.nombre}; los estamos cargando.` : `El INEI publica los precios de ${P.nombre} el ${P.sale}. Apenas salgan, los verás aquí.`}
+        Mientras tanto, arriba tienes lo que cambió esta semana en el Mercado Mayorista.</p>
+      <div><button class="chip" data-act="alza-mes" data-v="${ALZAS[0].mes}">Ver ${ALZAS[0].nombre}</button></div></div>` : `
     <div class="card" style="gap:10px"><h2>Lo que más cambió en ${M.nombre}</h2>
-      <p class="small muted">Precios en Lima ${M.ipc >= 0 ? "subieron" : "bajaron"} ${Math.abs(M.ipc).toFixed(2)}% en promedio ese mes. 🛒 = está en tu canasta.</p>
+      <p class="small muted">Precios en Lima ${M.ipc >= 0 ? "subieron" : "bajaron"} ${Math.abs(M.ipc).toFixed(2)}% en promedio ese mes${M.anual != null ? ` (${M.anual.toFixed(2)}% en los últimos 12 meses)` : ""}. 🛒 = está en tu canasta.</p>
       <div class="leg"><span><span class="k up"></span>Subió</span><span><span class="k down"></span>Bajó</span></div>
       <div class="ab" role="list" aria-label="Variación de precios en ${M.nombre}">${barras}</div>
       <details><summary>Ver como tabla</summary><table class="tv"><thead><tr><th>Producto</th><th>Variación</th></tr></thead>
         <tbody>${filas.map(([n, v]) => `<tr><td>${esc(n)}</td><td>${fmtPct(v)}</td></tr>`).join("")}</tbody></table></details>
-      <p class="small muted">Fuente: <a href="${M.url}" target="_blank" rel="noopener">${esc(M.fuente)}</a>. Variación del precio promedio frente al mes anterior.</p></div>
+      <p class="small muted">Fuente: <a href="${M.url}" target="_blank" rel="noopener">${esc(M.fuente)}</a>. Variación del precio promedio frente al mes anterior.</p></div>`}
 
     <div class="card" style="gap:10px"><h2>En tu canasta</h2>${!mios.size
       ? `<p class="muted">Arma tu semana para ver si tus productos están subiendo.</p><button class="btn sec" data-go="semana">Armar mi semana</button>`
