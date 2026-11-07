@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Acuánto: arma los almuerzos de tu semana con los precios de hoy</title>
-<meta name="description" content="Acuánto arma los almuerzos de tu semana, te da la lista exacta de compras y te avisa qué subió para cambiarlo por algo que rinda igual. Precios del Mercado Mayorista de Lima y de Plaza Vea, Metro y Wong.">
-<meta name="theme-color" content="#0b6b3a">
+<meta name="description" content="Acuánto arma los almuerzos de tu semana, te avisa qué subió y con qué reemplazarlo, y te dice en qué supermercado sale más barata tu lista. Gratis, en la web o en tu Android.">
+<meta name="theme-color" content="#0b2a19">
 <meta property="og:title" content="Acuánto: tu semana de almuerzos con los precios de hoy">
-<meta property="og:description" content="Planifica los platos de la semana, compra lo justo y cambia lo que subió. Gratis, en tu Android o en la web.">
+<meta property="og:description" content="Planifica los platos de la semana, cambia lo que subió y compra donde sale más barato. Gratis y sin registro.">
 <meta property="og:image" content="https://itzelysium.github.io/acuanto/og.png">
 <meta property="og:url" content="https://itzelysium.github.io/acuanto/">
 <link rel="canonical" href="https://itzelysium.github.io/acuanto/">
@@ -18,15 +18,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bungee&display=swap">
 <script>
-  /* Si se abre como app instalada, va directo a la app. */
   if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) location.replace("app.html");
 </script>
 <style>
-/* Kind: software (app de consumo). Mode: Persuade.
-   Look: el mundo de la propia app. Verde Acuánto, etiquetas de cartón (kraft) como las de los puestos del mercado,
-   pizarra verde oscura detrás del celular. Atkinson Hyperlegible para todo el texto; Bungee solo para la marca y los precios.
-   Radio redondeado (app de consumo). Fondo claro: se usa de día, en la cocina o camino al mercado. */
+/* Kind: software (app de consumo). Mode: Persuade, con un momento grande: la demo de la app que se reproduce como un comercial.
+   Look: la pizarra verde oscura de los puestos de mercado, rótulos en Bungee como los letreros de Lima, etiquetas de cartón (kraft)
+   para los precios. Texto en Atkinson Hyperlegible, el de la app. Radio redondeado. La portada es oscura (la pizarra); el resto, claro. */
 :root {
+  --night: #0b2a19;
+  --night-2: #0f3621;
+  --night-line: rgba(232, 243, 234, .07);
+  --night-ink: #f1f7f2;
+  --night-muted: #b9cdbf;
   --bg: #f3f6f1;
   --surface: #ffffff;
   --ink: #17201a;
@@ -35,377 +38,455 @@
   --green: #0b6b3a;
   --green-ink: #ffffff;
   --green-soft: #e1f2e7;
-  --board: #0c3a22;
-  --board-ink: #e8f3ea;
-  --board-line: #1d5236;
+  --green-bright: #4cc584;
   --kraft: #dcb77d;
   --kraft-ink: #26180a;
   --red: #b42318;
   --red-soft: #fde7e3;
   --down: #1d5fb4;
   --down-soft: #e3eefb;
-  --shadow: 18, 40, 26;
+  --shadow: 12, 34, 22;
   --font-brand: "Bungee", "Arial Black", sans-serif;
   --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
   --r: 16px;
   --r-lg: 28px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --gutter: max(20px, env(safe-area-inset-left, 0px));
   --gutter-r: max(20px, env(safe-area-inset-right, 0px));
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1410; --surface: #19211b; --ink: #eef3ee; --muted: #b5c2b8; --line: #2d382f;
-    --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --board: #0a2717; --board-ink: #e2efe5; --board-line: #1f4a33;
-    --kraft: #c9a46b; --kraft-ink: #1f1308; --red: #ff8b76; --red-soft: #3b1712; --down: #7db4f5; --down-soft: #13263d; --shadow: 0, 0, 0;
+    --green: #4cc584; --green-ink: #062012; --green-soft: #143222; --kraft: #c9a46b; --kraft-ink: #1f1308;
+    --red: #ff8b76; --red-soft: #3b1712; --down: #7db4f5; --down-soft: #13263d; --shadow: 0, 0, 0; --night: #08200f; --night-2: #0b2a17;
     color-scheme: dark;
   }
 }
 * { box-sizing: border-box; }
-html { overflow-x: clip; scroll-behavior: smooth; scroll-padding-top: 76px; -webkit-text-size-adjust: 100%; }
+html { overflow-x: clip; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.125rem/1.55 var(--font-body); }
 img { max-width: 100%; display: block; }
 ::selection { background: var(--kraft); color: var(--kraft-ink); }
-:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: 6px; }
+:focus-visible { outline: 3px solid var(--green-bright); outline-offset: 3px; border-radius: 6px; }
 a { color: var(--green); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.wrap { max-width: 1180px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
 h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
-h1 { font-size: clamp(2.5rem, 5.4vw, 4.6rem); line-height: 1.02; font-weight: 700; max-width: 13ch; }
-h2 { font-size: clamp(2rem, 3.8vw, 3.1rem); line-height: 1.06; font-weight: 700; max-width: 22ch; }
-h3 { font-size: 1.3rem; line-height: 1.2; }
 p { margin: 0; max-width: 60ch; }
-.lead { font-size: clamp(1.15rem, 1.6vw, 1.35rem); color: var(--muted); }
-.num { font-variant-numeric: tabular-nums; }
-
-/* ---------- navegación ---------- */
-.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
-.nav .wrap { display: flex; align-items: center; gap: 24px; height: 68px; }
-.marca { font-family: var(--font-brand); font-size: 1.45rem; color: var(--green); text-decoration: none; letter-spacing: 0.02em; }
-.nav ul { list-style: none; display: flex; gap: 22px; margin: 0 0 0 auto; padding: 0; }
-.nav ul a { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 1rem; background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size 200ms var(--ease-out); padding-bottom: 2px; }
-.nav ul a:hover { background-size: 100% 2px; }
-.nav .btn { min-height: 44px; padding: 0 18px; font-size: 1rem; }
-@media (max-width: 900px) { .nav ul { display: none; } .nav .btn { margin-left: auto; } }
 
 /* ---------- botones ---------- */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; padding: 0 26px; border-radius: var(--r); border: 2px solid var(--green);
-  background: var(--green); color: var(--green-ink); font: 700 1.1rem/1.2 var(--font-body); text-decoration: none; cursor: pointer;
-  box-shadow: 0 6px 16px -8px rgba(var(--shadow), .55); transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms ease; }
-.btn.sec { background: transparent; color: var(--green); box-shadow: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 60px; padding: 0 28px; border-radius: var(--r); border: 2px solid transparent;
+  font: 700 1.12rem/1.2 var(--font-body); text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms ease; }
 .btn svg { width: 22px; height: 22px; flex: none; }
-@media (hover: hover) and (pointer: fine) { .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 22px -10px rgba(var(--shadow), .6); } .btn.sec:hover { background: var(--green-soft); } }
+.btn.kraft { background: var(--kraft); color: var(--kraft-ink); box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .6); }
+.btn.verde { background: var(--green); color: var(--green-ink); box-shadow: 0 10px 24px -14px rgba(var(--shadow), .7); }
+.btn.linea { border-color: rgba(241, 247, 242, .55); color: var(--night-ink); background: transparent; }
+.btn.linea-claro { border-color: var(--green); color: var(--green); background: transparent; }
+.btn .flecha { transition: transform 200ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { transform: translateY(-2px); }
+  .btn.kraft:hover, .btn.verde:hover { box-shadow: 0 16px 28px -14px rgba(0, 0, 0, .65); }
+  .btn.linea:hover { background: rgba(241, 247, 242, .08); }
+  .btn.linea-claro:hover { background: var(--green-soft); }
+  .btn:hover .flecha { transform: translateX(4px); }
+}
 .btn:active { transform: scale(0.97); }
-.acciones { display: flex; flex-wrap: wrap; gap: 12px; }
-.nota { font-size: 0.98rem; color: var(--muted); }
-
-/* qué botones ve cada equipo */
+.acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 [data-para] { display: none !important; }
-html[data-dispositivo="android"] [data-para~="android"],
-html[data-dispositivo="ios"] [data-para~="ios"],
-html[data-dispositivo="escritorio"] [data-para~="escritorio"] { display: inline-flex !important; }
-html[data-dispositivo="android"] p[data-para~="android"], html[data-dispositivo="ios"] p[data-para~="ios"], html[data-dispositivo="escritorio"] p[data-para~="escritorio"],
-html[data-dispositivo="android"] div[data-para~="android"], html[data-dispositivo="ios"] div[data-para~="ios"], html[data-dispositivo="escritorio"] div[data-para~="escritorio"] { display: block !important; }
+html[data-dispositivo="android"] [data-para~="android"], html[data-dispositivo="ios"] [data-para~="ios"], html[data-dispositivo="escritorio"] [data-para~="escritorio"] { display: inline-flex !important; }
+html[data-dispositivo="android"] div[data-para~="android"], html[data-dispositivo="ios"] div[data-para~="ios"], html[data-dispositivo="escritorio"] div[data-para~="escritorio"],
+html[data-dispositivo="android"] p[data-para~="android"], html[data-dispositivo="ios"] p[data-para~="ios"], html[data-dispositivo="escritorio"] p[data-para~="escritorio"] { display: block !important; }
 
-/* ---------- secciones ---------- */
-main > section { min-height: calc(100svh - 68px); padding-block: clamp(56px, 9vh, 112px); display: flex; align-items: center; }
-main > section > .wrap { width: 100%; }
-.cabeza { display: grid; gap: 16px; margin-bottom: clamp(28px, 5vh, 52px); }
+/* ---------- navegación ---------- */
+.nav { position: absolute; top: 0; left: 0; right: 0; z-index: 5; padding-top: env(safe-area-inset-top, 0px); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; height: 72px; }
+.marca { font-family: var(--font-brand); font-size: 1.45rem; color: var(--night-ink); text-decoration: none; letter-spacing: .02em; }
+.nav a.web { margin-left: auto; color: var(--night-ink); font-weight: 700; font-size: 1rem; text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size 200ms var(--ease-out); padding-bottom: 2px; }
+.nav a.web:hover { background-size: 100% 2px; }
 
-/* ---------- etiqueta de cartón (la firma de Acuánto) ---------- */
-.tag { position: relative; display: grid; gap: 2px; background: var(--kraft); color: var(--kraft-ink); padding: 14px 18px 12px 30px; border-radius: 6px 12px 12px 6px;
-  box-shadow: 0 10px 18px -10px rgba(var(--shadow), .6); transform: rotate(var(--giro, -2deg)); transition: transform 200ms var(--ease-out); min-width: 0; }
-.tag::before { content: ""; position: absolute; left: 11px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
-.tag b { font-weight: 700; font-size: 0.95rem; line-height: 1.15; }
-.tag .precio { font-family: var(--font-brand); font-size: 1.7rem; line-height: 1.05; }
-.tag .precio small { font-family: var(--font-body); font-weight: 700; font-size: 0.85rem; margin-left: 4px; }
+/* ---------- portada: la pizarra con la demo ---------- */
+.hero { position: relative; background: var(--night); color: var(--night-ink); min-height: 100svh; padding-top: calc(72px + env(safe-area-inset-top, 0px)); display: flex; align-items: center;
+  background-image: repeating-linear-gradient(0deg, transparent 0 55px, var(--night-line) 55px 56px), radial-gradient(1200px 600px at 75% 55%, var(--night-2), transparent 70%); }
+.hero .wrap { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); align-items: center; padding-block: clamp(20px, 4vh, 48px) clamp(28px, 5vh, 56px); }
+.hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); line-height: 1.02; font-weight: 700; max-width: 12ch; }
+.hero .lead { font-size: clamp(1.1rem, 1.5vw, 1.3rem); color: var(--night-muted); margin-top: 20px; max-width: 34rem; }
+.hero .acciones { margin-top: 30px; }
+.hero .dato { margin-top: 22px; font-size: 0.98rem; color: var(--night-muted); max-width: 34rem; }
+.hero .dato b { color: var(--night-ink); }
+
+/* escenario */
+.escena { position: relative; display: grid; justify-items: center; gap: 16px; }
+.rotulo { position: relative; height: 2.2em; width: 100%; max-width: 34rem; font-family: var(--font-brand); font-size: clamp(1.45rem, 2.5vw, 2.15rem); line-height: 1.02; color: var(--kraft); text-align: center; overflow: hidden; }
+.fono-wrap { position: relative; }
+.callout { position: absolute; z-index: 4; display: grid; gap: 4px; width: max-content; max-width: 190px; background: var(--kraft); color: var(--kraft-ink); padding: 14px 18px 13px 32px; border-radius: 6px 14px 14px 6px;
+  box-shadow: 0 22px 34px -18px rgba(0, 0, 0, .75); transform-origin: 18px 50%; opacity: 0; filter: blur(6px); transform: translateY(-16px) rotate(-14deg); pointer-events: none;
+  transition: opacity 360ms var(--ease-out), filter 360ms var(--ease-out), transform 680ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.callout::before { content: ""; position: absolute; left: 12px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--night); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5); }
+.callout.on { opacity: 1; filter: none; transform: rotate(var(--g, -4deg)); }
+.callout.sale { opacity: 0; filter: blur(6px); transform: rotate(var(--g, -4deg)) translateY(10px); transition-duration: 240ms; }
+.callout b { font-family: var(--font-brand); font-weight: 400; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.callout span { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+.callout[data-k="0"] { left: -128px; top: 462px; }
+.callout[data-k="1"] { right: -118px; top: 440px; --g: 4deg; }
+.callout[data-k="2"] { left: -136px; top: 168px; }
+.callout[data-k="2b"] { right: -112px; top: 450px; --g: 3deg; }
+.callout[data-k="3"] { right: -126px; top: 420px; --g: 4deg; }
+@media (max-width: 1180px) and (min-width: 961px) {
+  .callout { max-width: 150px; padding: 11px 14px 11px 28px; }
+  .callout b { font-size: 1.7rem; }
+  .callout[data-k="0"], .callout[data-k="2"] { left: -84px; }
+  .callout[data-k="1"], .callout[data-k="2b"], .callout[data-k="3"] { right: -76px; }
+}
+@media (max-width: 560px) { .callout { display: none; } }
+.rotulo span { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateY(40%); filter: blur(6px);
+  transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out), filter 420ms var(--ease-out); }
+.rotulo span.on { opacity: 1; transform: none; filter: none; }
+.rotulo span.sale { opacity: 0; transform: translateY(-40%); filter: blur(6px); transition-duration: 260ms; }
+
+.fono { position: relative; width: 300px; height: 620px; border: 10px solid #050c08; border-radius: 46px; background: #050c08; overflow: hidden;
+  box-shadow: 0 50px 80px -40px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255, 255, 255, .08); }
+.pantalla { position: absolute; inset: 0; border-radius: 36px; overflow: hidden; background: #f3f6f1; color: #17201a; font: 400 14px/1.4 var(--font-body); }
+.p-cab { background: #0b6b3a; color: #fff; padding: 22px 16px 12px; }
+.p-cab b { font-family: var(--font-brand); font-weight: 400; font-size: 20px; letter-spacing: .02em; display: block; line-height: 1; }
+.p-cab small { font-size: 11.5px; opacity: .9; }
+.p-cuerpo { position: absolute; top: 74px; left: 0; right: 0; bottom: 56px; padding: 14px 14px 0; }
+.p-barra { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: #fff; border-top: 2px solid #d3dcd1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; align-items: center; padding: 0 4px; text-align: center; font: 700 9.5px/1.1 var(--font-body); color: #4b5a50; }
+.p-barra span { display: grid; justify-items: center; gap: 2px; padding: 5px 0; border-radius: 10px; white-space: nowrap; letter-spacing: -0.01em; }
+.p-barra span.act { color: #0b6b3a; background: #e1f2e7; }
+.p-barra svg { width: 19px; height: 19px; }
+
+.cap { position: absolute; inset: 0; padding: 14px 14px 0; opacity: 0; transform: translateX(24px); transition: opacity 320ms var(--ease-out), transform 420ms var(--ease-out); pointer-events: none; }
+.cap.on { opacity: 1; transform: none; }
+.cap.sale { opacity: 0; transform: translateX(-24px); transition-duration: 220ms; }
+.cap h4 { margin: 0 0 4px; font-size: 18px; line-height: 1.15; letter-spacing: -.01em; }
+.cap .sub { font-size: 12.5px; color: #4b5a50; margin-bottom: 12px; }
+.tarj { background: #fff; border: 1px solid #d3dcd1; border-radius: 14px; padding: 10px 12px; }
+.contador { display: grid; grid-template-columns: 1fr auto 26px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.contador b { font-size: 14px; display: block; }
+.contador small { font-size: 11px; color: #4b5a50; }
+.bot { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #d3dcd1; display: grid; place-items: center; font-weight: 700; font-size: 16px; color: #17201a; background: #fff; transition: transform 140ms var(--ease-out), background-color 140ms; }
+.bot.press { transform: scale(0.88); background: #e1f2e7; }
+.cnt { font-family: var(--font-brand); font-size: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.pie-cap { margin-top: 10px; background: #e1f2e7; color: #0b6b3a; border-radius: 12px; padding: 9px 11px; font-weight: 700; font-size: 12.5px; opacity: 0; transform: translateY(8px); transition: opacity 300ms var(--ease-out), transform 360ms var(--ease-out); }
+.pie-cap.on { opacity: 1; transform: none; }
+.lbl-dias { margin: 12px 0 6px; font-weight: 700; font-size: 13px; }
+.dias-sel { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.dias-sel span { border: 1.5px solid #d3dcd1; border-radius: 9px; background: #fff; text-align: center; font-weight: 700; font-size: 11px; padding: 7px 0; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 160ms var(--ease-out); }
+.dias-sel span.on { background: #0b6b3a; border-color: #0b6b3a; color: #fff; }
+.otros { margin-top: 14px; opacity: 0; transition: opacity 280ms var(--ease-out); }
+.otros.on { opacity: 1; }
+.otros > b { display: block; font-size: 12.5px; margin-bottom: 4px; }
+.otro { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid #e3e9e1; font-size: 12.5px; opacity: 0; transform: translateY(6px); transition: opacity 280ms var(--ease-out), transform 340ms var(--ease-out); }
+.otro.on { opacity: 1; transform: none; }
+.otro .pl { margin: 0; }
+.dia { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid #e7ece5; }
+.dia > span { font-weight: 700; font-size: 12px; color: #4b5a50; }
+.chip { display: inline-flex; align-items: center; gap: 6px; width: fit-content; max-width: 100%; background: #e1f2e7; border: 1.5px solid #0b6b3a; border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 12px; line-height: 1.2;
+  opacity: 0; transform: scale(0.94); transition: opacity 260ms var(--ease-out), transform 320ms var(--ease-out); }
+.chip.on { opacity: 1; transform: none; }
+.sello { display: inline-block; margin-bottom: 10px; background: #fff3bf; color: #3d3100; border-radius: 10px; padding: 6px 9px; font-size: 11.5px; font-weight: 700; opacity: 0; transition: opacity 300ms var(--ease-out); }
+.sello.on { opacity: 1; }
+.alerta { background: #fde7e3; color: #8f1a12; border-radius: 14px; padding: 10px 12px; font-weight: 700; font-size: 13px; display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center;
+  opacity: 0; transform: translateY(-10px) scale(0.97); transition: opacity 300ms var(--ease-out), transform 380ms var(--ease-out); }
+.alerta.on { opacity: 1; transform: none; }
+.alerta i { width: 22px; height: 22px; border-radius: 50%; background: #b42318; color: #fff; font-style: normal; display: grid; place-items: center; font-size: 13px; }
+.cambio { margin-top: 12px; position: relative; height: 92px; }
+.ing { position: absolute; inset: 0; background: #fff; border: 1px solid #d3dcd1; border-radius: 14px; padding: 12px; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center;
+  transition: opacity 420ms var(--ease-out), filter 420ms var(--ease-out), transform 420ms var(--ease-out); }
+.ing .e { font-size: 26px; }
+.ing b { display: block; font-size: 15px; }
+.ing small { font-size: 11.5px; color: #4b5a50; }
+.ing .k { font-family: var(--font-brand); font-size: 15px; text-align: right; }
+.pl { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 7px; margin-top: 4px; }
+.pl.s { background: #fde7e3; color: #b42318; } .pl.b { background: #e3eefb; color: #1d5fb4; }
+.ing.nuevo { opacity: 0; filter: blur(4px); transform: scale(0.97); border-color: #0b6b3a; background: #e1f2e7; }
+.cambio.hecho .ing.viejo { opacity: 0; filter: blur(4px); transform: scale(0.97); }
+.cambio.hecho .ing.nuevo { opacity: 1; filter: none; transform: none; }
+.ahorro { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13px; opacity: 0; transition: opacity 300ms var(--ease-out); }
+.ahorro.on { opacity: 1; }
+.ahorro .tagm { background: var(--kraft); color: var(--kraft-ink); font-family: var(--font-brand); font-weight: 400; padding: 4px 8px 4px 12px; border-radius: 4px 8px 8px 4px; transform: rotate(-2deg); }
+.lista7 { font-size: 11.5px; color: #4b5a50; margin-bottom: 12px; }
+.barra-s { margin-bottom: 12px; }
+.barra-s .t { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; margin-bottom: 5px; }
+.barra-s .t .v { font-family: var(--font-brand); font-weight: 400; font-variant-numeric: tabular-nums; }
+.barra-s .riel { height: 12px; border-radius: 999px; background: #e7ece5; overflow: hidden; }
+.barra-s .fill { height: 100%; width: 100%; border-radius: 999px; background: #9fb3a6; transform-origin: left; transform: scaleX(0); transition: transform 900ms var(--ease-out); }
+.barra-s.gana .fill { background: #0b6b3a; }
+.barra-s.gana .t .v { background: var(--kraft); color: var(--kraft-ink); padding: 1px 7px 1px 9px; border-radius: 3px 7px 7px 3px; }
+.resumen { margin-top: 6px; background: #0b6b3a; color: #fff; border-radius: 12px; padding: 10px 12px; font-weight: 700; font-size: 13px; opacity: 0; transform: translateY(8px); transition: opacity 300ms var(--ease-out), transform 360ms var(--ease-out); }
+.resumen.on { opacity: 1; transform: none; }
+.dedo { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: rgba(11, 107, 58, .28); border: 2px solid rgba(11, 107, 58, .6); pointer-events: none; opacity: 0;
+  transform: translate(-50%, -50%) scale(0.7); transition: left 420ms var(--ease-in-out), top 420ms var(--ease-in-out), opacity 200ms ease, transform 160ms var(--ease-out); z-index: 3; }
+.dedo.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.dedo.tap { transform: translate(-50%, -50%) scale(0.75); }
+
+/* controles tipo video */
+.controles { width: min(100%, 30rem); display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.play { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(241, 247, 242, .45); background: transparent; color: var(--night-ink); display: grid; place-items: center; cursor: pointer; transition: transform 140ms var(--ease-out), background-color 140ms; }
+.play:active { transform: scale(0.94); }
+@media (hover: hover) and (pointer: fine) { .play:hover { background: rgba(241, 247, 242, .1); } }
+.play svg { width: 18px; height: 18px; }
+.play svg[hidden] { display: none; }
+.capitulos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.capitulos button { width: 100%; background: none; border: 0; padding: 6px 0 0; color: var(--night-muted); font: 700 0.8rem/1.2 var(--font-body); text-align: left; cursor: pointer; display: grid; gap: 7px; }
+.capitulos button[aria-current="step"] { color: var(--night-ink); }
+.capitulos .riel { display: block; height: 4px; border-radius: 999px; background: rgba(241, 247, 242, .2); overflow: hidden; }
+.capitulos .fill { display: block; height: 100%; background: var(--kraft); transform-origin: left; transform: scaleX(0); }
+@media (hover: hover) and (pointer: fine) { .capitulos button:hover { color: var(--night-ink); } .capitulos button:hover .riel { background: rgba(241, 247, 242, .32); } }
+.capitulos .hecho .fill { transform: scaleX(1); }
+
+/* ---------- prueba: precios reales ---------- */
+.seccion { padding-block: clamp(64px, 11vh, 128px); }
+.seccion h2 { font-size: clamp(2rem, 3.8vw, 3.1rem); line-height: 1.06; font-weight: 700; max-width: 20ch; }
+.seccion .lead { font-size: clamp(1.1rem, 1.5vw, 1.3rem); color: var(--muted); margin-top: 16px; }
+.pruebas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); margin-top: clamp(28px, 5vh, 48px); align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(18px, 2.4vw, 30px); box-shadow: 0 24px 40px -32px rgba(var(--shadow), .45); min-width: 0; }
+.panel h3 { font-size: 1.25rem; line-height: 1.2; }
+.panel .cuando { font-size: 0.92rem; color: var(--muted); margin-top: 4px; }
+.etiquetas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; margin-top: 20px; }
+.tag { position: relative; display: grid; gap: 3px; background: var(--kraft); color: var(--kraft-ink); padding: 12px 16px 11px 28px; border-radius: 6px 12px 12px 6px;
+  box-shadow: 0 10px 18px -12px rgba(var(--shadow), .6); transform: rotate(var(--giro, -1.5deg)); transition: transform 200ms var(--ease-out); }
+.tag:nth-child(2n) { --giro: 1.5deg; }
+.tag::before { content: ""; position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--surface); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
 @media (hover: hover) and (pointer: fine) { .tag:hover { transform: rotate(0deg) translateY(-2px); } }
-.pill { display: inline-flex; align-items: center; gap: 4px; width: fit-content; font-weight: 700; font-size: 0.85rem; line-height: 1; padding: 5px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.pill.sube { background: var(--red-soft); color: var(--red); }
-.pill.baja { background: var(--down-soft); color: var(--down); }
-.tag .pill { background: rgba(255, 255, 255, .55); }
-.tag .pill.sube { color: #8f1a12; } .tag .pill.baja { color: #134a8f; }
+.tag b { font-size: 0.92rem; line-height: 1.1; }
+.tag .precio { font-family: var(--font-brand); font-size: 1.45rem; line-height: 1; }
+.tag .precio small { font-family: var(--font-body); font-weight: 700; font-size: 0.8rem; margin-left: 3px; }
+.pill { display: inline-flex; width: fit-content; font-weight: 700; font-size: 0.82rem; line-height: 1; padding: 5px 8px; border-radius: 999px; background: rgba(255, 255, 255, .55); }
+.pill.sube { color: #8f1a12; } .pill.baja { color: #134a8f; }
+.reemplazos { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 0; }
+.reemplazos li { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 1rem; }
+.reemplazos li > span:last-child { color: var(--muted); font-size: 0.92rem; grid-column: 1 / -1; }
+.baratos { list-style: none; margin: 22px 0 0; padding: 0; }
+.baratos > b { display: block; font-size: 1.02rem; margin-bottom: 4px; }
+.baratos li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); font-size: 0.98rem; }
+.baratos li .c { color: var(--muted); font-size: 0.92rem; }
+.baratos li .v { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cadenas { margin-top: 20px; display: grid; gap: 14px; }
+.cadena .t { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; margin-bottom: 6px; }
+.cadena .v { font-family: var(--font-brand); font-variant-numeric: tabular-nums; }
+.cadena .riel { height: 14px; border-radius: 999px; background: var(--green-soft); overflow: hidden; }
+.cadena .fill { height: 100%; border-radius: 999px; background: color-mix(in srgb, var(--muted) 55%, transparent); }
+.cadena.gana .fill { background: var(--green); }
+.cadena.gana .v { background: var(--kraft); color: var(--kraft-ink); padding: 2px 8px 2px 10px; border-radius: 3px 8px 8px 3px; }
+.fuente { font-size: 0.9rem; color: var(--muted); margin-top: 16px; }
+.ver-mas { display: inline-block; margin-top: 22px; font-weight: 700; }
 
-/* ---------- celular ---------- */
-.fono { position: relative; width: 100%; border: 10px solid #0d1310; border-radius: 44px; overflow: hidden; background: #0d1310;
-  box-shadow: 0 40px 70px -30px rgba(var(--shadow), .55), 0 0 0 1px rgba(255, 255, 255, .06); }
-.fono img { width: 100%; height: auto; border-radius: 34px; }
-
-/* ---------- 1. portada ---------- */
-.hero { padding-block: clamp(32px, 6vh, 72px) !important; }
-.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
-.hero .texto { display: grid; gap: 22px; align-content: center; }
-.hero .dato { display: block; font-size: 1rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; max-width: 34rem; }
-.hero .dato b { color: var(--ink); }
-.pizarra { position: relative; background: var(--board); border-radius: var(--r-lg); padding: clamp(28px, 4vw, 44px) 0 0; display: grid; justify-items: center; overflow: visible; min-height: 520px;
-  background-image: repeating-linear-gradient(0deg, transparent 0 46px, var(--board-line) 46px 47px); }
-.pizarra .fono { width: min(320px, 72%); margin-bottom: -1px; border-bottom: 0; border-radius: 44px 44px 0 0; max-height: 600px; }
-.pizarra .fono img { border-radius: 34px 34px 0 0; }
-.pizarra .tags { position: absolute; inset: 0; pointer-events: none; }
-.pizarra .tag { position: absolute; pointer-events: auto; width: 12.5rem; }
-.pizarra .tag:nth-child(1) { left: -6%; top: 13%; --giro: -3deg; }
-.pizarra .tag:nth-child(2) { right: -3%; top: 38%; --giro: 2.5deg; }
-.pizarra .tag:nth-child(3) { left: -2%; top: 63%; --giro: -1.5deg; }
-
-/* ---------- 2. tres pasos ---------- */
-.pasos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 32px); }
-.paso { display: grid; grid-template-rows: auto auto auto 1fr; gap: 12px; min-width: 0; }
-.paso .n { font-family: var(--font-brand); font-size: 2.6rem; line-height: 1; color: var(--green); }
-.paso h3 { min-height: 2.4em; }
-.paso p { min-height: 4.7em; align-self: start; }
-.paso p { color: var(--muted); font-size: 1.05rem; }
-.captura { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); background: var(--surface); align-self: start; box-shadow: 0 24px 40px -30px rgba(var(--shadow), .5); }
-.captura img { width: 100%; height: auto; }
-.paso .captura img { aspect-ratio: 640 / 760; object-fit: cover; object-position: top; }
-
-/* ---------- 3. alzas ---------- */
-.dos { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(18px, 2.4vw, 28px); box-shadow: 0 24px 40px -32px rgba(var(--shadow), .45); min-width: 0; }
-.panel h3 { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
-.panel h3 span { font-size: 0.95rem; font-weight: 400; color: var(--muted); letter-spacing: 0; }
-.filas { list-style: none; margin: 14px 0 0; padding: 0; }
-.fila { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
-.fila .emo { font-size: 1.6rem; line-height: 1; grid-row: span 2; align-self: start; padding-top: 2px; }
-.fila .nom { font-weight: 700; }
-.fila .val { text-align: right; display: grid; justify-items: end; gap: 6px; }
-.fila .kg { font-family: var(--font-brand); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
-.fila .cambio { grid-column: 2 / 4; font-size: 0.98rem; color: var(--muted); }
-.fila .cambio b { color: var(--ink); }
-.fila.aprovecha { background: var(--green-soft); border-radius: var(--r); border-top: 0; padding-inline: 12px; margin-top: 8px; }
-.fuente { font-size: 0.9rem; color: var(--muted); margin-top: 12px; }
-.lado { display: grid; gap: 18px; }
-.lado .captura { max-width: 420px; }
-
-/* ---------- 4. supermercados ---------- */
-.tabla-caja { overflow-x: auto; margin-top: 8px; }
-table { width: 100%; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; min-width: 520px; }
-th, td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--line); vertical-align: middle; }
-th:first-child, td:first-child { text-align: left; }
-thead th { font-size: 0.95rem; color: var(--muted); font-weight: 700; }
-td .p { font-family: var(--font-brand); font-size: 1.05rem; white-space: nowrap; }
-td .uni { display: none; font-size: 0.8rem; color: var(--muted); font-weight: 400; }
-td .u { font-size: 0.85rem; color: var(--muted); margin-left: 3px; }
-td.barato .p { background: var(--kraft); color: var(--kraft-ink); padding: 4px 10px 4px 12px; border-radius: 4px 8px 8px 4px; display: inline-block; transform: rotate(-1.5deg); }
-td .of { display: block; font-size: 0.78rem; color: var(--muted); }
-tbody tr:last-child td { border-bottom: 0; }
-.ver-mas { display: inline-flex; margin-top: 18px; font-weight: 700; }
-
-/* ---------- 5. instalar ---------- */
-.instalar .dos { align-items: center; }
-.ventajas { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.ventajas li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start; }
-.ventajas svg { width: 26px; height: 26px; color: var(--green); }
-.pasos-manual[hidden] { display: none; }
-.pasos-manual { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; color: var(--muted); }
-.pasos-manual b { color: var(--ink); }
-.tarjeta-app { background: var(--board); color: var(--board-ink); border-radius: var(--r-lg); padding: clamp(24px, 4vw, 44px); display: grid; gap: 18px; justify-items: center; text-align: center; }
-.tarjeta-app .icono { width: 120px; height: 120px; border-radius: 28px; box-shadow: 0 18px 30px -16px rgba(0, 0, 0, .6); }
-.tarjeta-app .nombre { font-family: var(--font-brand); font-size: 1.6rem; }
-.tarjeta-app p { color: var(--board-ink); opacity: .9; max-width: 30ch; }
-.qr { background: #ffffff; padding: 14px; border-radius: 18px; width: 200px; }
+/* ---------- cierre ---------- */
+.cierre { background: var(--night); color: var(--night-ink); background-image: repeating-linear-gradient(0deg, transparent 0 55px, var(--night-line) 55px 56px); }
+.cierre .wrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+.cierre h2 { font-family: var(--font-brand); font-weight: 400; letter-spacing: 0; font-size: clamp(2rem, 4.2vw, 3.6rem); line-height: 1.02; max-width: 14ch; color: var(--night-ink); }
+.cierre .lead { color: var(--night-muted); }
+.cierre .acciones { margin-top: 28px; }
+.ventajas { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 10px; color: var(--night-muted); }
+.ventajas li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; }
+.ventajas svg { width: 22px; height: 22px; color: var(--green-bright); }
+.ventajas b { color: var(--night-ink); }
+.app-tarjeta { justify-self: center; display: grid; gap: 16px; justify-items: center; text-align: center; }
+.app-tarjeta .icono { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 18px 30px -16px rgba(0, 0, 0, .7); }
+.app-tarjeta .nombre { font-family: var(--font-brand); font-size: 1.5rem; }
+.qr { background: #fff; padding: 14px; border-radius: 18px; width: 190px; }
 .qr svg { display: block; width: 100%; height: auto; }
-.url { font-family: var(--font-body); font-weight: 700; letter-spacing: .01em; user-select: all; }
-.estado { font-weight: 700; color: var(--green); min-height: 1.5em; }
-.instalar .texto { display: grid; gap: 22px; }
+.url { font-weight: 700; color: var(--night-muted); user-select: all; }
+.estado { min-height: 1.4em; font-weight: 700; color: var(--green-bright); margin-top: 12px; }
+.pasos-manual { margin: 12px 0 0; padding-left: 1.3em; color: var(--night-muted); display: grid; gap: 6px; }
+.pasos-manual[hidden] { display: none; }
+.pasos-manual b { color: var(--night-ink); }
 
-/* ---------- pie ---------- */
-footer { border-top: 1px solid var(--line); padding-block: 40px calc(40px + env(safe-area-inset-bottom, 0px)); }
-footer .wrap { display: grid; grid-template-columns: auto 1fr; gap: 12px 40px; align-items: start; }
-footer p { font-size: 0.95rem; color: var(--muted); max-width: 70ch; }
-footer nav { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 700; }
+footer { padding-block: 34px calc(34px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: baseline; }
+footer .marca { color: var(--green); font-size: 1.2rem; }
+footer p { font-size: 0.92rem; color: var(--muted); max-width: 72ch; }
+footer nav { display: flex; gap: 18px; font-weight: 700; font-size: 0.95rem; }
 
-/* ---------- barra fija en el celular ---------- */
+/* barra fija en el celular */
 .barra { display: none; }
 
-/* ---------- tamaños ---------- */
-@media (max-width: 1240px) {
-  .pizarra .tag:nth-child(1) { left: -3%; } .pizarra .tag:nth-child(2) { right: -1%; }
-}
-@media (max-width: 1080px) {
-  .pizarra .tag { width: 11rem; }
-  .pizarra .tag .precio { font-size: 1.45rem; }
-}
-@media (max-width: 900px) {
-  main > section { min-height: auto; }
-  .hero .wrap, .dos { grid-template-columns: minmax(0, 1fr); }
-  .hero { min-height: auto !important; }
-  .pizarra { min-height: 0; margin-inline: auto; width: 100%; max-width: 560px; }
-  .pizarra .fono { width: min(300px, 64%); max-height: 470px; }
-  .pasos { grid-template-columns: minmax(0, 1fr); }
-  .paso { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); grid-template-rows: auto auto 1fr; align-items: start; column-gap: 24px; }
-  .paso h3, .paso p { min-height: 0; }
-  .paso .n, .paso h3, .paso p { grid-column: 1; }
-  .paso .captura { grid-column: 2; grid-row: 1 / span 3; }
-  .paso .captura img { aspect-ratio: 640 / 560; }
-  .lado .captura { max-width: 380px; }
-  footer .wrap { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 960px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); row-gap: 24px; }
+  .hero { min-height: auto; }
+  /* En celular y tableta la demo va justo después del titular y los botones, para que se vea al abrir la página. */
+  .hero .copia { display: contents; }
+  .hero h1 { order: 1; max-width: 16ch; }
+  .hero .acciones { order: 2; margin-top: 0; }
+  .escena { order: 3; margin-top: 12px; }
+  .hero .lead { order: 4; margin-top: 8px; }
+  .hero .dato { order: 5; margin-top: -8px; }
+  .pruebas, .cierre .wrap { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
   body { font-size: 1.0625rem; }
-  .acciones .btn { width: 100%; }
-  .pizarra .tag { width: 9.4rem; padding: 10px 12px 10px 24px; }
-  .pizarra .tag::before { left: 8px; width: 7px; height: 7px; margin-top: -3.5px; }
-  .pizarra .tag b { font-size: 0.82rem; }
-  .pizarra .tag .precio { font-size: 1.2rem; }
-  .pizarra .tag .mes { display: none; }
-  .pizarra .tag:nth-child(1) { left: -2%; top: 8%; }
-  .pizarra .tag:nth-child(2) { right: -2%; top: 36%; }
-  .pizarra .tag:nth-child(3) { left: -2%; top: 64%; }
-  .paso { grid-template-columns: minmax(0, 1fr); }
-  .paso .captura { grid-column: 1; grid-row: auto; }
-  .paso .captura img { aspect-ratio: 640 / 520; }
-  table { min-width: 0; }
-  th, td { padding: 10px 4px; }
-  th:first-child, td:first-child { padding-left: 0; }
-  td .p { font-size: 0.86rem; }
-  td .u { display: none; }
-  td .uni { display: block; }
-  td.barato .p { padding: 3px 6px 3px 8px; }
-  thead th { font-size: 0.85rem; }
+  .hero .acciones .btn, .cierre .acciones .btn { width: 100%; }
+  .hero h1 { font-size: 2.35rem; }
+  .p-barra { font-size: 8.5px; }
+  .fono { width: 276px; height: 572px; }
   .barra { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px var(--gutter-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter);
     background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); transform: translateY(110%); transition: transform 240ms var(--ease-out); }
-  .barra.ver { transform: translateY(0); }
+  .barra.ver { transform: none; }
   .barra .btn { width: 100%; min-height: 54px; }
   footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 }
-@media (prefers-reduced-motion: reduce) { .btn, .tag, .barra, .nav ul a { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .rotulo span, .cap, .chip, .alerta, .ing, .ahorro, .barra-s .fill, .resumen, .pie-cap, .sello, .dedo, .btn, .tag, .barra, .callout, .otro, .otros, .dias-sel span { transition: none !important; }
+}
 </style>
 </head>
 <body>
 <header class="nav">
   <div class="wrap">
     <a class="marca" href="#inicio" aria-label="Acuánto, inicio">ACUÁNTO</a>
-    <ul>
-      <li><a href="#semana">Cómo funciona</a></li>
-      <li><a href="#alzas">Alzas</a></li>
-      <li><a href="#supermercados">Supermercados</a></li>
-      <li><a href="#instalar">Instalar</a></li>
-    </ul>
-    <a class="btn sec" href="app.html" data-web="nav">Abrir la app</a>
+    <a class="web" href="app.html" data-web="nav">Abrir la versión web</a>
   </div>
 </header>
 
 <main>
   <section class="hero" id="inicio">
     <div class="wrap">
-      <div class="texto">
+      <div class="copia">
         <h1>Arma los almuerzos de tu semana con los precios de hoy</h1>
-        <p class="lead">Acuánto elige platos baratos y variados para tu familia, te da la lista exacta de compras y te avisa qué subió para cambiarlo por algo que rinda igual.</p>
+        <p class="lead">Acuánto elige platos baratos y variados para tu familia, te avisa qué subió y con qué reemplazarlo, y te dice en qué supermercado sale más barata tu lista.</p>
         <div class="acciones">
-          <button class="btn" type="button" data-instalar="hero" data-para="android">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-            Instalar en mi Android</button>
-          <a class="btn" href="app.html" data-web="hero" data-para="escritorio ios">Usar la versión web</a>
-          <a class="btn sec" href="app.html" data-web="hero-sec" data-para="android">Usar en el navegador</a>
-          <a class="btn sec" href="#instalar" data-para="escritorio">Pasarla a mi celular</a>
+          <a class="btn kraft" href="app.html" data-web="hero">Probar la versión web <span class="flecha" aria-hidden="true">→</span></a>
+          <button class="btn linea" type="button" data-instalar="hero" data-para="android">Instalar en mi Android</button>
         </div>
-        <p class="dato">Gratis y sin registro · Precios del <b id="fecha-hero">6 nov</b>: Mercado Mayorista de Lima y las webs de Plaza Vea, Metro y Wong.</p>
+        <p class="dato">Gratis y sin registro. Precios del <b class="fecha">6 nov</b> del Mercado Mayorista de Lima y de las webs de Plaza Vea, Metro y Wong.</p>
       </div>
-      <div class="pizarra">
-        <div class="fono"><img src="lz-plan.webp" width="720" height="1465" alt="La app Acuánto mostrando los almuerzos de la semana: con los precios del mes conviene arroz con pollo y es mejor dejar los tallarines rojos para otra semana porque subió el tomate."></div>
-        <div class="tags" id="tags-hero" aria-label="Precios de hoy en el Mercado Mayorista de Lima"></div>
+
+      <div class="escena" role="group" aria-label="Demostración de la app Acuánto">
+        <div class="rotulo" aria-hidden="true">
+          <span data-c="0">Dinos quiénes comen</span>
+          <span data-c="1">Armamos tu semana</span>
+          <span data-c="2">Te avisa lo que subió</span>
+          <span data-c="3">Compra donde sale más barato</span>
+        </div>
+        <div class="fono-wrap" aria-hidden="true">
+        <div class="callout" data-k="0"><b>¾</b><span>de porción para cada niño</span></div>
+        <div class="callout" data-k="1"><b>6</b><span>almuerzos baratos y variados</span></div>
+        <div class="callout" data-k="2"><b id="co-sube">+36%</b><span id="co-sube-t">zapallo este mes</span></div>
+        <div class="callout" data-k="2b"><b id="co-baja">−18%</b><span id="co-baja-t">camote, su reemplazo</span></div>
+        <div class="callout" data-k="3"><b id="co-ahorro">S/ 7.26</b><span id="co-ahorro-t">menos en Plaza Vea</span></div>
+        <div class="fono">
+          <div class="pantalla">
+            <div class="p-cab"><b>ACUÁNTO</b><small>El precio de hoy</small></div>
+            <div class="p-cuerpo">
+              <div class="cap" data-cap="0">
+                <h4>¿Quiénes comen en casa?</h4>
+                <div class="sub">Un niño come menos que un adulto: así tu lista trae lo justo.</div>
+                <div class="tarj">
+                  <div class="contador"><span><b>Adultos</b><small>1 porción</small></span><span class="bot">−</span><span class="cnt" id="c-ad">0</span><span class="bot" id="b-ad">+</span></div>
+                  <div class="contador"><span><b>Niños</b><small>¾ de porción</small></span><span class="bot">−</span><span class="cnt" id="c-ni">0</span><span class="bot" id="b-ni">+</span></div>
+                  <div class="contador" style="margin-bottom:0"><span><b>Jóvenes</b><small>un poco más</small></span><span class="bot">−</span><span class="cnt">0</span><span class="bot">+</span></div>
+                </div>
+                <div class="lbl-dias">¿Qué días cocinas?</div>
+                <div class="dias-sel" id="dias-sel"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+                <div class="pie-cap" id="pie-0">4 personas · comen como 3.5 adultos</div>
+              </div>
+              <div class="cap" data-cap="1">
+                <h4>¿Qué cocinarás cada día?</h4>
+                <div class="sello" id="sello">Semana inteligente: barata y variada</div>
+                <div class="dia"><span>Lun</span><span class="chip">Pescado a la plancha con camote</span></div>
+                <div class="dia"><span>Mar</span><span class="chip">Ceviche de jurel</span></div>
+                <div class="dia"><span>Mié</span><span class="chip">Lentejas con arroz y huevo</span></div>
+                <div class="dia"><span>Jue</span><span class="chip">Tacu tacu con huevo</span></div>
+                <div class="dia"><span>Vie</span><span class="chip">Arroz con pollo</span></div>
+                <div class="dia" style="border-bottom:0"><span>Sáb</span><span class="chip">Arroz a la cubana</span></div>
+              </div>
+              <div class="cap" data-cap="2">
+                <h4>Esta semana en tu canasta</h4>
+                <div class="sub">Precios del Mercado Mayorista de Lima.</div>
+                <div class="alerta" id="alerta"><i>!</i><span id="alerta-txt">El zapallo subió 36% este mes</span></div>
+                <div class="cambio" id="cambio">
+                  <div class="ing viejo"><span class="e" id="v-emo">🎃</span><span><b id="v-nom">Zapallo</b><span class="pl s" id="v-pl">▲ +36%</span></span><span class="k" id="v-k">S/ 2.55</span></div>
+                  <div class="ing nuevo"><span class="e" id="n-emo">🍠</span><span><b id="n-nom">Camote</b><span class="pl b" id="n-pl">▼ −18%</span></span><span class="k" id="n-k">S/ 1.30</span></div>
+                </div>
+                <div class="ahorro" id="ahorro"><span id="ahorro-txt">En locro y sopas</span><span class="tagm" id="ahorro-v">−S/ 1.25 kg</span></div>
+                <div class="otros" id="otros"></div>
+              </div>
+              <div class="cap" data-cap="3">
+                <h4>¿Dónde sale más barata tu lista?</h4>
+                <div class="lista7" id="lista7">Zanahoria, cebolla, tomate, azúcar, huevo, aceite y leche.</div>
+                <div id="barras-s"></div>
+                <div class="resumen" id="resumen">La misma lista cuesta S/ 7.26 menos en Plaza Vea que en Wong.</div>
+              </div>
+              <span class="dedo" id="dedo"></span>
+            </div>
+            <div class="p-barra">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l2-6h14l2 6"/><path d="M3 11h18v2a3 3 0 01-6 0 3 3 0 01-6 0 3 3 0 01-6 0z"/><path d="M5 15v5h14v-5"/></svg>Precios</span>
+              <span class="act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-1.6 9.2a1 1 0 01-1 .8H6.6a1 1 0 01-1-.8z"/><path d="M8.5 10l3.5-6 3.5 6"/><path d="M9.5 14v3M14.5 14v3"/></svg>Mi semana</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Aportar</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l4-4 3 3 6-7"/><path d="M14 7h4v4"/></svg>Alzas</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>Puntos</span>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="controles">
+          <button class="play" type="button" id="play" aria-label="Pausar la demostración" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="ico-pausa"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="ico-play" hidden><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.7L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>
+          </button>
+          <ol class="capitulos" aria-label="Capítulos de la demostración">
+            <li><button type="button" data-ir="0"><span class="riel"><span class="fill"></span></span>Quiénes comen</button></li>
+            <li><button type="button" data-ir="1"><span class="riel"><span class="fill"></span></span>Tus platos</button></li>
+            <li><button type="button" data-ir="2"><span class="riel"><span class="fill"></span></span>Lo que subió</button></li>
+            <li><button type="button" data-ir="3"><span class="riel"><span class="fill"></span></span>Más barato</button></li>
+          </ol>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="semana">
+  <section class="seccion" id="precios">
     <div class="wrap">
-      <div class="cabeza">
-        <h2>Tu semana lista en tres pasos</h2>
-        <p class="lead">Menos idas al mercado, nada que se bote y una cuenta que sabes antes de salir.</p>
-      </div>
-      <ol class="pasos">
-        <li class="paso">
-          <span class="n" aria-hidden="true">1</span>
-          <h3>Dinos quiénes comen</h3>
-          <p>Un niño come ¾ de porción y un joven un poco más. Así la lista trae lo justo.</p>
-          <div class="captura"><img src="lz-personas.webp" width="640" height="778" loading="lazy" alt="Pantalla para indicar cuántos adultos, adultos mayores, jóvenes y niños comen en casa."></div>
-        </li>
-        <li class="paso">
-          <span class="n" aria-hidden="true">2</span>
-          <h3>Elige los platos o pide una semana inteligente</h3>
-          <p>Siete almuerzos baratos y variados, con pescado y menestras, que aprovechan las sobras.</p>
-          <div class="captura"><img src="lz-dias.webp" width="640" height="804" loading="lazy" alt="Lunes con ensalada criolla y pescado a la plancha con camote; martes con ceviche de jurel."></div>
-        </li>
-        <li class="paso">
-          <span class="n" aria-hidden="true">3</span>
-          <h3>Lleva tu lista y tu cuenta</h3>
-          <p>Cuánto de cada cosa, cuánto gastas y en qué supermercado te sale más barato.</p>
-          <div class="captura"><img src="lz-lista.webp" width="640" height="1004" loading="lazy" alt="Lista de compras por pasillo: verduras, frutas, carnes, pescado y abarrotes, con el costo de cada grupo."></div>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="alzas">
-    <div class="wrap">
-      <div class="cabeza">
-        <h2>Qué subió esta semana y con qué lo reemplazas</h2>
-        <p class="lead">Seguimos cada día los precios del Mercado Mayorista de Lima. Cuando algo se dispara, la app te propone otro ingrediente que rinde igual en el plato.</p>
-      </div>
-      <div class="dos">
+      <h2>Precios reales, revisados cada mañana</h2>
+      <p class="lead" id="frase-precios">Seguimos el Mercado Mayorista de Lima y las tiendas online de Plaza Vea, Metro y Wong. Por eso la app sabe qué conviene cocinar esta semana.</p>
+      <div class="pruebas">
         <div class="panel">
-          <h3>En el Mercado Mayorista <span id="fecha-alzas">al 6 nov</span></h3>
-          <ul class="filas" id="filas-alzas"></ul>
-          <p class="fuente">Precio promedio por kilo de los últimos 7 días contra el de 4 semanas antes. Fuente: EMMSA, Gran Mercado Mayorista de Lima.</p>
+          <h3>Lo que más se movió en el Mercado Mayorista</h3>
+          <p class="cuando" id="cuando-may">Últimos 7 días contra 4 semanas antes · al 6 nov</p>
+          <div class="etiquetas" id="etiquetas"></div>
+          <ul class="reemplazos" id="reemplazos"></ul>
         </div>
-        <div class="lado">
-          <div class="captura"><img src="lz-sustitutos.webp" width="640" height="837" loading="lazy" alt="En la app, la canasta propone cambiar tomate por zanahoria y jurel por huevo, con lo que ahorras en cada cambio."></div>
+        <div class="panel">
+          <h3>La misma lista en tres supermercados</h3>
+          <p class="cuando" id="cuando-sup">Un kilo, litro o lata de cada producto · al 6 nov</p>
+          <div class="cadenas" id="cadenas"></div>
+          <ul class="baratos" id="baratos"></ul>
+          <p class="fuente" id="lista-txt"></p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="supermercados">
-    <div class="wrap">
-      <div class="cabeza">
-        <h2>Compara Plaza Vea, Metro y Wong antes de salir</h2>
-        <p class="lead" id="frase-super">Cada mañana revisamos el precio online de los productos de la canasta en las tres cadenas.</p>
-      </div>
-      <div class="panel">
-        <h3>Precio de hoy en la web de cada tienda <span id="fecha-super">al 6 nov</span></h3>
-        <div class="tabla-caja"><table id="tabla-super"></table></div>
-        <p class="fuente">La etiqueta marca el más barato. Precio publicado por cada cadena en su tienda online; puede incluir ofertas del día.</p>
       </div>
       <a class="ver-mas" href="precios.html">Ver el histórico de precios de cada producto</a>
     </div>
   </section>
 
-  <section class="instalar" id="instalar">
+  <section class="seccion cierre" id="empezar">
     <div class="wrap">
-      <div class="dos">
-        <div class="texto">
-          <h2>Instálala en tu Android</h2>
-          <p class="lead">Queda en tu pantalla de inicio como cualquier app, sin pasar por Play Store. Si prefieres, úsala directo en el navegador.</p>
-          <div class="acciones">
-            <button class="btn" type="button" data-instalar="seccion" data-para="android">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-              Instalar Acuánto</button>
-            <a class="btn sec" href="app.html" data-web="instalar" data-para="android">Usar en el navegador</a>
-            <a class="btn" href="app.html" data-web="instalar" data-para="escritorio ios">Abrir la versión web</a>
-          </div>
-          <p class="estado" id="estado" role="status" aria-live="polite"></p>
-          <ol class="pasos-manual" id="pasos-manual" hidden>
-            <li>Abre esta página en <b>Chrome</b>.</li>
-            <li>Toca el menú <b>⋮</b> arriba a la derecha y elige <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</li>
-            <li>Abre <b>Acuánto</b> desde su ícono.</li>
-          </ol>
-          <p class="nota" data-para="ios">En iPhone, úsala en Safari: toca <b>Compartir</b> y luego <b>Agregar a inicio</b> para tenerla a un toque.</p>
-          <ul class="ventajas">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Gratis y sin registro.</b> Tus platos y tu familia se guardan en tu celular.</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Funciona sin señal</b> con los últimos precios que viste.</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Se actualiza sola</b> cada mañana, sin descargar nada más.</span></li>
-          </ul>
+      <div>
+        <h2>Tu próxima semana, resuelta</h2>
+        <p class="lead">Ábrela en el navegador y arma tu primera semana ahora. Si te gusta, instálala en tu Android para tenerla a un toque.</p>
+        <div class="acciones">
+          <a class="btn kraft" href="app.html" data-web="cierre">Probar la versión web <span class="flecha" aria-hidden="true">→</span></a>
+          <button class="btn linea" type="button" data-instalar="cierre" data-para="android">Instalar en mi Android</button>
         </div>
-        <div class="tarjeta-app">
-          <img class="icono" src="icon-192.png" width="120" height="120" alt="">
-          <span class="nombre">ACUÁNTO</span>
-          <div data-para="escritorio">
-            <p>Escanea el código con la cámara de tu celular para abrirla ahí.</p>
-          </div>
-          <div class="qr" data-para="escritorio" aria-label="Código QR que abre itzelysium.github.io/acuanto"><svg viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="Código QR"><path fill="#0d1310" d="M0,0h1v1h-1zM1,0h1v1h-1zM2,0h1v1h-1zM3,0h1v1h-1zM4,0h1v1h-1zM5,0h1v1h-1zM6,0h1v1h-1zM9,0h1v1h-1zM12,0h1v1h-1zM13,0h1v1h-1zM14,0h1v1h-1zM15,0h1v1h-1zM16,0h1v1h-1zM17,0h1v1h-1zM18,0h1v1h-1zM19,0h1v1h-1zM22,0h1v1h-1zM23,0h1v1h-1zM24,0h1v1h-1zM25,0h1v1h-1zM26,0h1v1h-1zM27,0h1v1h-1zM28,0h1v1h-1zM0,1h1v1h-1zM6,1h1v1h-1zM10,1h1v1h-1zM11,1h1v1h-1zM12,1h1v1h-1zM13,1h1v1h-1zM14,1h1v1h-1zM15,1h1v1h-1zM17,1h1v1h-1zM22,1h1v1h-1zM28,1h1v1h-1zM0,2h1v1h-1zM2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM6,2h1v1h-1zM9,2h1v1h-1zM10,2h1v1h-1zM12,2h1v1h-1zM14,2h1v1h-1zM15,2h1v1h-1zM17,2h1v1h-1zM18,2h1v1h-1zM20,2h1v1h-1zM22,2h1v1h-1zM24,2h1v1h-1zM25,2h1v1h-1zM26,2h1v1h-1zM28,2h1v1h-1zM0,3h1v1h-1zM2,3h1v1h-1zM3,3h1v1h-1zM4,3h1v1h-1zM6,3h1v1h-1zM9,3h1v1h-1zM11,3h1v1h-1zM12,3h1v1h-1zM13,3h1v1h-1zM18,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM22,3h1v1h-1zM24,3h1v1h-1zM25,3h1v1h-1zM26,3h1v1h-1zM28,3h1v1h-1zM0,4h1v1h-1zM2,4h1v1h-1zM3,4h1v1h-1zM4,4h1v1h-1zM6,4h1v1h-1zM10,4h1v1h-1zM11,4h1v1h-1zM14,4h1v1h-1zM15,4h1v1h-1zM16,4h1v1h-1zM22,4h1v1h-1zM24,4h1v1h-1zM25,4h1v1h-1zM26,4h1v1h-1zM28,4h1v1h-1zM0,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM11,5h1v1h-1zM15,5h1v1h-1zM18,5h1v1h-1zM19,5h1v1h-1zM22,5h1v1h-1zM28,5h1v1h-1zM0,6h1v1h-1zM1,6h1v1h-1zM2,6h1v1h-1zM3,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM10,6h1v1h-1zM12,6h1v1h-1zM14,6h1v1h-1zM16,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM22,6h1v1h-1zM23,6h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM26,6h1v1h-1zM27,6h1v1h-1zM28,6h1v1h-1zM9,7h1v1h-1zM12,7h1v1h-1zM13,7h1v1h-1zM15,7h1v1h-1zM17,7h1v1h-1zM18,7h1v1h-1zM0,8h1v1h-1zM3,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM19,8h1v1h-1zM21,8h1v1h-1zM23,8h1v1h-1zM2,9h1v1h-1zM5,9h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM13,9h1v1h-1zM16,9h1v1h-1zM17,9h1v1h-1zM20,9h1v1h-1zM21,9h1v1h-1zM22,9h1v1h-1zM25,9h1v1h-1zM28,9h1v1h-1zM1,10h1v1h-1zM6,10h1v1h-1zM9,10h1v1h-1zM10,10h1v1h-1zM13,10h1v1h-1zM14,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM21,10h1v1h-1zM22,10h1v1h-1zM23,10h1v1h-1zM24,10h1v1h-1zM25,10h1v1h-1zM26,10h1v1h-1zM27,10h1v1h-1zM0,11h1v1h-1zM3,11h1v1h-1zM7,11h1v1h-1zM8,11h1v1h-1zM12,11h1v1h-1zM13,11h1v1h-1zM16,11h1v1h-1zM21,11h1v1h-1zM23,11h1v1h-1zM26,11h1v1h-1zM27,11h1v1h-1zM3,12h1v1h-1zM4,12h1v1h-1zM6,12h1v1h-1zM7,12h1v1h-1zM8,12h1v1h-1zM9,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM16,12h1v1h-1zM17,12h1v1h-1zM18,12h1v1h-1zM20,12h1v1h-1zM21,12h1v1h-1zM22,12h1v1h-1zM25,12h1v1h-1zM27,12h1v1h-1zM28,12h1v1h-1zM0,13h1v1h-1zM4,13h1v1h-1zM7,13h1v1h-1zM10,13h1v1h-1zM12,13h1v1h-1zM13,13h1v1h-1zM14,13h1v1h-1zM19,13h1v1h-1zM20,13h1v1h-1zM1,14h1v1h-1zM2,14h1v1h-1zM4,14h1v1h-1zM5,14h1v1h-1zM6,14h1v1h-1zM8,14h1v1h-1zM9,14h1v1h-1zM10,14h1v1h-1zM12,14h1v1h-1zM13,14h1v1h-1zM14,14h1v1h-1zM23,14h1v1h-1zM25,14h1v1h-1zM26,14h1v1h-1zM27,14h1v1h-1zM28,14h1v1h-1zM0,15h1v1h-1zM1,15h1v1h-1zM7,15h1v1h-1zM10,15h1v1h-1zM11,15h1v1h-1zM12,15h1v1h-1zM15,15h1v1h-1zM17,15h1v1h-1zM20,15h1v1h-1zM23,15h1v1h-1zM24,15h1v1h-1zM25,15h1v1h-1zM27,15h1v1h-1zM3,16h1v1h-1zM5,16h1v1h-1zM6,16h1v1h-1zM9,16h1v1h-1zM10,16h1v1h-1zM11,16h1v1h-1zM13,16h1v1h-1zM17,16h1v1h-1zM20,16h1v1h-1zM21,16h1v1h-1zM23,16h1v1h-1zM27,16h1v1h-1zM2,17h1v1h-1zM5,17h1v1h-1zM10,17h1v1h-1zM11,17h1v1h-1zM12,17h1v1h-1zM13,17h1v1h-1zM14,17h1v1h-1zM16,17h1v1h-1zM17,17h1v1h-1zM20,17h1v1h-1zM22,17h1v1h-1zM23,17h1v1h-1zM25,17h1v1h-1zM28,17h1v1h-1zM0,18h1v1h-1zM2,18h1v1h-1zM3,18h1v1h-1zM5,18h1v1h-1zM6,18h1v1h-1zM9,18h1v1h-1zM11,18h1v1h-1zM14,18h1v1h-1zM18,18h1v1h-1zM22,18h1v1h-1zM24,18h1v1h-1zM27,18h1v1h-1zM28,18h1v1h-1zM4,19h1v1h-1zM5,19h1v1h-1zM8,19h1v1h-1zM10,19h1v1h-1zM11,19h1v1h-1zM12,19h1v1h-1zM14,19h1v1h-1zM15,19h1v1h-1zM17,19h1v1h-1zM18,19h1v1h-1zM20,19h1v1h-1zM27,19h1v1h-1zM28,19h1v1h-1zM0,20h1v1h-1zM2,20h1v1h-1zM3,20h1v1h-1zM4,20h1v1h-1zM6,20h1v1h-1zM9,20h1v1h-1zM10,20h1v1h-1zM12,20h1v1h-1zM19,20h1v1h-1zM20,20h1v1h-1zM21,20h1v1h-1zM22,20h1v1h-1zM23,20h1v1h-1zM24,20h1v1h-1zM26,20h1v1h-1zM8,21h1v1h-1zM11,21h1v1h-1zM12,21h1v1h-1zM14,21h1v1h-1zM16,21h1v1h-1zM19,21h1v1h-1zM20,21h1v1h-1zM24,21h1v1h-1zM26,21h1v1h-1zM27,21h1v1h-1zM28,21h1v1h-1zM0,22h1v1h-1zM1,22h1v1h-1zM2,22h1v1h-1zM3,22h1v1h-1zM4,22h1v1h-1zM5,22h1v1h-1zM6,22h1v1h-1zM9,22h1v1h-1zM10,22h1v1h-1zM11,22h1v1h-1zM16,22h1v1h-1zM17,22h1v1h-1zM20,22h1v1h-1zM22,22h1v1h-1zM24,22h1v1h-1zM27,22h1v1h-1zM0,23h1v1h-1zM6,23h1v1h-1zM8,23h1v1h-1zM10,23h1v1h-1zM11,23h1v1h-1zM12,23h1v1h-1zM14,23h1v1h-1zM18,23h1v1h-1zM20,23h1v1h-1zM24,23h1v1h-1zM25,23h1v1h-1zM26,23h1v1h-1zM0,24h1v1h-1zM2,24h1v1h-1zM3,24h1v1h-1zM4,24h1v1h-1zM6,24h1v1h-1zM11,24h1v1h-1zM16,24h1v1h-1zM17,24h1v1h-1zM18,24h1v1h-1zM20,24h1v1h-1zM21,24h1v1h-1zM22,24h1v1h-1zM23,24h1v1h-1zM24,24h1v1h-1zM27,24h1v1h-1zM28,24h1v1h-1zM0,25h1v1h-1zM2,25h1v1h-1zM3,25h1v1h-1zM4,25h1v1h-1zM6,25h1v1h-1zM8,25h1v1h-1zM9,25h1v1h-1zM10,25h1v1h-1zM11,25h1v1h-1zM13,25h1v1h-1zM19,25h1v1h-1zM22,25h1v1h-1zM24,25h1v1h-1zM25,25h1v1h-1zM26,25h1v1h-1zM27,25h1v1h-1zM0,26h1v1h-1zM2,26h1v1h-1zM3,26h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM10,26h1v1h-1zM11,26h1v1h-1zM19,26h1v1h-1zM24,26h1v1h-1zM25,26h1v1h-1zM26,26h1v1h-1zM28,26h1v1h-1zM0,27h1v1h-1zM6,27h1v1h-1zM9,27h1v1h-1zM11,27h1v1h-1zM12,27h1v1h-1zM14,27h1v1h-1zM15,27h1v1h-1zM17,27h1v1h-1zM18,27h1v1h-1zM20,27h1v1h-1zM21,27h1v1h-1zM22,27h1v1h-1zM27,27h1v1h-1zM0,28h1v1h-1zM1,28h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM8,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM13,28h1v1h-1zM17,28h1v1h-1zM20,28h1v1h-1zM21,28h1v1h-1zM25,28h1v1h-1zM27,28h1v1h-1z"/></svg></div>
-          <p class="url">itzelysium.github.io/acuanto</p>
-        </div>
+        <p class="estado" id="estado" role="status" aria-live="polite"></p>
+        <ol class="pasos-manual" id="pasos-manual" hidden>
+          <li>Abre esta página en <b>Chrome</b>.</li>
+          <li>Toca el menú <b>⋮</b> y elige <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</li>
+          <li>Abre <b>Acuánto</b> desde su ícono.</li>
+        </ol>
+        <ul class="ventajas">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Gratis y sin registro.</b> Tu familia y tus platos se guardan en tu celular.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Funciona sin señal</b> con los últimos precios que viste.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span><b>Sin Play Store:</b> se instala desde el navegador y se actualiza sola.</span></li>
+        </ul>
+      </div>
+      <div class="app-tarjeta">
+        <img class="icono" src="icon-192.png" width="112" height="112" alt="">
+        <span class="nombre">ACUÁNTO</span>
+        <p data-para="escritorio" style="color:var(--night-muted);max-width:26ch">Escanea con tu celular para abrirla ahí.</p>
+        <div class="qr" data-para="escritorio" role="img" aria-label="Código QR que abre itzelysium.github.io/acuanto"><svg viewBox="0 0 29 29" shape-rendering="crispEdges"><path fill="#0d1310" d="M0,0h1v1h-1zM1,0h1v1h-1zM2,0h1v1h-1zM3,0h1v1h-1zM4,0h1v1h-1zM5,0h1v1h-1zM6,0h1v1h-1zM9,0h1v1h-1zM12,0h1v1h-1zM13,0h1v1h-1zM14,0h1v1h-1zM15,0h1v1h-1zM16,0h1v1h-1zM17,0h1v1h-1zM18,0h1v1h-1zM19,0h1v1h-1zM22,0h1v1h-1zM23,0h1v1h-1zM24,0h1v1h-1zM25,0h1v1h-1zM26,0h1v1h-1zM27,0h1v1h-1zM28,0h1v1h-1zM0,1h1v1h-1zM6,1h1v1h-1zM10,1h1v1h-1zM11,1h1v1h-1zM12,1h1v1h-1zM13,1h1v1h-1zM14,1h1v1h-1zM15,1h1v1h-1zM17,1h1v1h-1zM22,1h1v1h-1zM28,1h1v1h-1zM0,2h1v1h-1zM2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM6,2h1v1h-1zM9,2h1v1h-1zM10,2h1v1h-1zM12,2h1v1h-1zM14,2h1v1h-1zM15,2h1v1h-1zM17,2h1v1h-1zM18,2h1v1h-1zM20,2h1v1h-1zM22,2h1v1h-1zM24,2h1v1h-1zM25,2h1v1h-1zM26,2h1v1h-1zM28,2h1v1h-1zM0,3h1v1h-1zM2,3h1v1h-1zM3,3h1v1h-1zM4,3h1v1h-1zM6,3h1v1h-1zM9,3h1v1h-1zM11,3h1v1h-1zM12,3h1v1h-1zM13,3h1v1h-1zM18,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM22,3h1v1h-1zM24,3h1v1h-1zM25,3h1v1h-1zM26,3h1v1h-1zM28,3h1v1h-1zM0,4h1v1h-1zM2,4h1v1h-1zM3,4h1v1h-1zM4,4h1v1h-1zM6,4h1v1h-1zM10,4h1v1h-1zM11,4h1v1h-1zM14,4h1v1h-1zM15,4h1v1h-1zM16,4h1v1h-1zM22,4h1v1h-1zM24,4h1v1h-1zM25,4h1v1h-1zM26,4h1v1h-1zM28,4h1v1h-1zM0,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM11,5h1v1h-1zM15,5h1v1h-1zM18,5h1v1h-1zM19,5h1v1h-1zM22,5h1v1h-1zM28,5h1v1h-1zM0,6h1v1h-1zM1,6h1v1h-1zM2,6h1v1h-1zM3,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM10,6h1v1h-1zM12,6h1v1h-1zM14,6h1v1h-1zM16,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM22,6h1v1h-1zM23,6h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM26,6h1v1h-1zM27,6h1v1h-1zM28,6h1v1h-1zM9,7h1v1h-1zM12,7h1v1h-1zM13,7h1v1h-1zM15,7h1v1h-1zM17,7h1v1h-1zM18,7h1v1h-1zM0,8h1v1h-1zM3,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM19,8h1v1h-1zM21,8h1v1h-1zM23,8h1v1h-1zM2,9h1v1h-1zM5,9h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM13,9h1v1h-1zM16,9h1v1h-1zM17,9h1v1h-1zM20,9h1v1h-1zM21,9h1v1h-1zM22,9h1v1h-1zM25,9h1v1h-1zM28,9h1v1h-1zM1,10h1v1h-1zM6,10h1v1h-1zM9,10h1v1h-1zM10,10h1v1h-1zM13,10h1v1h-1zM14,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM21,10h1v1h-1zM22,10h1v1h-1zM23,10h1v1h-1zM24,10h1v1h-1zM25,10h1v1h-1zM26,10h1v1h-1zM27,10h1v1h-1zM0,11h1v1h-1zM3,11h1v1h-1zM7,11h1v1h-1zM8,11h1v1h-1zM12,11h1v1h-1zM13,11h1v1h-1zM16,11h1v1h-1zM21,11h1v1h-1zM23,11h1v1h-1zM26,11h1v1h-1zM27,11h1v1h-1zM3,12h1v1h-1zM4,12h1v1h-1zM6,12h1v1h-1zM7,12h1v1h-1zM8,12h1v1h-1zM9,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM16,12h1v1h-1zM17,12h1v1h-1zM18,12h1v1h-1zM20,12h1v1h-1zM21,12h1v1h-1zM22,12h1v1h-1zM25,12h1v1h-1zM27,12h1v1h-1zM28,12h1v1h-1zM0,13h1v1h-1zM4,13h1v1h-1zM7,13h1v1h-1zM10,13h1v1h-1zM12,13h1v1h-1zM13,13h1v1h-1zM14,13h1v1h-1zM19,13h1v1h-1zM20,13h1v1h-1zM1,14h1v1h-1zM2,14h1v1h-1zM4,14h1v1h-1zM5,14h1v1h-1zM6,14h1v1h-1zM8,14h1v1h-1zM9,14h1v1h-1zM10,14h1v1h-1zM12,14h1v1h-1zM13,14h1v1h-1zM14,14h1v1h-1zM23,14h1v1h-1zM25,14h1v1h-1zM26,14h1v1h-1zM27,14h1v1h-1zM28,14h1v1h-1zM0,15h1v1h-1zM1,15h1v1h-1zM7,15h1v1h-1zM10,15h1v1h-1zM11,15h1v1h-1zM12,15h1v1h-1zM15,15h1v1h-1zM17,15h1v1h-1zM20,15h1v1h-1zM23,15h1v1h-1zM24,15h1v1h-1zM25,15h1v1h-1zM27,15h1v1h-1zM3,16h1v1h-1zM5,16h1v1h-1zM6,16h1v1h-1zM9,16h1v1h-1zM10,16h1v1h-1zM11,16h1v1h-1zM13,16h1v1h-1zM17,16h1v1h-1zM20,16h1v1h-1zM21,16h1v1h-1zM23,16h1v1h-1zM27,16h1v1h-1zM2,17h1v1h-1zM5,17h1v1h-1zM10,17h1v1h-1zM11,17h1v1h-1zM12,17h1v1h-1zM13,17h1v1h-1zM14,17h1v1h-1zM16,17h1v1h-1zM17,17h1v1h-1zM20,17h1v1h-1zM22,17h1v1h-1zM23,17h1v1h-1zM25,17h1v1h-1zM28,17h1v1h-1zM0,18h1v1h-1zM2,18h1v1h-1zM3,18h1v1h-1zM5,18h1v1h-1zM6,18h1v1h-1zM9,18h1v1h-1zM11,18h1v1h-1zM14,18h1v1h-1zM18,18h1v1h-1zM22,18h1v1h-1zM24,18h1v1h-1zM27,18h1v1h-1zM28,18h1v1h-1zM4,19h1v1h-1zM5,19h1v1h-1zM8,19h1v1h-1zM10,19h1v1h-1zM11,19h1v1h-1zM12,19h1v1h-1zM14,19h1v1h-1zM15,19h1v1h-1zM17,19h1v1h-1zM18,19h1v1h-1zM20,19h1v1h-1zM27,19h1v1h-1zM28,19h1v1h-1zM0,20h1v1h-1zM2,20h1v1h-1zM3,20h1v1h-1zM4,20h1v1h-1zM6,20h1v1h-1zM9,20h1v1h-1zM10,20h1v1h-1zM12,20h1v1h-1zM19,20h1v1h-1zM20,20h1v1h-1zM21,20h1v1h-1zM22,20h1v1h-1zM23,20h1v1h-1zM24,20h1v1h-1zM26,20h1v1h-1zM8,21h1v1h-1zM11,21h1v1h-1zM12,21h1v1h-1zM14,21h1v1h-1zM16,21h1v1h-1zM19,21h1v1h-1zM20,21h1v1h-1zM24,21h1v1h-1zM26,21h1v1h-1zM27,21h1v1h-1zM28,21h1v1h-1zM0,22h1v1h-1zM1,22h1v1h-1zM2,22h1v1h-1zM3,22h1v1h-1zM4,22h1v1h-1zM5,22h1v1h-1zM6,22h1v1h-1zM9,22h1v1h-1zM10,22h1v1h-1zM11,22h1v1h-1zM16,22h1v1h-1zM17,22h1v1h-1zM20,22h1v1h-1zM22,22h1v1h-1zM24,22h1v1h-1zM27,22h1v1h-1zM0,23h1v1h-1zM6,23h1v1h-1zM8,23h1v1h-1zM10,23h1v1h-1zM11,23h1v1h-1zM12,23h1v1h-1zM14,23h1v1h-1zM18,23h1v1h-1zM20,23h1v1h-1zM24,23h1v1h-1zM25,23h1v1h-1zM26,23h1v1h-1zM0,24h1v1h-1zM2,24h1v1h-1zM3,24h1v1h-1zM4,24h1v1h-1zM6,24h1v1h-1zM11,24h1v1h-1zM16,24h1v1h-1zM17,24h1v1h-1zM18,24h1v1h-1zM20,24h1v1h-1zM21,24h1v1h-1zM22,24h1v1h-1zM23,24h1v1h-1zM24,24h1v1h-1zM27,24h1v1h-1zM28,24h1v1h-1zM0,25h1v1h-1zM2,25h1v1h-1zM3,25h1v1h-1zM4,25h1v1h-1zM6,25h1v1h-1zM8,25h1v1h-1zM9,25h1v1h-1zM10,25h1v1h-1zM11,25h1v1h-1zM13,25h1v1h-1zM19,25h1v1h-1zM22,25h1v1h-1zM24,25h1v1h-1zM25,25h1v1h-1zM26,25h1v1h-1zM27,25h1v1h-1zM0,26h1v1h-1zM2,26h1v1h-1zM3,26h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM10,26h1v1h-1zM11,26h1v1h-1zM19,26h1v1h-1zM24,26h1v1h-1zM25,26h1v1h-1zM26,26h1v1h-1zM28,26h1v1h-1zM0,27h1v1h-1zM6,27h1v1h-1zM9,27h1v1h-1zM11,27h1v1h-1zM12,27h1v1h-1zM14,27h1v1h-1zM15,27h1v1h-1zM17,27h1v1h-1zM18,27h1v1h-1zM20,27h1v1h-1zM21,27h1v1h-1zM22,27h1v1h-1zM27,27h1v1h-1zM0,28h1v1h-1zM1,28h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM8,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM13,28h1v1h-1zM17,28h1v1h-1zM20,28h1v1h-1zM21,28h1v1h-1zM25,28h1v1h-1zM27,28h1v1h-1z"/></svg></div>
+        <span class="url">itzelysium.github.io/acuanto</span>
       </div>
     </div>
   </section>
@@ -414,16 +495,13 @@ footer nav { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 700; }
 <footer>
   <div class="wrap">
     <a class="marca" href="#inicio">ACUÁNTO</a>
-    <div style="display:grid;gap:12px">
-      <nav aria-label="Enlaces"><a href="app.html" data-web="pie">Versión web</a><a href="precios.html">Radar de precios</a><a href="#instalar">Instalar en Android</a></nav>
-      <p>Versión de prueba, hecha en Lima por DataPrix. Precios: Gran Mercado Mayorista de Lima (EMMSA) y tiendas online de Plaza Vea, Metro y Wong, revisados cada mañana. Contamos visitas e instalaciones de forma anónima para mejorar la app.</p>
-    </div>
+    <nav aria-label="Enlaces"><a href="app.html" data-web="pie">Versión web</a><a href="precios.html">Radar de precios</a></nav>
+    <p>Versión de prueba, hecha en Lima por DataPrix. Precios del Gran Mercado Mayorista de Lima (EMMSA) y de las tiendas online de Plaza Vea, Metro y Wong, revisados cada mañana. Contamos visitas e instalaciones de forma anónima para mejorar la app.</p>
   </div>
 </footer>
 
 <div class="barra" id="barra">
-  <button class="btn" type="button" data-instalar="barra" data-para="android">Instalar en mi Android</button>
-  <a class="btn" href="app.html" data-web="barra" data-para="escritorio ios">Usar la versión web</a>
+  <a class="btn verde" href="app.html" data-web="barra">Probar la versión web</a>
 </div>
 
 <script type="application/json" id="datos">{"snap":{"may":{"fecha":"2026-11-06","fechas":["2026-09-28","2026-09-29","2026-09-30","2026-10-01","2026-10-02","2026-10-03","2026-10-04","2026-10-05","2026-10-06","2026-10-07","2026-10-08","2026-10-09","2026-10-10","2026-10-11","2026-10-12","2026-10-13","2026-10-14","2026-10-15","2026-10-16","2026-10-17","2026-10-18","2026-10-19","2026-10-20","2026-10-21","2026-10-22","2026-10-23","2026-10-24","2026-10-25","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-10-31","2026-11-01","2026-11-02","2026-11-03","2026-11-04","2026-11-05","2026-11-06"],"productos":{"aji":{"prom":[4.78,4.78,5.25,5.7,5.53,5.2,5.2,5.15,5.05,5.25,5.25,5.83,5.73,5.73,5.65,5.35,5.13,4.95,4.88,5.0,5.0,5.13,5.2,5.03,4.93,5.0,5.0,5.0,5.08,5.15,5.03,4.88,4.88,5.08,5.08,5.13,5.25,5.4,5.33,5.4]},"ajo":{"prom":[3.75,4.5,3.25,3.25,3.13,3.13,3.13,3.25,3.25,3.13,3.13,3.0,3.0,3.0,4.0,4.0,3.88,3.88,3.88,3.88,3.88,4.13,4.25,5.0,5.0,5.0,5.0,5.0,6.25,6.25,6.25,6.0,6.0,6.0,6.0,6.0,6.13,6.13,6.13,6.13]},"arveja":{"prom":[8.03,7.15,6.45,6.7,6.88,6.75,6.75,6.7,7.15,6.83,6.83,7.15,6.88,6.88,6.68,6.58,7.03,7.4,7.15,7.08,7.08,7.25,7.58,7.65,7.35,7.08,7.2,7.2,7.25,7.33,8.03,7.15,6.83,6.75,6.75,7.15,7.33,7.95,8.2,8.0]},"camote":{"prom":[1.69,1.48,1.7,1.68,1.58,1.58,1.58,1.58,1.58,1.63,1.63,1.59,1.59,1.59,1.49,1.44,1.44,1.44,1.46,1.46,1.46,1.46,1.41,1.3,1.3,1.3,1.3,1.3,1.28,1.28,1.26,1.34,1.35,1.35,1.35,1.35,1.25,1.25,1.35,1.3]},"cebolla":{"prom":[2.35,2.4,2.15,2.2,2.43,2.43,2.43,2.45,2.45,2.45,2.45,2.75,2.75,2.75,2.75,2.75,2.75,2.88,2.83,2.88,2.88,2.88,2.78,2.78,2.65,2.63,2.63,2.63,2.63,2.6,2.35,2.4,2.35,2.35,2.35,2.35,2.35,2.38,2.38,2.7]},"choclo":{"prom":[4.61,4.13,4.29,4.56,4.42,4.08,4.08,4.96,5.21,5.13,5.13,5.25,5.27,5.27,5.08,5.25,5.17,4.83,5.5,4.79,4.79,5.08,4.96,5.0,5.25,5.4,5.29,5.29,5.25,5.67,5.59,5.63,5.58,5.88,5.88,5.92,5.96,6.08,6.17,6.25]},"limon":{"prom":[2.62,2.92,2.86,2.98,2.86,2.74,2.74,2.5,2.48,2.36,2.36,2.62,2.74,2.74,2.92,2.98,3.07,3.1,3.22,3.16,3.16,2.86,2.74,2.66,2.86,2.74,2.92,2.92,2.92,2.82,2.62,2.5,2.68,2.8,2.8,2.62,2.56,2.5,2.74,2.5]},"maiz-morado":{"prom":[4.33,3.78,3.73,3.75,3.75,3.7,3.7,3.6,3.5,3.63,3.63,3.63,3.63,3.63,3.65,3.7,3.7,3.7,3.8,3.75,3.75,3.7,3.7,3.7,3.75,3.73,3.9,3.9,3.9,3.68,4.33,4.08,4.88,4.7,4.7,4.75,4.7,4.03,4.1,3.9]},"olluco":{"prom":[4.3,4.45,4.25,4.33,4.35,4.3,4.3,4.25,4.25,4.38,4.38,4.35,4.3,4.3,4.28,4.28,4.25,4.28,4.28,4.28,4.28,4.25,4.0,4.0,4.28,4.25,4.53,4.53,4.53,4.53,4.58,4.75,4.78,5.03,5.03,4.78,4.6,4.7,4.83,4.83]},"papa-amarilla":{"prom":[4.25,3.83,4.13,4.18,3.88,3.8,3.8,3.98,4.3,4.35,4.35,4.65,4.65,4.65,4.1,3.85,3.93,3.95,4.0,3.95,3.95,4.03,3.75,4.0,3.88,3.88,3.88,3.88,4.13,3.95,4.25,4.23,4.18,4.18,4.18,4.38,5.28,5.53,5.55,5.55]},"papa-blanca":{"prom":[1.04,1.59,1.06,1.25,1.23,1.18,1.18,1.31,1.21,1.23,1.23,1.33,1.33,1.33,1.25,1.2,1.15,1.25,1.23,1.23,1.23,1.0,0.95,1.05,1.08,1.08,1.08,1.08,1.38,1.51,1.51,1.59,1.46,1.48,1.48,1.6,1.6,1.65,1.78,1.84]},"tomate":{"prom":[4.69,5.44,5.81,5.25,4.75,4.5,4.5,3.63,3.5,3.56,3.56,4.13,4.0,4.0,4.69,4.75,4.13,4.13,4.75,4.44,4.44,4.75,4.75,4.63,4.38,4.19,4.06,4.06,4.81,4.81,4.25,4.13,4.12,3.94,3.94,3.81,4.12,4.38,4.38,4.06]},"zanahoria":{"prom":[2.17,2.78,2.14,1.95,2.06,2.11,2.11,2.56,2.83,2.67,2.67,1.89,1.81,1.81,2.47,2.92,2.14,1.89,2.56,3.39,3.39,2.61,3.0,3.0,2.33,2.0,2.39,2.39,2.0,2.72,2.17,2.78,2.17,2.72,2.72,2.94,4.22,2.83,3.83,5.0]},"zapallo":{"prom":[1.83,2.05,1.98,1.98,1.98,1.88,1.88,1.83,1.83,1.85,1.78,1.83,1.88,1.88,1.78,1.83,1.78,1.78,1.8,1.78,1.78,1.78,1.95,1.88,2.0,1.98,2.0,2.0,1.95,2.13,2.13,2.3,2.35,2.45,2.45,2.43,2.43,2.58,2.6,2.55]}}},"sup":{"fecha":"2026-11-06","cadenas":{"plazavea":{"nombre":"Plaza Vea","precios":{"tomate":{"precio":6.5,"unidad":"kilo","oferta":false},"cebolla":{"precio":3.99,"unidad":"kilo","oferta":false},"zanahoria":{"precio":4.99,"unidad":"kilo","oferta":false},"huevo":{"precio":9.94,"unidad":"kilo","oferta":false},"azucar":{"precio":4.18,"unidad":"kilo","oferta":false},"aceite":{"precio":6.11,"unidad":"litro","oferta":true},"leche":{"precio":3.82,"unidad":"lata","oferta":true}}},"metro":{"nombre":"Metro","precios":{"tomate":{"precio":6.49,"unidad":"kilo","oferta":true},"cebolla":{"precio":2.99,"unidad":"kilo","oferta":true},"zanahoria":{"precio":8.79,"unidad":"kilo","oferta":false},"huevo":{"precio":8.13,"unidad":"kilo","oferta":false},"azucar":{"precio":3.08,"unidad":"kilo","oferta":true},"aceite":{"precio":6.11,"unidad":"litro","oferta":true},"leche":{"precio":4.1,"unidad":"lata","oferta":false}}},"wong":{"nombre":"Wong","precios":{"tomate":{"precio":7.39,"unidad":"kilo","oferta":false},"cebolla":{"precio":4.8,"unidad":"kilo","oferta":false},"zanahoria":{"precio":8.99,"unidad":"kilo","oferta":false},"huevo":{"precio":9.94,"unidad":"kilo","oferta":false},"azucar":{"precio":3.58,"unidad":"kilo","oferta":false},"aceite":{"precio":7.89,"unidad":"litro","oferta":false},"leche":{"precio":4.2,"unidad":"lata","oferta":false}}}},"total":35}},"prod":{"pollo":{"n":"Pollo","e":"🍗","u":"kilo"},"aceite":{"n":"Aceite vegetal","e":"🧴","u":"litro"},"aji":{"n":"Ají amarillo","e":"🌶️","u":"kilo"},"arveja":{"n":"Arveja verde","e":"🟢","u":"kilo"},"huevo":{"n":"Huevo","e":"🥚","u":"kilo"},"cebolla":{"n":"Cebolla roja","e":"🧅","u":"kilo"},"ajo":{"n":"Ajos","e":"🧄","u":"kilo"},"maiz-morado":{"n":"Maíz morado","e":"🟣","u":"kilo"},"azucar":{"n":"Azúcar rubia","e":"🍬","u":"kilo"},"leche":{"n":"Leche evaporada","e":"🥛","u":"lata"},"mandarina":{"n":"Mandarina","e":"🟠","u":"kilo"},"papaya":{"n":"Papaya","e":"🍈","u":"kilo"},"olluco":{"n":"Olluco","e":"🥔","u":"kilo"},"choclo":{"n":"Choclo","e":"🌽","u":"unidad"},"frejol":{"n":"Frejol canario","e":"🟡","u":"kilo"},"maracuya":{"n":"Maracuyá","e":"🟡","u":"kilo"},"camote":{"n":"Camote","e":"🍠","u":"kilo"},"papa-amarilla":{"n":"Papa amarilla","e":"🥔","u":"kilo"},"lenteja":{"n":"Lenteja","e":"🟤","u":"kilo"},"papa-blanca":{"n":"Papa blanca","e":"🥔","u":"kilo"},"quinua":{"n":"Quinua","e":"🌾","u":"kilo"},"naranja":{"n":"Naranja de jugo","e":"🍊","u":"kilo"},"zanahoria":{"n":"Zanahoria","e":"🥕","u":"kilo"},"limon":{"n":"Limón","e":"🍋","u":"kilo"},"pina":{"n":"Piña","e":"🍍","u":"kilo"},"tomate":{"n":"Tomate","e":"🍅","u":"kilo"},"zapallo":{"n":"Zapallo","e":"🎃","u":"kilo"},"arroz":{"n":"Arroz","e":"🍚","u":"kilo"},"fideos":{"n":"Fideos","e":"🍝","u":"kilo"},"platano":{"n":"Plátano de seda","e":"🍌","u":"kilo"}},"sust":{"papa-amarilla":[["papa-blanca","En sopas, guisos y fritas. En causa y huancaína no es igual."],["camote","Más dulce; bien sancochado."]],"papa-blanca":[["camote","Sancochado o en guisos."],["olluco","En guisos y saltados."]],"camote":[["papa-blanca","Sancochada, para acompañar."]],"limon":[["maracuya","Para refrescos y aliños. En ceviche no reemplaza."],["naranja","Solo para refrescos."]],"tomate":[["zapallo","Da cuerpo a guisos y estofados."],["zanahoria","Mezclada en aderezos y tallarines rojos."]],"aji":[["zanahoria","Licuada da el color amarillo; pica menos."]],"zapallo":[["zanahoria","En sopas y guisos."],["camote","En locro y sopas."]],"zanahoria":[["zapallo","En sopas y guisos."]],"arveja":[["zanahoria","En arroces y estofados."],["frejol","Seco rinde más; remójalo la noche antes."]],"choclo":[["arveja","En arroces y sopas: un poco de arveja por cada choclo."]],"olluco":[["papa-blanca","En guisos."]]},"staples":["zanahoria","cebolla","tomate","azucar","huevo","aceite","leche"]}</script>
@@ -434,6 +512,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 700; }
   const ua = navigator.userAgent, html = document.documentElement;
   const disp = /Android/i.test(ua) ? "android" : (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) ? "ios" : "escritorio";
   html.dataset.dispositivo = disp;
+  const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- medición anónima (misma tabla y sesión que la app) ---------- */
   const SUPA = { url: "https://oospzzziyyvrsnesdbhz.supabase.co", key: "sb_publishable_RwcfIrlGFa-ZQb4v6oe29A_1gwiPv4_" };
@@ -447,55 +526,48 @@ footer nav { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 700; }
   }
   function evento(nombre, datos) {
     if (!medir) return;
-    fetch(SUPA.url + "/rest/v1/eventos", { method: "POST", keepalive: true,
-      headers: { apikey: SUPA.key, "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify([{ sesion: sesion(), version: "landing-1", rol: null, evento: nombre, datos: datos || {} }]) }).catch(() => {});
+    fetch(SUPA.url + "/rest/v1/eventos", { method: "POST", keepalive: true, headers: { apikey: SUPA.key, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify([{ sesion: sesion(), version: "landing-2", rol: null, evento: nombre, datos: datos || {} }]) }).catch(() => {});
   }
-  const q = new URLSearchParams(location.search);
   let ref = ""; try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
-  evento("landing_visita", { dispositivo: disp, ref, utm: q.get("utm_source") || "" });
+  evento("landing_visita", { dispositivo: disp, ref, utm: new URLSearchParams(location.search).get("utm_source") || "" });
 
   /* ---------- instalar en Android ---------- */
-  let aviso = null;
-  const estado = $("#estado");
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); aviso = e; html.dataset.instalable = "si"; });
-  window.addEventListener("appinstalled", () => {
-    try { localStorage.setItem("acuanto.instalada", "1"); } catch (e) {}
-    estado.textContent = "Listo: Acuánto ya está en tu pantalla de inicio."; evento("landing_instalada", {});
-  });
+  let aviso = null; const estado = $("#estado");
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); aviso = e; });
+  window.addEventListener("appinstalled", () => { estado.textContent = "Listo: Acuánto ya está en tu pantalla de inicio."; evento("landing_instalada", {}); });
   async function instalar(desde) {
     if (aviso) {
-      aviso.prompt();
-      const r = await aviso.userChoice.catch(() => ({ outcome: "error" }));
-      evento("landing_instalar", { desde, resultado: r.outcome });
-      if (r.outcome === "accepted") estado.textContent = "Instalando Acuánto…";
-      aviso = null;
-      return;
+      aviso.prompt(); const r = await aviso.userChoice.catch(() => ({ outcome: "error" }));
+      evento("landing_instalar", { desde, resultado: r.outcome }); if (r.outcome === "accepted") estado.textContent = "Instalando Acuánto…"; aviso = null; return;
     }
     evento("landing_instalar", { desde, resultado: "manual" });
-    $("#pasos-manual").hidden = false;
-    estado.textContent = "Tu navegador no muestra el aviso de instalación aquí. Sigue estos pasos:";
-    if (desde !== "seccion") $("#instalar").scrollIntoView({ block: "start" });
+    $("#pasos-manual").hidden = false; estado.textContent = "Tu navegador no muestra el aviso de instalación aquí. Sigue estos pasos:";
+    $("#empezar").scrollIntoView({ block: "start" });
   }
   $$("[data-instalar]").forEach((b) => b.addEventListener("click", () => instalar(b.dataset.instalar)));
   $$("[data-web]").forEach((a) => a.addEventListener("click", () => evento("landing_web", { desde: a.dataset.web, dispositivo: disp })));
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-
-  /* barra fija en el celular cuando el botón de la portada ya no se ve */
-  const barra = $("#barra"), heroBtns = $(".hero .acciones");
-  if ("IntersectionObserver" in window && heroBtns) {
-    new IntersectionObserver(([e]) => barra.classList.toggle("ver", !e.isIntersecting && e.boundingClientRect.top < 0)).observe(heroBtns);
+  // La barra fija del celular aparece cuando ya pasaste los botones de la portada y desaparece al llegar a los del cierre.
+  const barra = $("#barra"), vis = new Map();
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => vis.set(e.target, { en: e.isIntersecting, arriba: e.boundingClientRect.top < 0 }));
+      const h = vis.get($(".hero .acciones")), c = vis.get($(".cierre .acciones"));
+      barra.classList.toggle("ver", !!h && !h.en && h.arriba && !(c && c.en));
+    });
+    io.observe($(".hero .acciones")); io.observe($(".cierre .acciones"));
   }
 
-  /* ---------- precios ---------- */
+  /* ---------- datos de precios ---------- */
   const MES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
   const fechaCorta = (iso) => { const [y, m, d] = iso.split("-").map(Number); return d + " " + MES[m - 1]; };
   const sol = (v) => "S/ " + v.toFixed(2);
   const pct = (v) => (v > 0 ? "+" : "−") + Math.abs(Math.round(v)) + "%";
   const media = (a) => { const b = a.filter((v) => v != null); return b.length ? b.reduce((s, v) => s + v, 0) / b.length : null; };
   const P = (id) => D.prod[id] || { n: id, e: "" };
-  const UNI = { kilo: "kg", litro: "litro", lata: "lata", unidad: "unidad" };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const art = (n) => (/a$|ón$/i.test(n.split(" ")[0]) && !/^(ají|maíz)/i.test(n) ? "La " : "El ") + n.toLowerCase();
 
   function cambios(M) {
     const F = M.fechas, fin = new Date(F[F.length - 1] + "T12:00:00");
@@ -504,62 +576,149 @@ footer nav { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 700; }
     return Object.entries(M.productos).map(([id, p]) => {
       const hoy = media(p.prom.filter((v, i) => F[i] >= a7)), antes = media(p.prom.filter((v, i) => F[i] >= b0 && F[i] <= b1));
       const ult = [...p.prom].reverse().find((v) => v != null);
-      return hoy && antes && ult ? { id, v: (hoy / antes - 1) * 100, hoy, antes, ult } : null;
+      return hoy && antes && ult ? { id, v: (hoy / antes - 1) * 100, ult } : null;
     }).filter(Boolean).sort((a, b) => b.v - a.v);
   }
-  function reemplazo(r, porId) {
-    const c = (D.sust[r.id] || []).map(([id, nota]) => ({ id, nota, x: porId[id] })).filter((c) => c.x && c.x.v < r.v - 15).sort((a, b) => a.x.v - b.x.v);
-    return c[0] || null;
+  // Para cada producto que subió, el reemplazo de la app que subió bastante menos (o bajó), eligiendo el más barato del mes.
+  function reemplazos(cs) {
+    const por = Object.fromEntries(cs.map((c) => [c.id, c]));
+    return cs.filter((c) => c.v > 3).map((r) => {
+      const s = (D.sust[r.id] || []).map(([id, nota]) => ({ id, nota, x: por[id] })).filter((c) => c.x && c.x.v < r.v - 15).sort((a, b) => a.x.v - b.x.v)[0];
+      return s ? { r, s } : null;
+    }).filter(Boolean);
+  }
+  function canasta(Sp) {
+    const cad = Object.entries(Sp.cadenas || {});
+    const items = D.staples.filter((pid) => cad.every(([, v]) => v.precios && v.precios[pid] && v.precios[pid].precio));
+    const tot = cad.map(([c, v]) => ({ c, n: v.nombre || c, t: items.reduce((s, pid) => s + v.precios[pid].precio, 0) })).sort((a, b) => a.t - b.t);
+    return { items, tot };
   }
 
-  function pintarMayorista(M) {
-    const cs = cambios(M); if (!cs.length) return;
-    const porId = Object.fromEntries(cs.map((c) => [c.id, c]));
+  function pintarDatos(M, Sp) {
     const fecha = fechaCorta(M.fecha || M.fechas[M.fechas.length - 1]);
-    $("#fecha-hero").textContent = fecha; $("#fecha-alzas").textContent = "al " + fecha;
-    const suben = cs.filter((c) => c.v > 3).slice(0, 5), bajan = cs.filter((c) => c.v < -5).reverse();
-    const tags = [suben[0], suben[1], bajan[0] || suben[2]].filter(Boolean);
-    $("#tags-hero").innerHTML = tags.map((t) => `<div class="tag"><b>${esc(P(t.id).n)}</b><span class="precio">${sol(t.ult)}<small>kg</small></span>
-      <span class="pill ${t.v > 0 ? "sube" : "baja"}">${t.v > 0 ? "▲" : "▼"} ${pct(t.v)}<span class="mes"> en un mes</span></span></div>`).join("");
-    const fila = (r) => {
-      const s = r.v > 0 ? reemplazo(r, porId) : null;
-      const txt = r.v > 0
-        ? (s ? `Cámbialo por <b>${esc(P(s.id).n.toLowerCase())}</b> (${pct(s.x.v)})${s.nota ? ". " + esc(s.nota) : ""}` : "Compra solo lo de la semana o déjalo para otra.")
-        : "Bajó: buen momento para ponerlo en tus platos.";
-      return `<li class="fila${r.v < 0 ? " aprovecha" : ""}"><span class="emo" aria-hidden="true">${P(r.id).e}</span><span class="nom">${esc(P(r.id).n)}</span>
-        <span class="val"><span class="kg">${sol(r.ult)}</span><span class="pill ${r.v > 0 ? "sube" : "baja"}">${r.v > 0 ? "▲" : "▼"} ${pct(r.v)}</span></span>
-        <span class="cambio">${txt}</span></li>`;
-    };
-    $("#filas-alzas").innerHTML = suben.map(fila).join("") + (bajan[0] ? fila(bajan[0]) : "");
-  }
-
-  function pintarSuper(Sp) {
-    const cad = Object.entries(Sp.cadenas || {}); if (!cad.length) return;
-    $("#fecha-super").textContent = "al " + fechaCorta(Sp.fecha);
-    let filas = "", mayor = null;
-    for (const pid of D.staples) {
-      const ps = cad.map(([c, v]) => ({ c, n: v.nombre || c, x: (v.precios || {})[pid] })).filter((o) => o.x && o.x.precio);
-      if (ps.length < 2) continue;
-      const min = Math.min(...ps.map((o) => o.x.precio)), max = Math.max(...ps.map((o) => o.x.precio));
-      if (!mayor || max / min > mayor.r) mayor = { r: max / min, pid, min: ps.find((o) => o.x.precio === min), max: ps.find((o) => o.x.precio === max) };
-      const un = UNI[ps[0].x.unidad] || ps[0].x.unidad;
-      filas += `<tr><td><b>${esc(P(pid).n)}</b><span class="uni">por ${un}</span></td>` + cad.map(([c]) => {
-        const o = ps.find((z) => z.c === c);
-        if (!o) return `<td><span class="u">sin dato</span></td>`;
-        return `<td class="${o.x.precio === min ? "barato" : ""}"><span class="p">${sol(o.x.precio)}</span><span class="u">/${UNI[o.x.unidad] || o.x.unidad}</span>${o.x.oferta ? `<span class="of">en oferta</span>` : ""}</td>`;
-      }).join("") + "</tr>";
+    $$(".fecha").forEach((e) => (e.textContent = fecha));
+    const cs = cambios(M);
+    // demo: capítulo "lo que subió", con el producto que más subió y tiene un buen reemplazo
+    const todos = reemplazos(cs), par = todos.find((x) => x.r.v > 10);
+    if (par) {
+      const { r, s } = par;
+      $("#alerta-txt").textContent = `${art(P(r.id).n)} subió ${Math.round(r.v)}% este mes`;
+      $("#v-emo").textContent = P(r.id).e; $("#v-nom").textContent = P(r.id).n; $("#v-pl").textContent = "▲ " + pct(r.v); $("#v-k").textContent = sol(r.ult);
+      $("#n-emo").textContent = P(s.id).e; $("#n-nom").textContent = P(s.id).n; $("#n-pl").textContent = (s.x.v < 0 ? "▼ " : "▲ ") + pct(s.x.v); $("#n-k").textContent = sol(s.x.ult);
+      $("#ahorro-txt").textContent = s.nota ? s.nota.replace(/\.$/, "") : "Rinde igual en el plato";
+      const dif = r.ult - s.x.ult; $("#ahorro-v").textContent = dif > 0 ? "−" + sol(dif) + " kg" : "Más barato";
+      $("#co-sube").textContent = pct(r.v); $("#co-sube-t").textContent = P(r.id).n.toLowerCase() + " este mes";
+      $("#co-baja").textContent = pct(s.x.v); $("#co-baja-t").textContent = P(s.id).n.toLowerCase() + ", su reemplazo";
+      const otros = todos.filter((x) => x !== par).slice(0, 2);
+      $("#otros").innerHTML = otros.length ? `<b>También te sugerimos</b>` + otros.map(({ r, s }) => `<div class="otro"><span>${esc(P(r.id).n)} → <b>${esc(P(s.id).n)}</b></span><span class="pl s">▲ ${pct(r.v)}</span></div>`).join("") : "";
     }
-    $("#tabla-super").innerHTML = `<thead><tr><th scope="col">Producto</th>${cad.map(([c, v]) => `<th scope="col">${esc(v.nombre || c)}</th>`).join("")}</tr></thead><tbody>${filas}</tbody>`;
-    const total = Sp.total || Object.keys(Object.assign({}, ...cad.map(([, v]) => v.precios || {}))).length;
-    if (mayor) $("#frase-super").textContent = `Cada mañana revisamos el precio online de ${total} productos de la canasta en las tres cadenas. La diferencia puede ser grande: hoy ${({ kilo: "el kilo", litro: "el litro", lata: "la lata", unidad: "la unidad" })[mayor.min.x.unidad] || "el precio"} de ${P(mayor.pid).n.toLowerCase()} va de ${sol(mayor.min.x.precio)} en ${mayor.min.n} a ${sol(mayor.max.x.precio)} en ${mayor.max.n}.`;
+    // sección de precios: etiquetas y reemplazos
+    const suben = cs.filter((c) => c.v > 3), bajan = cs.filter((c) => c.v < -5).reverse();
+    const tags = [...suben.slice(0, 3), ...bajan.slice(0, 1)];
+    $("#etiquetas").innerHTML = tags.map((t) => `<div class="tag"><b>${esc(P(t.id).n)}</b><span class="precio">${sol(t.ult)}<small>kg</small></span><span class="pill ${t.v > 0 ? "sube" : "baja"}">${t.v > 0 ? "▲" : "▼"} ${pct(t.v)}</span></div>`).join("");
+    const rs = todos.slice(0, 3);
+    $("#reemplazos").innerHTML = rs.map(({ r, s }) => `<li><b>${esc(P(r.id).n)} → ${esc(P(s.id).n)}</b><span class="pill" style="background:var(--${s.x.v < 0 ? "down" : "green"}-soft);color:var(--${s.x.v < 0 ? "down" : "green"})">${s.x.v < 0 ? "▼" : "▲"} ${pct(s.x.v)}</span><span>${esc(s.nota || "Rinde igual en el plato.")}</span></li>`).join("");
+    $("#cuando-may").textContent = "Últimos 7 días contra 4 semanas antes · al " + fecha;
+    // supermercados
+    if (Sp && Sp.cadenas) {
+      const { items, tot } = canasta(Sp);
+      if (tot.length >= 2 && items.length >= 3) {
+        const max = tot[tot.length - 1].t, min = tot[0].t;
+        const nombres = items.map((pid) => P(pid).n.toLowerCase());
+        const lista = nombres.slice(0, -1).join(", ") + " y " + nombres[nombres.length - 1];
+        $("#lista7").textContent = lista.charAt(0).toUpperCase() + lista.slice(1) + ".";
+        $("#lista-txt").textContent = `Lista: ${lista}. Precio de la web de cada cadena; puede incluir ofertas del día.`;
+        $("#cuando-sup").textContent = "Un kilo, litro o lata de cada producto · al " + fechaCorta(Sp.fecha);
+        $("#resumen").textContent = `La misma lista cuesta ${sol(max - min)} menos en ${tot[0].n} que en ${tot[tot.length - 1].n}.`;
+        $("#co-ahorro").textContent = sol(max - min); $("#co-ahorro-t").textContent = "menos en " + tot[0].n;
+        const barra = (o, i, cls) => `<div class="${cls}${i === 0 ? " gana" : ""}" data-w="${(o.t / max).toFixed(3)}"><div class="t"><span>${esc(o.n)}</span><span class="v">${sol(o.t)}</span></div><div class="riel"><div class="fill"></div></div></div>`;
+        $("#barras-s").innerHTML = tot.map((o, i) => barra(o, i, "barra-s")).join("");
+        $("#cadenas").innerHTML = tot.map((o, i) => barra(o, i, "cadena")).join("");
+        $$("#cadenas .cadena").forEach((e) => (e.querySelector(".fill").style.width = (+e.dataset.w * 100) + "%"));
+        const UNI = { kilo: "kg", litro: "litro", lata: "lata", unidad: "unidad" };
+        $("#baratos").innerHTML = `<b>Dónde comprar cada uno hoy</b>` + items.map((pid) => {
+          const m = Object.values(Sp.cadenas).map((v) => ({ n: v.nombre, p: v.precios[pid] })).sort((a, b) => a.p.precio - b.p.precio)[0];
+          return `<li><span>${esc(P(pid).n)}</span><span class="c">${esc(m.n)}</span><span class="v">${sol(m.p.precio)} <small>${esc(UNI[m.p.unidad] || m.p.unidad || "")}</small></span></li>`;
+        }).join("");
+        $("#frase-precios").textContent = `Seguimos el Mercado Mayorista de Lima y las tiendas online de Plaza Vea, Metro y Wong. Hoy, la misma lista de ${items.length} productos cuesta ${sol(max - min)} menos en ${tot[0].n} que en ${tot[tot.length - 1].n}.`;
+      }
+    }
   }
 
-  pintarMayorista(D.snap.may); pintarSuper(D.snap.sup);
-  const traer = (f) => fetch(f + "?t=" + Date.now(), { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-  if (location.protocol.startsWith("http")) {
-    traer("precios_mayorista.json").then((M) => { if (M && M.fechas && M.productos) pintarMayorista(M); });
-    traer("precios_super.json").then((Sp) => { if (Sp && Sp.cadenas) { Sp.total = Object.keys(Object.assign({}, ...Object.values(Sp.cadenas).map((v) => v.precios || {}))).length; pintarSuper(Sp); } });
+  /* ---------- la demo: una línea de tiempo con capítulos ---------- */
+  const caps = $$(".cap"), rotulos = $$(".rotulo span"), botones = $$(".capitulos button"), dedo = $("#dedo"), callouts = $$(".callout");
+  const DUR = [6000, 6000, 6400, 5800];
+  // Posición del centro de un elemento dentro de la pantalla del celular, en píxeles de diseño (no cambia con el zoom).
+  const cuerpo = $(".p-cuerpo");
+  const pos = (el) => { let x = el.offsetWidth / 2, y = el.offsetHeight / 2, n = el; while (n && n !== cuerpo) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; } return [x, y]; };
+  function tocar(el) {
+    if (reducir) return;
+    const [x, y] = pos(el); dedo.style.left = x + "px"; dedo.style.top = y + "px"; dedo.classList.add("on");
+    setTimeout(() => { dedo.classList.add("tap"); el.classList.add("press"); }, 380); setTimeout(() => { dedo.classList.remove("tap"); el.classList.remove("press"); }, 560);
   }
+  const co = (k) => () => { const e = callouts.find((c) => c.dataset.k === k); e.classList.remove("sale"); e.classList.add("on"); };
+  const dias = () => $$("#dias-sel span");
+  const PASOS = [
+    [[700, () => tocar($("#b-ad"))], [1000, () => ($("#c-ad").textContent = "1")], [1400, () => tocar($("#b-ad"))], [1700, () => ($("#c-ad").textContent = "2")],
+     [2200, () => tocar($("#b-ni"))], [2500, () => ($("#c-ni").textContent = "1")], [2700, co("0")], [2900, () => tocar($("#b-ni"))], [3200, () => ($("#c-ni").textContent = "2")],
+     [3500, () => { dedo.classList.remove("on"); }], ...[0, 1, 2, 3, 4, 5].map((i) => [3700 + i * 130, () => dias()[i].classList.add("on")]), [4600, () => $("#pie-0").classList.add("on")]],
+    [[300, () => $("#sello").classList.add("on")], ...[0, 1, 2, 3, 4, 5].map((i) => [800 + i * 480, () => caps[1].querySelectorAll(".chip")[i].classList.add("on")]), [3900, co("1")]],
+    [[500, () => $("#alerta").classList.add("on")], [900, co("2")], [2000, () => tocar($("#cambio"))], [2350, () => { $("#cambio").classList.add("hecho"); dedo.classList.remove("on"); }], [2700, co("2b")],
+     [3100, () => $("#ahorro").classList.add("on")], [3900, () => { $("#otros").classList.add("on"); $$("#otros .otro").forEach((e, i) => setTimeout(() => e.classList.add("on"), reducir ? 0 : 120 + i * 220)); }]],
+    [[500, () => $$("#barras-s .barra-s").forEach((e, i) => setTimeout(() => (e.querySelector(".fill").style.transform = `scaleX(${e.dataset.w})`), reducir ? 0 : i * 160))], [2300, () => $("#resumen").classList.add("on")], [2700, co("3")]],
+  ];
+  function reiniciar(i) {
+    const c = caps[i];
+    c.querySelectorAll(".on").forEach((e) => e.classList.remove("on"));
+    c.querySelectorAll(".hecho").forEach((e) => e.classList.remove("hecho"));
+    if (i === 0) { $("#c-ad").textContent = "0"; $("#c-ni").textContent = "0"; }
+    if (i === 3) c.querySelectorAll(".barra-s .fill").forEach((f) => (f.style.transform = "scaleX(0)"));
+    callouts.forEach((e) => { e.classList.toggle("sale", e.classList.contains("on")); e.classList.remove("on"); });
+    dedo.classList.remove("on", "tap");
+  }
+  function completar(i) { PASOS[i].forEach(([, fn]) => fn()); dedo.classList.remove("on"); }
+  let actual = -1, t0 = 0, transcurrido = 0, hechos = 0, jugando = !reducir, visible = true, raf = 0, ultimo = 0;
+  function mostrar(i) {
+    const prev = actual; actual = i; transcurrido = 0; hechos = 0;
+    caps.forEach((c, k) => { c.classList.toggle("on", k === i); c.classList.toggle("sale", k === prev && k !== i); });
+    rotulos.forEach((r, k) => { r.classList.toggle("on", k === i); r.classList.toggle("sale", k === prev && k !== i); });
+    botones.forEach((b, k) => { b.toggleAttribute("aria-current", k === i); if (k === i) b.setAttribute("aria-current", "step"); b.parentElement.classList.toggle("hecho", k < i); b.querySelector(".fill").style.transform = k < i ? "scaleX(1)" : "scaleX(0)"; });
+    reiniciar(i);
+    if (reducir) completar(i);
+  }
+  function cuadro(ts) {
+    const dt = ultimo ? Math.min(ts - ultimo, 100) : 0; ultimo = ts;
+    if (jugando && visible && !document.hidden) {
+      transcurrido += dt;
+      const pasos = PASOS[actual];
+      while (hechos < pasos.length && pasos[hechos][0] <= transcurrido) { pasos[hechos][1](); hechos++; }
+      botones[actual].querySelector(".fill").style.transform = `scaleX(${Math.min(1, transcurrido / DUR[actual])})`;
+      if (transcurrido >= DUR[actual]) mostrar((actual + 1) % caps.length);
+    }
+    raf = requestAnimationFrame(cuadro);
+  }
+  const play = $("#play");
+  function ponerJuego(v) {
+    jugando = v; play.setAttribute("aria-pressed", String(!v)); play.setAttribute("aria-label", v ? "Pausar la demostración" : "Reproducir la demostración");
+    $("#ico-pausa").hidden = !v; $("#ico-play").hidden = v;
+  }
+  play.addEventListener("click", () => ponerJuego(!jugando));
+  botones.forEach((b) => b.addEventListener("click", () => { mostrar(+b.dataset.ir); if (reducir) ponerJuego(false); }));
+  if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.2 }).observe($(".escena"));
+
+  // En pantallas de escritorio bajas, el celular se achica para que la demo entre completa en la portada.
+  const fonoWrap = $(".fono-wrap");
+  function escalar() { const z = innerWidth > 960 ? Math.max(0.66, Math.min(1, (innerHeight - 250) / 640)) : 1; fonoWrap.style.zoom = z.toFixed(3); }
+  escalar(); addEventListener("resize", escalar);
+
+  /* ---------- arranque ---------- */
+  pintarDatos(D.snap.may, D.snap.sup);
+  mostrar(0); ponerJuego(!reducir);
+  requestAnimationFrame(cuadro);
+  const traer = (f) => fetch(f + "?t=" + Date.now(), { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (location.protocol.startsWith("http")) Promise.all([traer("precios_mayorista.json"), traer("precios_super.json")]).then(([M, Sp]) => {
+    if (M && M.fechas && M.productos) pintarDatos(M, Sp && Sp.cadenas ? Sp : D.snap.sup);
+  });
 })();
 </script>
 </body>
