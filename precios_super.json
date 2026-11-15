@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-14",
- "generado": "2026-11-14T12:15-05:00",
+ "fecha": "2026-11-15",
+ "generado": "2026-11-15T12:56-05:00",
  "fuente": "Catálogo online público de cada supermercado (VTEX)",
  "cadenas": {
   "plazavea": {
@@ -23,15 +23,6 @@
      "url": "https://www.plazavea.com.pe/tomate-redondo-x-k-g-1/p",
      "oferta": false,
      "candidatos": 3
-    },
-    "cebolla": {
-     "precio": 4.39,
-     "unidad": "kilo",
-     "mediana": 4.39,
-     "item": "Cebolla Roja x kg",
-     "url": "https://www.plazavea.com.pe/cebolla-roja-x-kg-1/p",
-     "oferta": false,
-     "candidatos": 1
     },
     "papa-amarilla": {
      "precio": 6.79,
@@ -180,11 +171,11 @@
     "carne": {
      "precio": 42.9,
      "unidad": "kilo",
-     "mediana": 48.5,
+     "mediana": 49.4,
      "item": "Bisteck EL BUEN CORTE x kg",
      "url": "https://www.plazavea.com.pe/bisteck-el-buen-corte-x-kg-20168641/p",
      "oferta": false,
-     "candidatos": 3
+     "candidatos": 2
     },
     "huevo": {
      "precio": 8.78,
@@ -261,11 +252,11 @@
     "azucar": {
      "precio": 3.58,
      "unidad": "kilo",
-     "mediana": 4.6,
+     "mediana": 4.18,
      "item": "Azúcar Rubia BELL'S Bolsa 5Kg",
      "url": "https://www.plazavea.com.pe/azucar-rubia-bells-bolsa-5kg-20198553/p",
      "oferta": false,
-     "candidatos": 7
+     "candidatos": 5
     },
     "aceite": {
      "precio": 6.11,
@@ -286,16 +277,17 @@
      "candidatos": 1
     },
     "queso": {
-     "precio": 36.4,
+     "precio": 31.9,
      "unidad": "kilo",
-     "mediana": 36.4,
-     "item": "Queso Fresco GLORIA x kg",
-     "url": "https://www.plazavea.com.pe/queso-fresco-gloria-x-k-g/p",
-     "oferta": false,
-     "candidatos": 1
+     "mediana": 34.15,
+     "item": "Queso Fresco BONLÉ x kg",
+     "url": "https://www.plazavea.com.pe/queso-fresco-bonle-x-k-g/p",
+     "oferta": true,
+     "candidatos": 2
     }
    },
    "sin_precio": [
+    "cebolla",
     "aji",
     "ajo",
     "naranja",
@@ -380,11 +372,11 @@
     "camote": {
      "precio": 2.79,
      "unidad": "kilo",
-     "mediana": 3.79,
+     "mediana": 4.35,
      "item": "Camote Morado Meza x kg",
      "url": "https://www.metro.pe/camote-morado-meza-x-kg/p",
      "oferta": true,
-     "candidatos": 5
+     "candidatos": 6
     },
     "zanahoria": {
      "precio": 7.99,
@@ -407,7 +399,7 @@
     "olluco": {
      "precio": 12.49,
      "unidad": "kilo",
-     "mediana": 12.74,
+     "mediana": 13.24,
      "item": "Olluco Metro x kg",
      "url": "https://www.metro.pe/olluco-metro-x-kg-2-2/p",
      "oferta": false,
@@ -432,22 +424,22 @@
      "candidatos": 3
     },
     "manzana": {
-     "precio": 4.69,
+     "precio": 3.99,
      "unidad": "kilo",
-     "mediana": 9.89,
+     "mediana": 8.99,
      "item": "Manzana Israel Añawi Metro x kg",
      "url": "https://www.metro.pe/manzana-israel-anawi-metro-x-kg-2/p",
      "oferta": true,
      "candidatos": 11
     },
     "mandarina": {
-     "precio": 4.19,
+     "precio": 3.99,
      "unidad": "kilo",
-     "mediana": 5.99,
+     "mediana": 5.0,
      "item": "Mandarina Costa x kg",
      "url": "https://www.metro.pe/mandarina-costa-x-kg-95623-2/p",
      "oferta": true,
-     "candidatos": 3
+     "candidatos": 2
     },
     "naranja": {
      "precio": 4.0,
@@ -513,13 +505,13 @@
      "candidatos": 12
     },
     "huevo": {
-     "precio": 7.57,
+     "precio": 8.13,
      "unidad": "kilo",
-     "mediana": 12.11,
-     "item": "Huevos Rosados Avivel 90un",
-     "url": "https://www.metro.pe/huevos-rosados-avivel-90un-1025079/p",
-     "oferta": true,
-     "candidatos": 15
+     "mediana": 11.89,
+     "item": "Huevos Pardos Metro Bandeja 90 Unid",
+     "url": "https://www.metro.pe/huevos-pardos-metro-bandeja-90-unid-2/p",
+     "oferta": false,
+     "candidatos": 16
     },
     "arroz": {
      "precio": 3.28,
@@ -573,7 +565,7 @@
      "item": "Avena Tradicional Cuisine & Co 1kg",
      "url": "https://www.metro.pe/hojuelas-de-avena-precocida-cuisine-co-bolsa-1-kg-891743/p",
      "oferta": true,
-     "candidatos": 20
+     "candidatos": 19
     },
     "maiz-morado": {
      "precio": 10.89,
@@ -614,11 +606,11 @@
     "queso": {
      "precio": 38.0,
      "unidad": "kilo",
-     "mediana": 40.9,
+     "mediana": 45.88,
      "item": "Queso Fresco Oquendo 250g",
      "url": "https://www.metro.pe/queso-fresco-oquendo-250g-2/p",
      "oferta": true,
-     "candidatos": 4
+     "candidatos": 2
     }
    },
    "sin_precio": [
@@ -631,11 +623,11 @@
     "limon": {
      "precio": 4.79,
      "unidad": "kilo",
-     "mediana": 4.79,
+     "mediana": 8.89,
      "item": "Limón x kg",
      "url": "https://www.wong.pe/lim-n-x-kg-4029/p",
      "oferta": false,
-     "candidatos": 1
+     "candidatos": 2
     },
     "tomate": {
      "precio": 7.39,
@@ -647,7 +639,7 @@
      "candidatos": 1
     },
     "cebolla": {
-     "precio": 4.8,
+     "precio": 4.99,
      "unidad": "kilo",
      "mediana": 6.9,
      "item": "Cebolla Roja x kg",
@@ -655,14 +647,23 @@
      "oferta": false,
      "candidatos": 3
     },
-    "papa-blanca": {
-     "precio": 1.9,
+    "papa-amarilla": {
+     "precio": 5.5,
      "unidad": "kilo",
-     "mediana": 4.2,
-     "item": "Papa Blanca Yungay x kg",
-     "url": "https://www.wong.pe/papa-blanca-yungay-x-kg-162060/p",
-     "oferta": true,
-     "candidatos": 5
+     "mediana": 7.19,
+     "item": "Papa Amarilla Cocktail Comcen 1kg",
+     "url": "https://www.wong.pe/papa-amarilla-cocktail-comcen-1kg-774134-2/p",
+     "oferta": false,
+     "candidatos": 3
+    },
+    "papa-blanca": {
+     "precio": 2.79,
+     "unidad": "kilo",
+     "mediana": 4.4,
+     "item": "Papa Blanca Cocktail x kg",
+     "url": "https://www.wong.pe/papa-blanca-cocktail-x-kg-20795/p",
+     "oferta": false,
+     "candidatos": 4
     },
     "aji": {
      "precio": 16.3,
@@ -739,7 +740,7 @@
     "manzana": {
      "precio": 4.99,
      "unidad": "kilo",
-     "mediana": 9.89,
+     "mediana": 10.49,
      "item": "Manzana Israel x kg",
      "url": "https://www.wong.pe/manzana-israel-x-kg-3920/p",
      "oferta": true,
@@ -766,7 +767,7 @@
     "papaya": {
      "precio": 5.99,
      "unidad": "kilo",
-     "mediana": 6.99,
+     "mediana": 6.49,
      "item": "Papaya x kg",
      "url": "https://www.wong.pe/papaya-x-kg-3936/p",
      "oferta": true,
@@ -782,12 +783,12 @@
      "candidatos": 3
     },
     "maracuya": {
-     "precio": 11.99,
+     "precio": 10.99,
      "unidad": "kilo",
-     "mediana": 11.99,
+     "mediana": 10.99,
      "item": "Maracuyá x kg",
      "url": "https://www.wong.pe/maracuya-x-kg-3924/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "gallina": {
@@ -800,22 +801,22 @@
      "candidatos": 1
     },
     "carne": {
-     "precio": 41.2,
+     "precio": 41.58,
      "unidad": "kilo",
      "mediana": 49.85,
-     "item": "Bisteck de Paleta Nacional x kg",
-     "url": "https://www.wong.pe/bisteck-de-paleta-nacional-x-kg-3-2/p",
+     "item": "Bisteck Feteado Wong Pasturas de Oxapampa x kg",
+     "url": "https://www.wong.pe/bisteck-feteado-wong-pasturas-de-oxapampa-x-kg/p",
      "oferta": true,
      "candidatos": 14
     },
     "huevo": {
      "precio": 9.39,
      "unidad": "kilo",
-     "mediana": 18.33,
-     "item": "Huevos Clásicos Pardos La Calera 30un",
-     "url": "https://www.wong.pe/huevos-clasicos-pardos-la-calera-30un-2-2/p",
+     "mediana": 18.19,
+     "item": "Huevos Pardos Wong 30un",
+     "url": "https://www.wong.pe/huevos-pardos-wong-30un-1035228/p",
      "oferta": true,
-     "candidatos": 13
+     "candidatos": 15
     },
     "arroz": {
      "precio": 3.7,
@@ -851,7 +852,7 @@
      "item": "Quinua Blanca Cuisine & Co 1kg",
      "url": "https://www.wong.pe/quinua-blanca-cuisine-co-1kg-1067489/p",
      "oferta": false,
-     "candidatos": 16
+     "candidatos": 15
     },
     "avena": {
      "precio": 9.9,
@@ -863,12 +864,12 @@
      "candidatos": 12
     },
     "maiz-morado": {
-     "precio": 12.99,
+     "precio": 10.29,
      "unidad": "kilo",
      "mediana": 18.0,
      "item": "Maíz Morado x kg",
      "url": "https://www.wong.pe/maiz-morado-x-kg-4030/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 3
     },
     "azucar": {
@@ -909,7 +910,6 @@
     }
    },
    "sin_precio": [
-    "papa-amarilla",
     "ajo",
     "pollo",
     "jurel",
