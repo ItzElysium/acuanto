@@ -1,6 +1,6 @@
 {
- "fecha": "2026-11-25",
- "generado": "2026-11-25T15:36-05:00",
+ "fecha": "2026-11-26",
+ "generado": "2026-11-26T15:27-05:00",
  "fuente": "Catálogo online público de cada supermercado (VTEX)",
  "cadenas": {
   "plazavea": {
@@ -25,40 +25,31 @@
      "candidatos": 3
     },
     "cebolla": {
-     "precio": 4.69,
+     "precio": 2.37,
      "unidad": "kilo",
-     "mediana": 4.69,
+     "mediana": 2.37,
      "item": "Cebolla Roja x kg",
      "url": "https://www.plazavea.com.pe/cebolla-roja-x-kg-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "papa-amarilla": {
-     "precio": 8.49,
+     "precio": 4.27,
      "unidad": "kilo",
-     "mediana": 9.14,
+     "mediana": 4.57,
      "item": "Papa Amarilla Peruanita x kg",
      "url": "https://www.plazavea.com.pe/papa-amarilla-peruanita-x-k-g-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 2
     },
     "papa-blanca": {
-     "precio": 2.59,
+     "precio": 1.38,
      "unidad": "kilo",
-     "mediana": 3.99,
+     "mediana": 1.96,
      "item": "Papa Blanca Cocktail Malla x kg",
      "url": "https://www.plazavea.com.pe/papa-blanca-cocktail-malla-x-k-g-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 4
-    },
-    "aji": {
-     "precio": 16.5,
-     "unidad": "kilo",
-     "mediana": 16.5,
-     "item": "Ají Amarillo Pack x 2 und aprox.",
-     "url": "https://www.plazavea.com.pe/aji-amarillo-pack-x-2-und-aprox/p",
-     "oferta": false,
-     "candidatos": 1
     },
     "zapallo": {
      "precio": 4.38,
@@ -70,48 +61,48 @@
      "candidatos": 1
     },
     "choclo": {
-     "precio": 4.99,
+     "precio": 4.49,
      "unidad": "unidad",
-     "mediana": 4.99,
+     "mediana": 4.49,
      "item": "Choclo Entero x und.",
      "url": "https://www.plazavea.com.pe/choclo-entero-x-und-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "camote": {
-     "precio": 3.29,
+     "precio": 2.08,
      "unidad": "kilo",
-     "mediana": 3.54,
-     "item": "Camote Amarillo Procesado x kg",
-     "url": "https://www.plazavea.com.pe/camote-amarillo-procesado-x-k-g-1/p",
-     "oferta": false,
+     "mediana": 2.08,
+     "item": "Camote Morado x kg",
+     "url": "https://www.plazavea.com.pe/camote-morado-x-k-g-1/p",
+     "oferta": true,
      "candidatos": 2
     },
     "zanahoria": {
-     "precio": 8.29,
+     "precio": 7.96,
      "unidad": "kilo",
-     "mediana": 8.29,
+     "mediana": 7.96,
      "item": "Zanahoria x kg",
      "url": "https://www.plazavea.com.pe/zanahoria-x-k-g-1/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "arveja": {
-     "precio": 13.99,
+     "precio": 12.48,
      "unidad": "kilo",
-     "mediana": 13.99,
+     "mediana": 12.48,
      "item": "Arveja Pack x 250g aprox.",
      "url": "https://www.plazavea.com.pe/arveja-pack-x-250g-1-aprox/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "olluco": {
-     "precio": 10.9,
+     "precio": 9.96,
      "unidad": "kilo",
-     "mediana": 10.9,
+     "mediana": 9.96,
      "item": "Olluco Pack x 250g aprox.",
      "url": "https://www.plazavea.com.pe/olluco-pack-x-250g-1-aprox/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 1
     },
     "platano": {
@@ -196,7 +187,7 @@
      "candidatos": 2
     },
     "huevo": {
-     "precio": 9.39,
+     "precio": 9.89,
      "unidad": "kilo",
      "mediana": 13.52,
      "item": "Huevos Pardos BELL'S Bandeja 30un",
@@ -207,11 +198,11 @@
     "arroz": {
      "precio": 3.38,
      "unidad": "kilo",
-     "mediana": 4.34,
+     "mediana": 4.38,
      "item": "Arroz Superior BELL'S Bolsa 5Kg",
      "url": "https://www.plazavea.com.pe/arroz-superior-bells-bolas-5kg/p",
      "oferta": false,
-     "candidatos": 22
+     "candidatos": 21
     },
     "lenteja": {
      "precio": 8.2,
@@ -219,26 +210,26 @@
      "mediana": 11.8,
      "item": "Lenteja Bebé BELL'S Bolsa 500g",
      "url": "https://www.plazavea.com.pe/lenteja-bebe-bells-bolsa-500g-20220358/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 9
     },
     "frejol": {
      "precio": 11.2,
      "unidad": "kilo",
-     "mediana": 18.4,
+     "mediana": 18.2,
      "item": "Frejol Panamito VALLENORTE Bolsa 500g",
      "url": "https://www.plazavea.com.pe/frejol-panamito-vallenorte-bolsa-500g/p",
      "oferta": false,
      "candidatos": 3
     },
     "fideos": {
-     "precio": 4.0,
+     "precio": 3.9,
      "unidad": "kilo",
-     "mediana": 5.4,
+     "mediana": 5.8,
      "item": "Fideos NICOLINI Tallarín Grueso Bolsa 1kg",
      "url": "https://www.plazavea.com.pe/fideo-tallarin-grueso-nicolini-bolsa-1kg/p",
      "oferta": true,
-     "candidatos": 14
+     "candidatos": 16
     },
     "quinua": {
      "precio": 14.4,
@@ -252,7 +243,7 @@
     "avena": {
      "precio": 8.9,
      "unidad": "kilo",
-     "mediana": 18.07,
+     "mediana": 17.69,
      "item": "Avena BELL'S Bolsa 1Kg",
      "url": "https://www.plazavea.com.pe/avena-bells-bolsa-1kg/p",
      "oferta": false,
@@ -270,11 +261,11 @@
     "azucar": {
      "precio": 3.44,
      "unidad": "kilo",
-     "mediana": 4.7,
+     "mediana": 4.38,
      "item": "Azúcar Rubia BELL'S Bolsa 5Kg",
      "url": "https://www.plazavea.com.pe/azucar-rubia-bells-bolsa-5kg-20198553/p",
-     "oferta": true,
-     "candidatos": 6
+     "oferta": false,
+     "candidatos": 8
     },
     "aceite": {
      "precio": 6.3,
@@ -286,9 +277,9 @@
      "candidatos": 12
     },
     "leche": {
-     "precio": 3.83,
+     "precio": 3.82,
      "unidad": "lata",
-     "mediana": 3.83,
+     "mediana": 3.82,
      "item": "Leche Evaporada Entera GLORIA Lata 390g Paquete 6un",
      "url": "https://www.plazavea.com.pe/leche-evaporada-entera-gloria-lata-390g-paquete-6un-20402648/p",
      "oferta": true,
@@ -305,6 +296,7 @@
     }
    },
    "sin_precio": [
+    "aji",
     "ajo",
     "naranja",
     "jurel"
@@ -341,12 +333,12 @@
      "candidatos": 3
     },
     "papa-amarilla": {
-     "precio": 5.3,
+     "precio": 4.5,
      "unidad": "kilo",
      "mediana": 6.79,
      "item": "Papa Amarilla Cocktail Comcen 1kg",
      "url": "https://www.metro.pe/papa-amarilla-cocktail-comcen-1kg-2/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 3
     },
     "papa-blanca": {
@@ -359,7 +351,7 @@
      "candidatos": 5
     },
     "aji": {
-     "precio": 9.99,
+     "precio": 14.5,
      "unidad": "kilo",
      "mediana": 16.3,
      "item": "Ají Amarillo x kg",
@@ -395,20 +387,20 @@
      "candidatos": 6
     },
     "zanahoria": {
-     "precio": 9.79,
+     "precio": 4.49,
      "unidad": "kilo",
-     "mediana": 9.89,
+     "mediana": 7.24,
      "item": "Zanahoria Especial x kg",
      "url": "https://www.metro.pe/zanahoria-especial-x-kg-2-2/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 2
     },
     "arveja": {
-     "precio": 14.97,
+     "precio": 12.99,
      "unidad": "kilo",
-     "mediana": 16.25,
-     "item": "Arveja en Granos Cuisine & Co 400g",
-     "url": "https://www.metro.pe/arveja-en-granos-cuisine-co-400g-996453/p",
+     "mediana": 14.97,
+     "item": "Arveja x kg",
+     "url": "https://www.metro.pe/arveja-x-kg-154-2/p",
      "oferta": true,
      "candidatos": 3
     },
@@ -442,19 +434,19 @@
     "manzana": {
      "precio": 4.99,
      "unidad": "kilo",
-     "mediana": 9.44,
+     "mediana": 8.74,
      "item": "Manzana Israel Añawi Metro x kg",
      "url": "https://www.metro.pe/manzana-israel-anawi-metro-x-kg-2/p",
      "oferta": false,
      "candidatos": 10
     },
     "mandarina": {
-     "precio": 5.69,
+     "precio": 5.19,
      "unidad": "kilo",
-     "mediana": 5.85,
+     "mediana": 5.6,
      "item": "Mandarina Costa x kg",
      "url": "https://www.metro.pe/mandarina-costa-x-kg-95623-2/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 2
     },
     "naranja": {
@@ -512,22 +504,22 @@
      "candidatos": 1
     },
     "carne": {
-     "precio": 40.2,
+     "precio": 43.9,
      "unidad": "kilo",
      "mediana": 43.9,
      "item": "Bisteck de Tapa Nacional x kg",
      "url": "https://www.metro.pe/bisteck-de-tapa-nacional-en-bandeja-x-kg-390616-2/p",
-     "oferta": true,
+     "oferta": false,
      "candidatos": 12
     },
     "huevo": {
      "precio": 7.39,
      "unidad": "kilo",
-     "mediana": 11.59,
+     "mediana": 12.11,
      "item": "Huevos Rosados Avivel 90un",
      "url": "https://www.metro.pe/huevos-rosados-avivel-90un-1025079/p",
      "oferta": true,
-     "candidatos": 16
+     "candidatos": 15
     },
     "arroz": {
      "precio": 3.38,
@@ -565,23 +557,14 @@
      "oferta": true,
      "candidatos": 7
     },
-    "quinua": {
-     "precio": 15.75,
-     "unidad": "kilo",
-     "mediana": 30.62,
-     "item": "Quinua Máxima 400g",
-     "url": "https://www.metro.pe/quinua-m-xima-400g-1067506/p",
-     "oferta": false,
-     "candidatos": 17
-    },
     "avena": {
      "precio": 9.8,
      "unidad": "kilo",
-     "mediana": 13.48,
+     "mediana": 16.33,
      "item": "Avena Precocida 3 Ositos 500g",
      "url": "https://www.metro.pe/avena-precocida-3-ositos-500g-133311-2/p",
      "oferta": true,
-     "candidatos": 19
+     "candidatos": 20
     },
     "maiz-morado": {
      "precio": 16.49,
@@ -602,12 +585,12 @@
      "candidatos": 12
     },
     "aceite": {
-     "precio": 6.3,
+     "precio": 6.22,
      "unidad": "litro",
      "mediana": 7.61,
-     "item": "Aceite Vegetal de Soya Máxima 5L",
-     "url": "https://www.metro.pe/aceite-vegetal-de-soya-maxima-5l-973623-2/p",
-     "oferta": false,
+     "item": "Aceite Vegetal Metro 900ml",
+     "url": "https://www.metro.pe/aceite-vegetal-metro-900ml-1016588/p",
+     "oferta": true,
      "candidatos": 14
     },
     "leche": {
@@ -630,7 +613,8 @@
     }
    },
    "sin_precio": [
-    "jurel"
+    "jurel",
+    "quinua"
    ]
   },
   "wong": {
@@ -673,12 +657,12 @@
      "candidatos": 3
     },
     "papa-blanca": {
-     "precio": 2.79,
+     "precio": 1.79,
      "unidad": "kilo",
      "mediana": 4.4,
      "item": "Papa Blanca Cocktail x kg",
      "url": "https://www.wong.pe/papa-blanca-cocktail-x-kg-20795/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 4
     },
     "aji": {
@@ -718,13 +702,13 @@
      "candidatos": 7
     },
     "zanahoria": {
-     "precio": 9.41,
+     "precio": 9.99,
      "unidad": "kilo",
-     "mediana": 9.7,
-     "item": "Zanahoria Justo al Día 700g",
-     "url": "https://www.wong.pe/zanahoria-justo-al-dia-700g-903862-2/p",
+     "mediana": 9.99,
+     "item": "Zanahoria x kg",
+     "url": "https://www.wong.pe/zanahoria-x-kg-4047/p",
      "oferta": false,
-     "candidatos": 2
+     "candidatos": 1
     },
     "arveja": {
      "precio": 14.97,
@@ -826,21 +810,21 @@
      "candidatos": 13
     },
     "huevo": {
-     "precio": 9.94,
+     "precio": 9.28,
      "unidad": "kilo",
      "mediana": 15.0,
      "item": "Huevos Pardos Wong 30un",
      "url": "https://www.wong.pe/huevos-pardos-wong-30un-1035228/p",
-     "oferta": false,
+     "oferta": true,
      "candidatos": 13
     },
     "arroz": {
-     "precio": 3.98,
+     "precio": 3.78,
      "unidad": "kilo",
-     "mediana": 4.9,
-     "item": "Arroz Superior Añejo Faraón Rojo 5kg",
-     "url": "https://www.wong.pe/arroz-superior-anejo-faraon-rojo-5kg-570525/p",
-     "oferta": true,
+     "mediana": 4.54,
+     "item": "Arroz Extra Wong Bolsa 5 Kg",
+     "url": "https://www.wong.pe/arroz-extra-wong-bolsa-5-kg/p",
+     "oferta": false,
      "candidatos": 14
     },
     "lenteja": {
@@ -868,7 +852,7 @@
      "item": "Quinua Blanca Cuisine & Co 1kg",
      "url": "https://www.wong.pe/quinua-blanca-cuisine-co-1kg-1067489/p",
      "oferta": false,
-     "candidatos": 17
+     "candidatos": 15
     },
     "avena": {
      "precio": 9.8,
@@ -916,13 +900,13 @@
      "candidatos": 2
     },
     "queso": {
-     "precio": 40.5,
+     "precio": 53.75,
      "unidad": "kilo",
-     "mediana": 53.75,
-     "item": "Queso Fresco Gloria x kg",
-     "url": "https://www.wong.pe/queso-fresco-gloria-x-kg-495730/p",
+     "mediana": 54.77,
+     "item": "Queso Fresco Ecologic 400g",
+     "url": "https://www.wong.pe/queso-fresco-ecologic-400g-993344/p",
      "oferta": false,
-     "candidatos": 3
+     "candidatos": 2
     }
    },
    "sin_precio": [
